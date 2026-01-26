@@ -15,3 +15,5 @@
 ## If implementing concepts we haven't covered in school, ask the teacher before. And the whole team must understand it. 
 ## Write explaing and good structured documenttation in English. 
 ## Last but not least have FUN!!! and a good README.md 
+## work on small pieces , for example: a small thing so it will go quickly commiting. 
+## Understanable code This is for JARL :) 
