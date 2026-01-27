@@ -1,0 +1,9 @@
+{
+    "host": "xxxxxxx",
+    "port": 3307,
+    "username": "xxxxxx",
+    "password": "xxxxxx",
+    "database": "xxxxxx",
+    "createTablesIfNotExist": true,
+    "seedDataIfEmpty": true
+}
