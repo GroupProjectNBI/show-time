@@ -17,3 +17,4 @@
 ## Last but not least have FUN!!! and a good README.md 
 ## work on small pieces , for example: a small thing so it will go quickly commiting. 
 ## Understanable code This is for JARL :) 
+## We are ignoring team members that dont have godd audio as exempel bad mikes. This is live meeting and digital. 
