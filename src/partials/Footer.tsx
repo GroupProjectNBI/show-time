@@ -3,49 +3,70 @@ import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <footer className="bg-footerBg text-goldText py-10">
-      <div className="container mx-autopx-4 grid grid-cols-1 md:grid-cols-2 gap-8">
+    <footer className="bg-footerBg text-goldText py-12">
 
-        {/*Hitta till oss*/}
-        <div>
-          <h3 className="text-lg font-bold mb-2">Hitta till oss</h3>
-          <p>Adress:<br />Propellergatan 1<br />211 15 Malmö</p>
-          <p className="mt-4">
-            <strong>Öppettider:</strong><br />
-            Mån - Fre 17:30 - 21:15<br />
-            Lör - Sön 13.30 - 21:15
+      <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-12">
+
+        {/* Hitta till oss */}
+        <div className="md:w-1/2">
+          <h3 className="text-xl font-semibold mb-4">Hitta till oss</h3>
+
+          <p className="mb-6">
+            Adress:<br />
+            Propellergatan 1<br />
+            211 15 Malmö
+          </p>
+
+          <p>
+            <span className="font-semibold">Öppettider:</span><br />
+            Mån - Fre 17:30 - 22:00<br />
+            Lör - Sön 13:30 - 21:15
           </p>
         </div>
-      </div>
 
-      {/* Övrigt */}
-      <div>
-        <h3 className="text-lg font-bold mb-2">Övrigt</h3>
-        <div className="flex flex-col gap-2">
-          <Link to="/om-oss" className="hover:underline">Om oss</Link>
-          <Link to="/kontakt" className="hover:underline">Kontakta oss</Link>
-          <Link to="/jobba-hos-oss" className="hover:underline">Jobba hos oss</Link>
-          <Link to="faq" className="hover:underline">FAQ</Link>
-          <Link to="/bli-medlem" className="hover:underline">Bli medlem</Link>
+        {/* Övrigt */}
+        <div className="md:w-1/2">
+          <h3 className="text-xl font-semibold mb-4">Övrigt</h3>
+
+          <div className="flex flex-col space-y-2">
+            <Link to="/om-oss" className="hover:text-white transition">
+              Om oss
+            </Link>
+            <Link to="/kontakt" className="hover:text-white transition">
+              Kontakta oss - formulär
+            </Link>
+            <Link to="/jobba" className="hover:text-white transition">
+              Jobba hos oss
+            </Link>
+            <Link to="/faq" className="hover:text-white transition">
+              FAQ
+            </Link>
+            <Link to="/bli-medlem" className="hover:text-white transition">
+              Bli medlem
+            </Link>
+          </div>
+
+          {/* Sociala medier */}
+          <div className="flex mt-6 gap-6 text-2xl hover:text-white hover:scale-110 transition-all duration-300">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+              <FaFacebookF />
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+              <FaTwitter />
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+              <FaInstagram />
+            </a>
+          </div>
         </div>
 
-        {/* Sociala medier */}
-        <div className="flex mt-4 gap-4 text-2x1">
-          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-            <FaFacebookF />
-          </a>
-          <a href="hhtps://twitter.com" target="_blank" rel="noopener noreferrer">
-            <FaTwitter />
-          </a>
-          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-          </a>
-        </div>
       </div>
-      {/*Copyright */}
-      <div className="mt-10 text-center text-sm">
+
+      {/* Copyright */}
+      <div className="text-center mt-12 text-sm opacity-80">
         © Copyright
       </div>
+
     </footer>
   );
-
 }
