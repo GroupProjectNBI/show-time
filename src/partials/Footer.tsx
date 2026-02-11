@@ -1,13 +1,12 @@
-import { Container, Row, Col } from 'react-bootstrap';
+import 'tailwindcss';
 
 export default function Footer() {
-  return <footer>
-    <Container fluid>
-      <Row>
-        <Col className="text-center py-3 text-bg-primary">
-          © The Good Grocery {new Date().getFullYear()}
-        </Col>
-      </Row>
-    </Container>
-  </footer>;
+  return (
+    <footer className="bg-blue-700 text-white py-4">
+      <div className="container mx-auto text center">
+        © Copyright
+      </div>
+    </footer>
+  );
+
 }
