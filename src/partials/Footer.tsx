@@ -47,14 +47,30 @@ export default function Footer() {
           </div>
 
           {/* Sociala medier */}
-          <div className="flex mt-6 gap-6 text-2xl hover:text-white hover:scale-110 transition-all duration-300">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+          <div className="falx mt-6 gap-6 text-2xl">
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white hover:scale-110 transition-all duration-300">
+
               <FaFacebookF />
             </a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+
+            <a href="https://twitter.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white hover:scale-110 transition-all duration-300">
+
               <FaTwitter />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition">
+
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white hover:scale-110 transition-all duration-300">
+
               <FaInstagram />
             </a>
           </div>
