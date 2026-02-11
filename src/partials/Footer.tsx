@@ -47,7 +47,7 @@ export default function Footer() {
           </div>
 
           {/* Sociala medier */}
-          <div className="falx mt-6 gap-6 text-2xl">
+          <div className="flex mt-6 gap-6 text-2xl">
             <a
               href="https://facebook.com"
               target="_blank"
