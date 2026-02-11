@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
+import footerImage from "../assets/footer-image.png";
+
 
 export default function Footer() {
   return (
@@ -74,6 +76,15 @@ export default function Footer() {
               <FaInstagram />
             </a>
           </div>
+        </div>
+
+        {/* Bild */}
+        <div className="md:w-1/3 flex justify-center md:justify-end">
+          <img
+            src={footerImage}
+            alt="The Good Grocery"
+            className="w-40 md:w-48 object-contain"
+          />
         </div>
 
       </div>
