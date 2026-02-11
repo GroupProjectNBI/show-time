@@ -28,6 +28,22 @@ export default function Footer() {
           <Link to="faq" className="hover:underline">FAQ</Link>
           <Link to="/bli-medlem" className="hover:underline">Bli medlem</Link>
         </div>
+
+        {/* Sociala medier */}
+        <div className="flex mt-4 gap-4 text-2x1">
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+            <FaFacebookF />
+          </a>
+          <a href="hhtps://twitter.com" target="_blank" rel="noopener noreferrer">
+            <FaTwitter />
+          </a>
+          <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+          </a>
+        </div>
+      </div>
+      {/*Copyright */}
+      <div className="mt-10 text-center text-sm">
+        © Copyright
       </div>
     </footer>
   );
