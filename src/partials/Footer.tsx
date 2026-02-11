@@ -17,6 +17,18 @@ export default function Footer() {
           </p>
         </div>
       </div>
+
+      {/* Övrigt */}
+      <div>
+        <h3 className="text-lg font-bold mb-2">Övrigt</h3>
+        <div className="flex flex-col gap-2">
+          <Link to="/om-oss" className="hover:underline">Om oss</Link>
+          <Link to="/kontakt" className="hover:underline">Kontakta oss</Link>
+          <Link to="/jobba-hos-oss" className="hover:underline">Jobba hos oss</Link>
+          <Link to="faq" className="hover:underline">FAQ</Link>
+          <Link to="/bli-medlem" className="hover:underline">Bli medlem</Link>
+        </div>
+      </div>
     </footer>
   );
 
