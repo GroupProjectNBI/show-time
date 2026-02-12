@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 import routes from "../routes";
 
 
@@ -59,12 +60,12 @@ export default function Footer() {
               <FaFacebookF />
             </a>
 
-            <a href="https://twitter.com"
+            <a href="https://x.com"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white hover:scale-110 transition-all duration-300">
 
-              <FaTwitter />
+              <FaXTwitter />
             </a>
 
             <a
