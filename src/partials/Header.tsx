@@ -1,50 +1,143 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Container, Nav, Navbar } from 'react-bootstrap';
-import routes from '../routes';
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import routes from "../routes";
 
 export default function Header() {
-
-  // whether the navbar is expanded or not
-  // (we use this to close it after a click/selection)
   const [expanded, setExpanded] = useState(false);
 
-  //  get the current route
   const pathName = useLocation().pathname;
   const currentRoute = routes
-    .slice().sort((a, b) => a.path.length > b.path.length ? -1 : 1)
-    .find(x => pathName.indexOf(x.path.split(':')[0]) === 0);
-  // function that returns true if a menu item is 'active'
+    .slice()
+    .sort((a, b) => (a.path.length > b.path.length ? -1 : 1))
+    .find((x) => pathName.indexOf(x.path.split(":")[0]) === 0);
+
   const isActive = (path: string) =>
     path === currentRoute?.path || path === currentRoute?.parent;
 
-  return <header>
-    <Navbar
-      expanded={expanded}
-      expand="md"
-      className="bg-primary"
-      data-bs-theme="dark"
-      fixed="top"
-    >
-      <Container fluid>
-        <Navbar.Brand className="me-5" as={Link} to="/">
-          The Good Grocery
-        </Navbar.Brand>
-        <Navbar.Toggle onClick={() => setExpanded(!expanded)} />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            {routes.filter(x => x.menuLabel).map(
-              ({ menuLabel, path }, i) =>
-                <Nav.Link
-                  as={Link} key={i} to={path}
-                  className={isActive(path) ? 'active' : ''}
-                  /* close menu after selection*/
-                  onClick={() => setTimeout(() => setExpanded(false), 200)}
-                >{menuLabel}</Nav.Link>
-            )}
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
-  </header>;
+  const closeMenu = () => setTimeout(() => setExpanded(false), 150);
+
+  const menuRoutes = routes.filter((x) => x.menuLabel);
+
+  return (
+    <header className="h-24">
+      <div className="fixed inset-x-0 top-0 z-50">
+        {/* keep a wrapper so the mobile dropdown lines up with the pill */}
+        <div className="mx-auto mt-4 w-[min(1200px,calc(100%-32px))]">
+          {/* TOP PILL */}
+          <div className="rounded-full bg-primary shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+            <div className="flex h-16 items-center px-6">
+              {/* LEFT: logo + nav close together */}
+              <div className="flex items-center gap-6">
+                <Link to="/" onClick={() => setExpanded(false)} className="shrink-0">
+                  <img
+                    src="/images/logos/show-time.png"
+                    alt="Show-Time"
+                    className="h-48 w-auto transition-transform duration-300 hover:scale-105"
+                    draggable={false}
+                  />
+                </Link>
+
+                {/* DESKTOP NAV */}
+                <nav className="hidden md:flex items-center gap-3" aria-label="Huvudmeny">
+                  {menuRoutes.map(({ menuLabel, path }, i) => {
+                    const active = isActive(path);
+
+                    return (
+                      <Link
+                        key={i}
+                        to={path}
+                        aria-current={active ? "page" : undefined}
+                        className={[
+                          // hover with a ''pill'' look
+                          "rounded-full px-4 py-1.5 text-base font-semibold transition duration-200",
+                          "hover:bg-white/5",
+
+                          // colors: active full accent, others dim
+                          active ? "text-accent" : "text-accent/60 hover:text-accent/90",
+
+                          // active indicator: ONLY shadow under (no bg, no pill highlight)
+                          active ? "bg-transparent shadow-none drop-shadow-[0_12px_16px_rgba(0,0,0,0.55)]" : "",
+                        ].join(" ")}
+                        onClick={() => setExpanded(false)}
+                      >
+                        {menuLabel}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              </div>
+
+              {/* RIGHT: login pinned right */}
+              <div className="ml-auto hidden md:block">
+                <Link
+                  to="/login"
+                  className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent transition duration-200 hover:bg-accent hover:text-primary"
+                >
+                  Logga in
+                </Link>
+              </div>
+
+              {/* MOBILE TOGGLE pinned right */}
+              <button
+                className="ml-auto md:hidden inline-flex items-center justify-center rounded-full p-2 text-accent hover:bg-white/10"
+                onClick={() => setExpanded((v) => !v)}
+                aria-controls="mobile-nav"
+                aria-expanded={expanded}
+              >
+                <span className="sr-only">Öppna meny</span>
+                <div className="space-y-1.5">
+                  <span className="block h-0.5 w-6 bg-accent" />
+                  <span className="block h-0.5 w-6 bg-accent" />
+                  <span className="block h-0.5 w-6 bg-accent" />
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* MOBILE MENU: separate dropdown panel */}
+          <div id="mobile-nav" className={expanded ? "block md:hidden" : "hidden"}>
+            <div className="mt-3 rounded-2xl bg-primary shadow-[0_18px_40px_rgba(0,0,0,0.55)] ring-1 ring-white/10">
+              <nav className="space-y-1 p-3" aria-label="Huvudmeny mobil">
+                {menuRoutes.map(({ menuLabel, path }, i) => {
+                  const active = isActive(path);
+
+                  return (
+                    <Link
+                      key={i}
+                      to={path}
+                      onClick={closeMenu}
+                      className={[
+                        "block w-full rounded-xl px-4 py-3 text-base font-semibold transition",
+
+                        // hover can have a soft background
+                        "hover:bg-white/10",
+
+                        // dim others, keep active full accent
+                        active ? "text-accent" : "text-accent/70 hover:text-accent",
+
+                        // active: shadow under
+                        active ? "bg-transparent shadow-none drop-shadow-[0_12px_16px_rgba(0,0,0,0.55)]" : "",
+                      ].join(" ")}
+                    >
+                      {menuLabel}
+                    </Link>
+                  );
+                })}
+
+                <div className="pt-2">
+                  <Link
+                    to="/login"
+                    onClick={closeMenu}
+                    className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent transition hover:bg-accent hover:text-primary"
+                  >
+                    Logga in
+                  </Link>
+                </div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
 }
