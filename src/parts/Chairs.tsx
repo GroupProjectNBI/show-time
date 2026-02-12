@@ -1,15 +1,22 @@
 // import { useStateContext } from '../utils/useStateObject';
+import { LiaChairSolid } from "react-icons/lia";
 
-Chairs.route = {
-    path: '/test',
-    menuLabel: 'details',
-    index: 2
-};
+interface ChairsProps {
+    numberOfSeats: number;
+}
 
 // an image component that automatically switches to black and white
 // by adding the css class 'bw' if bwImages is true in our context
-export default function Chairs() {
-    return <>
-        <h1>Hello</h1>
-    </>
+export default function Chairs({ numberOfSeats }: ChairsProps) {
+    const seats = [...Array(numberOfSeats)];
+    return (
+        <div className="chairs-row" style={{ display: 'flex', gap: '5px' }}>
+            {seats.map((_, i) => (
+                <span key={i} className="seat-icon">
+                    <LiaChairSolid />
+                </span>
+            ))}
+            <span>({numberOfSeats} platser)</span>
+        </div>
+    );
 }

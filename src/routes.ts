@@ -9,7 +9,7 @@ import ProductDetailsPage from './pages/ProductDetailsPage.tsx';
 import ProductsPage from './pages/ProductsPage.tsx';
 import AnimalPage from './pages/Animal.tsx';
 import ScreeningsPage from './pages/ScreeningsPage.tsx';
-import Chairs from './parts/Chairs.tsx';
+import TestDelux from './pages/UnknownPage.tsx';
 
 export default [
   AboutPage,
@@ -19,7 +19,7 @@ export default [
   ProductsPage,
   AnimalPage,
   ScreeningsPage,
-  Chairs,
+  TestDelux,
   AnimalPage
 ]
   // map the route property of each page component to a Route
