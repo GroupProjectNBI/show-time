@@ -12,9 +12,6 @@ export default function App() {
 
   return <>
     <div className='min-h-screen flex flex-col bg-slate-900 text-slate-100'>
-      <div className='m-4 rounded-xl bg-green-500 p-6 text-black text-xl font-bold'>
-        Test tailwind
-      </div>
       <Header />
       <Main />
       <Footer />

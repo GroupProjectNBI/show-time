@@ -7,8 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        footerBg: "#463F41",
-        goldText: "#C6A96A",
+        primary: "#680909",
+        accent: "#C6A96A"
+      },
+      fontFamily: {
+        serif: ["'Roboto Serif'", "serif"],
       },
     },
   },
