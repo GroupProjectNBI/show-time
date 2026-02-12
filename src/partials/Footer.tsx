@@ -21,7 +21,7 @@ export default function Footer() {
 
           <p>
             <span className="font-semibold">Öppettider:</span><br />
-            Mån - Fre 17:30 - 22:00<br />
+            Mån - Fre 17:30 - 21:15<br />
             Lör - Sön 13:30 - 21:15
           </p>
         </div>
