@@ -14,6 +14,7 @@ export default function App() {
     <div className='min-h-screen flex flex-col bg-slate-900 text-slate-100'>
       <Header />
       <Main />
+
       <Footer />
     </div>
   </>;
