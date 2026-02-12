@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import styles from "./TicketSelector.module.css";
 
 type TicketProps = {
   label: string;
@@ -25,16 +26,21 @@ export default function ComponentTicket({
   }, [count, total]);
 
   return (
-    <div className="ticketRow">
-      <div className="ticketHeader">
+    <div className={styles.ticketRow}>
+      <div className={styles.ticketHeader}>
         <span>{label} á {price} kr</span>
         <span>{total} kr</span>
       </div>
 
-      <div className="counter">
-        <button onClick={decrease}>-</button>
-        <span>{count}</span>
-        <button onClick={increase}>+</button>
+      <div className={styles.counterRow}>
+        <button className={styles.minusButton} onClick={decrease}>−</button>
+
+        <div className={styles.countBox}>
+          {count}
+        </div>
+
+        <button className={styles.plusButton} onClick={increase}>+</button>
       </div>
-    </div>);
+    </div>
+  );
 }
