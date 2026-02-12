@@ -30,6 +30,6 @@ dist-ssr
 *.sln
 *.sw?
 
-backend/db-config.json
+backend/src/db-config.json
 backend/obj/
 backend/bin/

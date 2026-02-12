@@ -1,0 +1,9 @@
+{
+    "host": "jarllindquist.com",
+    "port": 3307,
+    "username": "b_user",
+    "password": "b_password",
+    "database": "project_b_db",
+    "createTablesIfNotExist": true,
+    "seedDataIfEmpty": true
+}
