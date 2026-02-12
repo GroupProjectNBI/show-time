@@ -16,7 +16,7 @@ export default function TestDelux() {
     useEffect(() => {
         (async () => {
             // Hämtar teaterdata
-            const data = await fetchJson('/api/Theater');
+            const data = await fetchJson('/api/Theater?where=id=2');
             setSeatArray(data);
         })();
     }, []);
