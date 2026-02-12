@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
 import { FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
-import footerImage from "../assets/footer-image.png";
+import routes from "../routes";
 
 
 export default function Footer() {
   return (
-    <footer className="bg-footerBg text-goldText py-12">
+    <footer className="bg-footer text-accent py-12">
 
       <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between gap-12">
 
@@ -81,9 +81,9 @@ export default function Footer() {
         {/* Bild */}
         <div className="md:w-1/3 flex justify-center md:justify-end">
           <img
-            src={footerImage}
-            alt="The Good Grocery"
-            className="w-40 md:w-48 object-contain"
+            src="/images/logos/show-time-circle.png"
+            alt="Footer Logo"
+            className="max-w-full md:max-w-xs object-contain"
           />
         </div>
 
