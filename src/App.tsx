@@ -3,6 +3,14 @@ import Header from "./partials/Header";
 import Main from './partials/Main';
 import Footer from './partials/Footer';
 
+// App.tsx
+import TicketSelector from "./Components/TicketSelector";
+
+
+
+
+
+
 
 export default function App() {
 
@@ -14,7 +22,9 @@ export default function App() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <Main />
-
+      <div>
+        <TicketSelector />
+      </div>
       <Footer />
     </div>
   </>;
