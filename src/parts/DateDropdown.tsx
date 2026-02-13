@@ -86,8 +86,8 @@ export default function DateDropdown({ valueISO, onChange }: Props) {
       result.push({ date: new Date(viewMonth.getFullYear(), viewMonth.getMonth(), day), inMonth: true });
     }
 
-    // trailing to complete weeks (42 cells => 6 rows)
-    while (result.length < 42) {
+    // trailing days for the weeks to get the right amount of weeks per month
+    while (result.length % 7 !== 0) {
       const d = new Date(last);
       d.setDate(d.getDate() + (result.length - (firstWeekday + last.getDate()) + 1));
       result.push({ date: d, inMonth: false });

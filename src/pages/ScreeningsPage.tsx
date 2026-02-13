@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ScreeningsList from "../parts/ScreeningsList";
-import DateDropdown from "../parts/DateDropDown";
+import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
 
 function ScreeningsPage() {
@@ -25,7 +25,6 @@ function ScreeningsPage() {
           <DateDropdown
             valueISO={selectedDateISO}
             onChange={setSelectedDateISO}
-            placeholder="Välj dag & datum"
           />
 
           {/* FILTER BUTTON primary color */}
