@@ -6,12 +6,15 @@ import AboutPage from './pages/AboutPage.tsx';
 import NotFoundPage from './pages/NotFoundPage.tsx';
 import OurVisionPage from './pages/OurVisionPage.tsx';
 import ProductDetailsPage from './pages/ProductDetailsPage.tsx';
-import ProductsPage from './pages/ProductsPage.tsx';
 import AnimalPage from './pages/Animal.tsx';
+import ProductsPage from './pages/ProductsPage.tsx';
 import ScreeningsPage from './pages/ScreeningsPage.tsx';
 import TestDelux from './pages/UnknownPage.tsx';
 
+
+
 export default [
+  
   AboutPage,
   NotFoundPage,
   OurVisionPage,

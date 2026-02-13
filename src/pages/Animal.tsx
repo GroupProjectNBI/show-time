@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 AnimalPage.route = {
     path: '/Animals',
-    menuLabel: 'gå på bio',
+    menuLabel: 'Animal',
     index: 2
 };
 
@@ -20,7 +20,8 @@ interface AnimalMovie {
     startTime: string,
     endTime: string,
     screeningDate: string,
-    availableSeats: number
+    avaliableSeats: number;
+    availableSeats: number;
 }
 
 export default function AnimalPage() {
@@ -50,5 +51,5 @@ export default function AnimalPage() {
             <img src={`/images/posters/${movieId}.webp`} alt={movieTitle} />
             <hr />
         </article>)}
-    </>
+    </>;
 };
