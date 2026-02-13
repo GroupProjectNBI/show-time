@@ -8,12 +8,17 @@ import OurVisionPage from './pages/OurVisionPage.tsx';
 import ProductDetailsPage from './pages/ProductDetailsPage.tsx';
 import ProductsPage from './pages/ProductsPage.tsx';
 import AnimalPage from './pages/Animal.tsx';
+import ScreeningsPage from './pages/ScreeningsPage.tsx';
+import TestDelux from './pages/UnknownPage.tsx';
+
 export default [
   AboutPage,
   NotFoundPage,
   OurVisionPage,
   ProductDetailsPage,
   ProductsPage,
+  ScreeningsPage,
+  TestDelux,
   AnimalPage
 ]
   // map the route property of each page component to a Route
