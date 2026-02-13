@@ -3,7 +3,7 @@ import { Row, Col } from 'react-bootstrap';
 OurVisionPage.route = {
   path: '/our-vision',
   menuLabel: 'Our Vision',
-  index: 3
+  index: -1
 };
 
 export default function OurVisionPage() {

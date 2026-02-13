@@ -7,10 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#680909",
-        accent: "#C6A96A",
+        primary: "#680909", // Default mörkröda
+        accent: "#C6A96A",  // Guldiga för stolarna
         footer: "#463F41",
-        surface: "#282828",
+        surface: "#282828",,
+        booked: "#4a0606",  // En ännu mörkare röd för krysset/linjen om man vill
       },
       fontFamily: {
         serif: ["'Roboto Serif'", "serif"],
@@ -18,5 +19,4 @@ export default {
     },
   },
   plugins: [],
-}
-
+};
