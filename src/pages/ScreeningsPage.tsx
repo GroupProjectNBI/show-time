@@ -1,8 +1,25 @@
+//Importerat fetchJson för att kommunicera med din backend
+import { useState, useEffect } from "react";
+import fetchJson from "../utils/fetchJson";
 import ScreeningsList from "../parts/ScreeningsList";
 import type { Screening } from "../interfaces/Screenings";
 
 function ScreeningsPage() {
-  const screenings: Screening[] = []; // empty for now, will add mockdata
+//Skapat en state-variabel som håller listan med filmer. Den är tom [] från början.
+// Den här raden skapar både variabeln OCH funktionen (setScreenings) som uppdaterar den
+const [screenings, setScreenings] = useState<Screening[]>([]); // empty for now, will add mockdata
+useEffect(() => {
+    async function loadData() {
+      // Anropar våra SQL-vy v_screenings via API:et
+      const data = await fetchJson("/api/v_screenings");
+      
+      // Om hämtningen lyckas, spara filmerna i vår state
+      if (data && !data.error) {
+        setScreenings(data);
+      }
+    }
+    loadData();
+  }, []);
 
   return (
     <div className="min-h-screen pt-8">
