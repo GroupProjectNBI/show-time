@@ -19,7 +19,7 @@ export default function Header() {
   const menuRoutes = routes.filter((x) => x.menuLabel);
 
   return (
-    <header className="h-24">
+    <header>
       <div className="fixed inset-x-0 top-0 z-50">
         {/* keep a wrapper so the mobile dropdown lines up with the pill */}
         <div className="mx-auto mt-4 w-[min(1200px,calc(100%-32px))]">

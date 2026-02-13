@@ -1,5 +1,4 @@
 import { Row, Col } from 'react-bootstrap';
-import Image from '../parts/Image';
 
 OurVisionPage.route = {
   path: '/our-vision',
@@ -12,10 +11,6 @@ export default function OurVisionPage() {
     <Row>
       <Col>
         <h2 className="text-primary">We run with our vision!</h2>
-        <Image
-          src="/images/start.jpg"
-          alt="A runner's legs and hands at the starting line of a track race."
-        />
       </Col>
     </Row>
     <Row>

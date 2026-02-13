@@ -1,5 +1,5 @@
 import { Row, Col } from 'react-bootstrap';
-import Image from '../parts/Image';
+
 
 AboutPage.route = {
   path: '/about-us',
@@ -12,10 +12,6 @@ export default function AboutPage() {
     <Row>
       <Col>
         <h2 className="text-primary">About us</h2>
-        <Image
-          src="/images/us.jpg"
-          alt="A group photo of our employees."
-        />
       </Col>
     </Row>
     <Row>
