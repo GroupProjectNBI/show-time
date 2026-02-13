@@ -9,7 +9,8 @@ export default {
       colors: {
         primary: "#680909", // Default mörkröda
         accent: "#C6A96A",  // Guldiga för stolarna
-        footer: "#463F41",
+        footer: "#463F41",  // Bakgrund footer
+        surface: "#282828", // Bakgrundsfärg
         booked: "#4a0606",  // En ännu mörkare röd för krysset/linjen om man vill
       },
       fontFamily: {
@@ -18,4 +19,4 @@ export default {
     },
   },
   plugins: [],
-}
+};

@@ -2,7 +2,6 @@ import type Product from '../interfaces/Product';
 import { Row, Col } from 'react-bootstrap';
 import { Link, useLoaderData } from 'react-router-dom';
 import NotFoundPage from './NotFoundPage';
-import Image from '../parts/Image';
 import productsLoader from '../utils/productsLoader';
 
 ProductDetailsPage.route = {
@@ -27,10 +26,6 @@ export default function ProductDetailsPage() {
     <Row>
       <Col>
         <h2 className="text-primary">{name}</h2>
-        <Image
-          src={'/images/products/' + id + '.jpg'}
-          alt={'Product image of the product ' + name + '.'}
-        />
         {description.split('\n').map((x, i) => <p key={i}>{x}</p>)}
       </Col>
     </Row>
