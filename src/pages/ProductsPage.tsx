@@ -6,7 +6,7 @@ import Select from '../parts/Select';
 import ProductCard from '../parts/ProductCard';
 import productsLoader from '../utils/productsLoader';
 import { getHelpers } from '../utils/productPageHelpers';
-
+//MovieListPage.tsx
 ProductsPage.route = {
   path: '/',
   menuLabel: 'Products',

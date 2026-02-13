@@ -19,7 +19,7 @@ export default function Header() {
   const menuRoutes = routes.filter((x) => x.menuLabel);
 
   return (
-    <header className="h-24">
+    <header>
       <div className="fixed inset-x-0 top-0 z-50">
         {/* keep a wrapper so the mobile dropdown lines up with the pill */}
         <div className="mx-auto mt-4 w-[min(1200px,calc(100%-32px))]">
@@ -32,7 +32,7 @@ export default function Header() {
                   <img
                     src="/images/logos/show-time.png"
                     alt="Show-Time"
-                    className="h-48 w-auto transition-transform duration-300 hover:scale-105"
+                    className="h-48 w-auto mt-2 transition-transform duration-300 hover:scale-105"
                     draggable={false}
                   />
                 </Link>
@@ -71,7 +71,7 @@ export default function Header() {
               <div className="ml-auto hidden md:block">
                 <Link
                   to="/login"
-                  className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent transition duration-200 hover:bg-accent hover:text-primary"
+                  className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
                 >
                   Logga in
                 </Link>
@@ -128,7 +128,7 @@ export default function Header() {
                   <Link
                     to="/login"
                     onClick={closeMenu}
-                    className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent transition hover:bg-accent hover:text-primary"
+                    className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
                   >
                     Logga in
                   </Link>
