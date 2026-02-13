@@ -10,7 +10,7 @@ export default function Footer() {
 
         {/* Hitta till oss */}
         <div className="w-full md:w-1/3">
-          <h3 className="text-xl font-semibold mb-4">Hitta till oss</h3>
+          <h3 className="text-xl font-semibold mb-1">Hitta till oss</h3>
 
           <p className="mb-6 leading-relaxed">
             Adress:<br />
@@ -27,26 +27,26 @@ export default function Footer() {
 
         {/* Övrigt */}
         <div className="w-full md:w-1/3">
-          <h3 className="text-xl font-semibold mb-4">Övrigt</h3>
+          <h3 className="text-xl font-semibold mb-1">Övrigt</h3>
 
-          <div className="flex flex-col space-y-2">
-            <Link to="/om-oss" className="hover:text-white transition py-1">Om oss</Link>
-            <Link to="/kontakt" className="hover:text-white transition py-1">Kontakta oss - formulär</Link>
-            <Link to="/jobba" className="hover:text-white transition py-1">Jobba hos oss</Link>
-            <Link to="/faq" className="hover:text-white transition py-1">FAQ</Link>
-            <Link to="/bli-medlem" className="hover:text-white transition py-1">Bli medlem</Link>
+          <div className="flex flex-col leading-relaxed">
+            <p><Link to="/om-oss" className="hover:text-white transition">Om oss</Link></p>
+            <p><Link to="/kontakt" className="hover:text-white transition">Kontakta oss - formulär</Link></p>
+            <p><Link to="/jobba" className="hover:text-white transition">Jobba hos oss</Link></p>
+            <p><Link to="/faq" className="hover:text-white transition">FAQ</Link></p>
+            <p><Link to="/bli-medlem" className="hover:text-white transition">Bli medlem</Link></p>
           </div>
         </div>
 
         {/* Logotyp + Sociala medier */}
-        <div className="w-full md:w-1/3 flex flex-col items-center md:items-start">
+        <div className="w-full md:w-1/3 flex flex-col items-start md:items-start">
           <img
             src="/images/logos/show-time-circle.png"
             alt="Footer Logo"
-            className="max-w-[250px] h-[250px] object-contain mb-4"
+            className="h-[220px] object-contain"
           />
 
-          <div className="flex gap-6 text-2xl pt-2">
+          <div className="flex gap-6 text-2xl mt-4 self-center md:self-center">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
               className="hover:text-white hover:scale-110 transition-all duration-300">
               <FaFacebookF />
@@ -64,14 +64,16 @@ export default function Footer() {
           </div>
         </div>
 
+
       </div>
+
 
       {/* Divider */}
       <div className="border-t border-accent/20 mt-10 pt-6 text-center text-sm opacity-80">
         © Copyright
       </div>
 
-    </footer>
+    </footer >
 
   );
 }
