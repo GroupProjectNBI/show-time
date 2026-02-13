@@ -11,7 +11,7 @@ export default function App() {
   window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
 
   return <>
-    <div className='min-h-screen flex flex-col bg-slate-900 text-slate-100'>
+    <div className="min-h-screen flex flex-col">
       <Header />
       <Main />
 

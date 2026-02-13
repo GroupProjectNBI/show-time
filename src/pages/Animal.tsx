@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 AnimalPage.route = {
     path: '/Animals',
-    menuLabel: 'gå på bio',
+    menuLabel: 'Animal',
     index: 2
 };
 
@@ -20,7 +20,7 @@ interface AnimalMovie {
     startTime: string,
     endTime: string,
     screeningDate: string,
-    avaliableSeats: number
+    avaliableSeats: number;
 }
 
 export default function AnimalPage() {
@@ -49,5 +49,5 @@ export default function AnimalPage() {
             <p> Avaliable seats:{avaliableSeats} st.</p>
             <hr />
         </article>)}
-    </>
+    </>;
 };
