@@ -17,7 +17,6 @@ export default [
   OurVisionPage,
   ProductDetailsPage,
   ProductsPage,
-  AnimalPage,
   ScreeningsPage,
   TestDelux,
   AnimalPage
