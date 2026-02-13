@@ -20,7 +20,7 @@ interface AnimalMovie {
     startTime: string,
     endTime: string,
     screeningDate: string,
-    avaliableSeats: number
+    availableSeats: number
 }
 
 export default function AnimalPage() {
@@ -43,10 +43,11 @@ export default function AnimalPage() {
     // animals has a truthy value
     return animals && <>
         <h1>Movies: </h1>
-        {animals.map(({ movieId, theaterName, movieTitle, avaliableSeats }) => <article key={movieId}>
+        {animals.map(({ movieId, theaterName, movieTitle, availableSeats }) => <article key={movieId}>
             <h3>{movieTitle}</h3>
-            <p>{movieTitle} in Thater: {theaterName}.</p>
-            <p> Avaliable seats:{avaliableSeats} st.</p>
+            <p>{movieTitle} in Theater: {theaterName}.</p>
+            <p> Avaliable seats: {availableSeats} st.</p>
+            <img src={`/images/posters/${movieId}.webp`} alt={movieTitle} />
             <hr />
         </article>)}
     </>
