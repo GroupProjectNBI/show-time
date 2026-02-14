@@ -8,4 +8,7 @@ export interface Screening {
   theaterName: string;   // Lade till denna
   avaliableSeats: number; // Lade till denna
   priceSek: number;
+  movieId: number;
+  duration: number;
+  totalAmountOfSeats: number;
 }
