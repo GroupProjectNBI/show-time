@@ -1,9 +1,3 @@
-AboutPage.route = {
-  path: '/about-us',
-  menuLabel: 'Om oss',
-  index: 2
-};
-
 export default function AboutPage() {
   return (
     <div className="w-full max-w-5xl mx-auto px-4 py-8">
@@ -39,6 +33,13 @@ export default function AboutPage() {
             Som lokal biograf vill vi vara en del av området och bidra till kulturlivet. För oss
             handlar bio inte bara om film - det handlar om upplevelse som delas tillsammans.
           </p>
+
+          {/* Bilden snyggt integrerad */}
+          <img
+            src="/images/Commercials/cinema.webp"
+            alt="Biograf"
+            className="w-full rounded-xl shadow-lg object-cover max-h-[260px]"
+          />
         </div>
 
       </div>
