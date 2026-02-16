@@ -3,7 +3,7 @@ import Header from "./partials/Header";
 import Main from './partials/Main';
 import Footer from './partials/Footer';
 
-// App.tsx
+
 import TicketSelector from "./Components/TicketSelector";
 
 
