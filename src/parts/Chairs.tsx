@@ -6,7 +6,7 @@ interface ChairsProps {
     rowId: number;              // Index för raden (0-baserat)
 }
 
-export default function Chairs({ numberOfSeats, previousSeatsCount, rowId }: ChairsProps) {
+export default function Chairs({ numberOfSeats, previousSeatsCount }: ChairsProps) {
     const seats = [...Array(numberOfSeats)];
     const [selectedInRow, setSelectedInRow] = useState<number[]>([]);
     const isOccupied = (id: number) => id % 7 === 0;
