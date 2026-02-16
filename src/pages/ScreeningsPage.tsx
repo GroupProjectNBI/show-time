@@ -6,6 +6,10 @@ import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
 
 function ScreeningsPage() {
+  //för drop down
+  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+
+
   //Skapat en state-variabel som håller listan med filmer. Den är tom [] från början.
   // Den här raden skapar både variabeln OCH funktionen (setScreenings) som uppdaterar den
   const [screenings, setScreenings] = useState<Screening[]>([]); // empty for now, will add mockdata
