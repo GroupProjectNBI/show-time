@@ -15,16 +15,27 @@ function ScreeningsPage() {
   const [screenings, setScreenings] = useState<Screening[]>([]); // empty for now, will add mockdata
   useEffect(() => {
     async function loadData() {
-      // Anropar våra SQL-vy v_screenings via API:et
-      const data = await fetchJson("/api/v_screenings");
+      if (selectedDateISO) {
+        // Anropar våra SQL-vy v_screenings via API:et
+        const data = await fetchJson("/api/v_screenings");
 
-      // Om hämtningen lyckas, spara filmerna i vår state
-      if (data && !data.error) {
-        setScreenings(data);
+        // Om hämtningen lyckas, spara filmerna i vår state
+        if (data && !data.error) {
+          setScreenings(data);
+        }
+      }
+      else {
+        const date = new Date();
+        // creatie it to a string and format
+        // setSelectedDateISO(date);
       }
     }
+
     loadData();
-  }, []);
+  }, [selectedDateISO]);
+
+
+
 
   return (
     <div className="min-h-screen pt-8">
