@@ -4,6 +4,11 @@ import Main from './partials/Main';
 import Footer from './partials/Footer';
 import TicketSelector from "./Components/TicketSelector"; // Osäker på om denna behövs här, men vi behåller den
 
+
+
+
+
+
 // 1. IMPORTERA DINA PROVIDERS
 // import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
