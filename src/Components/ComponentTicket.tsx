@@ -33,7 +33,7 @@ export default function ComponentTicket({
       </div>
 
       <div className={styles.counterRow}>
-        <button className={styles.minusButton} onClick={decrease}>−</button>
+        <button className={styles.minusButton} onClick={decrease}>-</button>
 
         <div className={styles.countBox}>
           {count}

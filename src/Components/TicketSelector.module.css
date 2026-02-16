@@ -1,7 +1,7 @@
 /* Wrapper */
 .wrapper {
   width: 100%;
-  max-width: 420px;
+  max-width: 1420px;
   margin: 0 auto;
   padding: 20px;
   background: #1a1a1a;
@@ -86,4 +86,21 @@
   font-size: 20px;
   font-weight: 600;
   color: #C6A96A;
+}
+
+@media (min-width: 768px) {
+  .ticketRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ticketHeader {
+    width: 75%;
+    margin-bottom: 0;
+  }
+
+  .counterRow {
+    justify-content: flex-end;
+  }
 }
