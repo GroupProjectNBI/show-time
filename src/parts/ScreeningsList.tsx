@@ -1,4 +1,5 @@
 import type { Screening } from "../interfaces/Screenings";
+import { calculatingTime } from "../utils/lengthcalc.ts";
 
 type Props = {
   screenings: Screening[];
@@ -11,37 +12,44 @@ export default function ScreeningsList({ screenings }: Props) {
         <p className="py-6 text-accent/70">Inga screenings att visa.</p>
       ) : (
         <div className="divide-y divide-white/10">
-          {screenings.map((s) => (
-            <div key={s.id} className="py-6">
+          {screenings.map(({ id, movieTitle, theaterName, avaliableSeats, startTime, movieId, duration, totalAmountOfSeats }) => (
+            <div key={id} className="py-6">
 
               {/* MOBILE layout */}
               <div className="space-y-4 md:hidden">
                 <div className="text-sm font-semibold text-accent/70">
 
-                 {/* === NY LOGIK: Hämtar klockslag från databasen (startTime) === */}
-                  KL. {new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {/* === NY LOGIK: Hämtar klockslag från databasen (startTime) === */}
+                  KL. {new Date(startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   {/* ========================================================== */}
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="h-20 w-14 shrink-0 overflow-hidden rounded-md bg-black/30" />
+                  <div className="h-20 w-14 shrink-0 overflow-hidden rounded-md " />
+                  <img src={`/images/posters/${movieId}.webp`} className="w-30 h-40" alt={movieTitle} />
                   <div className="text-base font-semibold text-accent">
-                    {s.movieTitle}
+                    {movieTitle}
                   </div>
                 </div>
 
                 <div>
                   <div className="font-semibold text-accent">
 
-                   {/* === NY LOGIK: Ändrat från salon till theaterName === */}
-                    Salong {s.theaterName}
+                    {/* === NY LOGIK: Ändrat från salon till theaterName === */}
+                    Salong {theaterName}
                     {/* ================================================= */}
 
                   </div>
                   <div className="text-sm text-accent/70">
 
-                   {/* === NY LOGIK: Hämtar siffran för lediga platser === */}
-                    {s.avaliableSeats} platser kvar
+                    {/* === NY LOGIK: Hämtar siffran för lediga platser === */}
+                    {avaliableSeats} av {totalAmountOfSeats} platser kvar
+                    {/* ================================================ */}
+                  </div>
+                  <div className="text-sm text-accent/70">
+
+                    {/* === NY LOGIK: Hämtar siffran för lediga platser === */}
+                    {calculatingTime(duration)}
                     {/* ================================================ */}
                   </div>
 
@@ -63,19 +71,20 @@ export default function ScreeningsList({ screenings }: Props) {
               {/* DESKTOP layout */}
               <div className="hidden md:grid md:grid-cols-[140px_1fr_280px] md:items-center md:py-1">
                 {/* TIME */}
-          
+
                 <div className="text-accent/70">
-              
-                {/* === NY LOGIK: Formaterar tid för datorvy === */}
-                  KL. {new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+
+                  {/* === NY LOGIK: Formaterar tid för datorvy === */}
+                  KL. {new Date(startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   {/* =========================================== */}
-                  </div>
+                </div>
 
                 {/* TITLE */}
                 <div className="flex items-center gap-5">
-                  <div className="h-24 w-16 overflow-hidden rounded-md bg-black/30" />
+                  <div className="h-24 w-16 overflow-hidden rounded-md " />
+                  <img src={`/images/posters/${movieId}.webp`} className="w-30 h-40" alt={movieTitle} />
                   <div className="text-base font-semibold text-accent">
-                    {s.movieTitle}
+                    {movieTitle}
                   </div>
                 </div>
 
@@ -83,14 +92,21 @@ export default function ScreeningsList({ screenings }: Props) {
                 <div className="justify-self-start pl-6">
                   <div className="font-semibold text-accent">
                     {/* === NY LOGIK: Kopplat till theaterName === */}
-                    Salong {s.theaterName}
+                    Salong {theaterName}
                     {/* ========================================= */}
-                  
                   </div>
                   <div className="text-sm text-accent/70">
-                    Platser -
+                    Platser:
                     {/* === NY LOGIK: Kopplat till avaliableSeats === */}
-                    <span className="text-accent">{s.avaliableSeats} platser kvar</span>
+                    <span className="text-accent"> {avaliableSeats} av {totalAmountOfSeats} platser kvar</span>
+                    {/* ============================================ */}
+
+                  </div>
+                  <div className="text-sm text-accent/70">
+                    Tid:
+                    {/* === NY LOGIK: Hanterar duration och bygger om den till timmar och minuter === */}
+                    <span className="text-accent"> {calculatingTime(duration)}</span>
+
                     {/* ============================================ */}
 
                   </div>
