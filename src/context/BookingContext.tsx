@@ -23,7 +23,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
     };
 
     const setOccupied = (seatIds: number[]) => {
-        setSelectedSeats(seatIds);
+        setOccupiedSeats(seatIds);
     }
 
     const clearBooking = () => {
