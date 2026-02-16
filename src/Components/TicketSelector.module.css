@@ -1,0 +1,106 @@
+/* Wrapper */
+.wrapper {
+  width: 100%;
+  max-width: 1420px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #1a1a1a;
+  border-radius: 12px;
+}
+
+/* Titel */
+.title {
+  font-size: 22px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #C6A96A;
+}
+
+/* Varje rad */
+.ticketRow {
+  border-bottom: 1px solid #444;
+  padding: 14px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Text-raden */
+.ticketHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 500;
+  color: #C6A96A;
+}
+
+/* Counter-raden */
+.counterRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Minus-knapp */
+.minusButton {
+  width: 40px;
+  height: 40px;
+  background: #C6A96A;
+  border: none;
+  border-radius: 6px;
+  font-size: 26px;
+  color: #680909;
+  cursor: pointer;
+}
+
+/* Plus-knapp */
+.plusButton {
+  width: 40px;
+  height: 40px;
+  background: #C6A96A;
+  border: none;
+  border-radius: 6px;
+  font-size: 26px;
+  color: #115F11;
+  cursor: pointer;
+}
+
+/* Mitten-sektionen */
+.countBox {
+  width: 60px;
+  height: 40px;
+  background: #463F41;
+  color: #C6A96A;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  border-radius: 6px;
+}
+
+/* Total-raden */
+.totalRow {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 20px;
+  font-weight: 600;
+  color: #C6A96A;
+}
+
+@media (min-width: 768px) {
+  .ticketRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .ticketHeader {
+    width: 75%;
+    margin-bottom: 0;
+  }
+
+  .counterRow {
+    justify-content: flex-end;
+  }
+}

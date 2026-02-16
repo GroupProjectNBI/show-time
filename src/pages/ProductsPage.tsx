@@ -39,11 +39,9 @@ export default function ProductsPage() {
   return <>
     <Row>
       <Col>
-        <h2 className="text-primary">Our products</h2>
+        <h2 className="text-primary"></h2>
         <p>
-          Our products are fantastic, organic and fresh.
-          They are also very reasonably priced, considering
-          they are all harvested with the greatest care.
+
         </p>
       </Col>
     </Row>

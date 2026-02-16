@@ -17,7 +17,10 @@ export default function ScreeningsList({ screenings }: Props) {
               {/* MOBILE layout */}
               <div className="space-y-4 md:hidden">
                 <div className="text-sm font-semibold text-accent/70">
-                  KL. {s.time}
+
+                 {/* === NY LOGIK: Hämtar klockslag från databasen (startTime) === */}
+                  KL. {new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {/* ========================================================== */}
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -29,11 +32,20 @@ export default function ScreeningsList({ screenings }: Props) {
 
                 <div>
                   <div className="font-semibold text-accent">
-                    Salong {s.salon}
+
+                   {/* === NY LOGIK: Ändrat från salon till theaterName === */}
+                    Salong {s.theaterName}
+                    {/* ================================================= */}
+
                   </div>
                   <div className="text-sm text-accent/70">
-                    Platser - kvar {/*EJ FÄRDIGT LOGIK FÖR PLATSER MÅSTE IN*/}
+
+                   {/* === NY LOGIK: Hämtar siffran för lediga platser === */}
+                    {s.avaliableSeats} platser kvar
+                    {/* ================================================ */}
                   </div>
+
+
 
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button className="rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-accent transition hover:bg-white/20">
@@ -46,10 +58,18 @@ export default function ScreeningsList({ screenings }: Props) {
                 </div>
               </div>
 
+
+
               {/* DESKTOP layout */}
               <div className="hidden md:grid md:grid-cols-[140px_1fr_280px] md:items-center md:py-1">
                 {/* TIME */}
-                <div className="text-accent/70">KL. {s.time}</div>
+          
+                <div className="text-accent/70">
+              
+                {/* === NY LOGIK: Formaterar tid för datorvy === */}
+                  KL. {new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {/* =========================================== */}
+                  </div>
 
                 {/* TITLE */}
                 <div className="flex items-center gap-5">
@@ -62,10 +82,17 @@ export default function ScreeningsList({ screenings }: Props) {
                 {/* SALON + SEATS + BUTTONS (left aligned + pushed inward) */}
                 <div className="justify-self-start pl-6">
                   <div className="font-semibold text-accent">
-                    Salong {s.salon}
+                    {/* === NY LOGIK: Kopplat till theaterName === */}
+                    Salong {s.theaterName}
+                    {/* ========================================= */}
+                  
                   </div>
                   <div className="text-sm text-accent/70">
-                    Platser - kvar {/*EJ FÄRDIGT LOGIK FÖR PLATSER MÅSTE IN*/}
+                    Platser -
+                    {/* === NY LOGIK: Kopplat till avaliableSeats === */}
+                    <span className="text-accent">{s.avaliableSeats} platser kvar</span>
+                    {/* ============================================ */}
+
                   </div>
 
                   <div className="mt-3 flex gap-2">
