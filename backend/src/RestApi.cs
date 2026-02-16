@@ -1,31 +1,32 @@
 namespace WebApp;
+
 public static class RestApi
 {
     public static void Start()
     {
-// 1. Hämta alla visningar från vyn (för dropdown-menyn)
-App.MapGet("/api/v_screenings", (HttpContext context) =>
-{
-    var sql = "SELECT * FROM v_screenings";
-    return RestResult.Parse(context, SQLQuery(sql, null, context));
-});
+        // 1. Hämta alla visningar från vyn (för dropdown-menyn)
+        // App.MapGet("/api/v_screenings", (HttpContext context) =>
+        // {
+        //     var sql = "SELECT * FROM v_screenings";
+        //     return RestResult.Parse(context, SQLQuery(sql, null, context));
+        // });
 
-// 2. Ta emot bokningen från formuläret och spara i tabellen Booking
-App.MapPost("/api/Booking", (HttpContext context, JsonElement body) =>
-{
-    // Skapa ett unikt bokningsnummer som krävs i uppgiften
-    string bookingNumber = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
+        // // 2. Ta emot bokningen från formuläret och spara i tabellen Booking
+        // App.MapPost("/api/Booking", (HttpContext context, JsonElement body) =>
+        // {
+        //     // Skapa ett unikt bokningsnummer som krävs i uppgiften
+        //     string bookingNumber = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
 
-    var sql = @"INSERT INTO Booking (bookingNumber, screeningId, userId) 
-                VALUES (@bookingNumber, @screeningId, (SELECT id FROM User LIMIT 1))";
+        //     var sql = @"INSERT INTO Booking (bookingNumber, screeningId, userId) 
+        //                 VALUES (@bookingNumber, @screeningId, (SELECT id FROM User LIMIT 1))";
 
-    var parameters = new {
-        bookingNumber = bookingNumber,
-        screeningId = body.GetProperty("screeningId").GetInt32()
-    };
+        //     var parameters = new {
+        //         bookingNumber = bookingNumber,
+        //         screeningId = body.GetProperty("screeningId").GetInt32()
+        //     };
 
-    return RestResult.Parse(context, SQLQuery(sql, parameters, context));
-});
+        //     return RestResult.Parse(context, SQLQuery(sql, parameters, context));
+        // });
         App.MapPost("/api/{table}", (
             HttpContext context, string table, JsonElement bodyJson
         ) =>

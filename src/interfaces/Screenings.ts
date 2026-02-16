@@ -6,7 +6,7 @@ export interface Screening {
   salon: string; //?
   startTime: string;     // Lade till denna
   theaterName: string;   // Lade till denna
-  avaliableSeats: number; // Lade till denna
+  availableSeats: number; // Lade till denna
   priceSek: number;
   movieId: number;
   duration: number;

@@ -20,7 +20,7 @@ export default function ProductDetailsPage() {
     return <NotFoundPage />;
   }
 
-  const { name, quantity, price$, description } = product;
+  const { name, quantity, price$, description } = product; // id 
 
   return <article className="product-details">
     <Row>
@@ -54,7 +54,7 @@ export default function ProductDetailsPage() {
     <Row>
       <Col>
         <Link to="/" className="btn btn-primary float-end">
-          Back to the product list
+
         </Link>
       </Col>
     </Row>

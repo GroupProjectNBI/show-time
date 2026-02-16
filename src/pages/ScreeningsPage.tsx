@@ -2,17 +2,22 @@
 import { useState, useEffect } from "react";
 import fetchJson from "../utils/fetchJson";
 import ScreeningsList from "../parts/ScreeningsList";
+import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
 
 function ScreeningsPage() {
-//Skapat en state-variabel som håller listan med filmer. Den är tom [] från början.
-// Den här raden skapar både variabeln OCH funktionen (setScreenings) som uppdaterar den
-const [screenings, setScreenings] = useState<Screening[]>([]); // empty for now, will add mockdata
-useEffect(() => {
+  //för drop down
+  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+
+
+  //Skapat en state-variabel som håller listan med filmer. Den är tom [] från början.
+  // Den här raden skapar både variabeln OCH funktionen (setScreenings) som uppdaterar den
+  const [screenings, setScreenings] = useState<Screening[]>([]); // empty for now, will add mockdata
+  useEffect(() => {
     async function loadData() {
       // Anropar våra SQL-vy v_screenings via API:et
       const data = await fetchJson("/api/v_screenings");
-      
+
       // Om hämtningen lyckas, spara filmerna i vår state
       if (data && !data.error) {
         setScreenings(data);
@@ -36,9 +41,10 @@ useEffect(() => {
 
         {/* FILTER ROW (responsive) */}
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-          <button className="w-full rounded-xl bg-white/10 px-5 py-2 text-sm font-semibold text-accent transition hover:bg-white/15 md:w-auto">
-            Välj dag & datum
-          </button>
+          <DateDropdown
+            valueISO={selectedDateISO}
+            onChange={setSelectedDateISO}
+          />
 
           {/* FILTER BUTTON primary color */}
           <button className="w-full rounded-xl bg-primary px-10 py-2 text-sm font-semibold text-accent transition hover:opacity-90 md:w-auto">

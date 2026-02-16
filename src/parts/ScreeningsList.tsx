@@ -1,5 +1,6 @@
 import type { Screening } from "../interfaces/Screenings";
 import { calculatingTime } from "../utils/lengthcalc.ts";
+import { Link, } from "react-router-dom";
 
 type Props = {
   screenings: Screening[];
@@ -12,7 +13,7 @@ export default function ScreeningsList({ screenings }: Props) {
         <p className="py-6 text-accent/70">Inga screenings att visa.</p>
       ) : (
         <div className="divide-y divide-white/10">
-          {screenings.map(({ id, movieTitle, theaterName, avaliableSeats, startTime, movieId, duration, totalAmountOfSeats }) => (
+          {screenings.map(({ id, movieTitle, theaterName, availableSeats, startTime, movieId, duration, totalAmountOfSeats }) => (
             <div key={id} className="py-6">
 
               {/* MOBILE layout */}
@@ -36,16 +37,16 @@ export default function ScreeningsList({ screenings }: Props) {
                   <div className="font-semibold text-accent">
 
                     {/* === NY LOGIK: Ändrat från salon till theaterName === */}
-                    Salong {theaterName}
+                    {theaterName} Salong
                     {/* ================================================= */}
 
-                  </div>
+                  </div >
                   <div className="text-sm text-accent/70">
 
                     {/* === NY LOGIK: Hämtar siffran för lediga platser === */}
-                    {avaliableSeats} av {totalAmountOfSeats} platser kvar
+                    {availableSeats} av {totalAmountOfSeats} platser kvar
                     {/* ================================================ */}
-                  </div>
+                  </div >
                   <div className="text-sm text-accent/70">
 
                     {/* === NY LOGIK: Hämtar siffran för lediga platser === */}
@@ -57,48 +58,48 @@ export default function ScreeningsList({ screenings }: Props) {
 
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button className="rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-accent transition hover:bg-white/20">
-                      Boka nu
+                      <Link to={`/test/${id}`} >Boka nu</Link>
                     </button>
                     <button className="rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-accent transition hover:bg-white/20">
                       Mer info
                     </button>
                   </div>
-                </div>
-              </div>
+                </div >
+              </div >
 
 
 
               {/* DESKTOP layout */}
-              <div className="hidden md:grid md:grid-cols-[140px_1fr_280px] md:items-center md:py-1">
+              < div className="hidden md:grid md:grid-cols-[140px_1fr_280px] md:items-center md:py-1" >
                 {/* TIME */}
 
-                <div className="text-accent/70">
+                < div className="text-accent/70" >
 
                   {/* === NY LOGIK: Formaterar tid för datorvy === */}
                   KL. {new Date(startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   {/* =========================================== */}
-                </div>
+                </div >
 
                 {/* TITLE */}
-                <div className="flex items-center gap-5">
+                < div className="flex items-center gap-5" >
                   <div className="h-24 w-16 overflow-hidden rounded-md " />
                   <img src={`/images/posters/${movieId}.webp`} className="w-30 h-40" alt={movieTitle} />
                   <div className="text-base font-semibold text-accent">
                     {movieTitle}
                   </div>
-                </div>
+                </div >
 
                 {/* SALON + SEATS + BUTTONS (left aligned + pushed inward) */}
-                <div className="justify-self-start pl-6">
+                < div className="justify-self-start pl-6" >
                   <div className="font-semibold text-accent">
                     {/* === NY LOGIK: Kopplat till theaterName === */}
-                    Salong {theaterName}
+                    {theaterName} Salong
                     {/* ========================================= */}
-                  </div>
+                  </div >
                   <div className="text-sm text-accent/70">
                     Platser:
                     {/* === NY LOGIK: Kopplat till avaliableSeats === */}
-                    <span className="text-accent"> {avaliableSeats} av {totalAmountOfSeats} platser kvar</span>
+                    <span className="text-accent"> {availableSeats} av {totalAmountOfSeats} platser kvar</span>
                     {/* ============================================ */}
 
                   </div>
@@ -113,18 +114,19 @@ export default function ScreeningsList({ screenings }: Props) {
 
                   <div className="mt-3 flex gap-2">
                     <button className="rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-accent transition hover:bg-white/20">
-                      Boka nu
+                      <Link to={`/test/${id}`} >Boka nu</Link>
                     </button>
                     <button className="rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-accent transition hover:bg-white/20">
                       Mer info
                     </button>
                   </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                </div >
+              </div >
+            </div >
+          ))
+          }
+        </div >
       )}
-    </section>
+    </section >
   );
 }
