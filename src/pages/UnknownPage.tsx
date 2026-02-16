@@ -34,25 +34,22 @@ export default function TestDelux() {
 
         const loadPageData = async () => {
             try {
-                // Vi hämtar all data men förbereder för filtrering
-                const allScreenings = await fetchJson(`/api/v_screenings`);
-                const allOccupied = await fetchJson(`/api/v_occupied_seats`);
-
-                // Logik för att hitta rätt data
-                const screening = allScreenings.find((s: any) => s.id === Number(id));
+                const screeningResult = await fetchJson(`/api/v_screenings?where=id=${id}`);
+                const screening = screeningResult[0]; // Vi tar första (och enda) träffen
 
                 if (screening) {
-                    // Nu har vi all information vi behöver för att visa rätt salong
+                    // 2. Hämta layout (samma som förut, men vi kan använda where här med)
                     const theaterId = screening.theaterName === "Stora" ? 1 : 2;
                     const layoutData = await fetchJson(`/api/Theater?where=id=${theaterId}`);
                     setSeatArray(layoutData);
 
-                    // Filtrera ut de upptagna stolarna för just denna visning
-                    const filteredOccupied = allOccupied
-                        .filter((occ: any) => occ.screeningId === Number(id))
-                        .map((occ: any) => occ.seatId);
+                    // 3. Hämta upptagna stolar för JUST denna visning direkt från DB
+                    const occupiedResult = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`);
 
-                    setOccupied(filteredOccupied);
+                    // Mappa om resultatet till en enkel lista med siffror
+                    const occupiedIds = occupiedResult.map((occ: any) => occ.seatId);
+
+                    setOccupied(occupiedIds);
                 }
             } catch (error) {
                 console.error("DoD-filtrering misslyckades:", error);
