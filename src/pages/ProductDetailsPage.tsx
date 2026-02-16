@@ -20,7 +20,7 @@ export default function ProductDetailsPage() {
     return <NotFoundPage />;
   }
 
-  const { id, name, quantity, price$, description } = product;
+  const { name, quantity, price$, description } = product; // id 
 
   return <article className="product-details">
     <Row>
