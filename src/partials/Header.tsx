@@ -8,6 +8,7 @@ export default function Header() {
   const pathName = useLocation().pathname;
   const currentRoute = routes
     .slice()
+    .filter((x) => x.index !== undefined && x.index >= 0) // ignore the catch-all 404 route
     .sort((a, b) => (a.path.length > b.path.length ? -1 : 1))
     .find((x) => pathName.indexOf(x.path.split(":")[0]) === 0);
 
