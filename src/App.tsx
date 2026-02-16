@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom'; // Lagt till Outlet om Main inte
 import Header from "./partials/Header";
 import Main from './partials/Main';
 import Footer from './partials/Footer';
-import TicketSelector from "./Components/TicketSelector"; // Osäker på om denna behövs här, men vi behåller den
+import TicketSelector from "./parts/TicketSelector"; // Osäker på om denna behövs här, men vi behåller den
 
 
 
