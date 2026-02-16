@@ -54,7 +54,7 @@ export default function ProductDetailsPage() {
     <Row>
       <Col>
         <Link to="/" className="btn btn-primary float-end">
-          Back to the product list
+
         </Link>
       </Col>
     </Row>
