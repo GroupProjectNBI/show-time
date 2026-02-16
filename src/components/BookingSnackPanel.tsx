@@ -8,7 +8,7 @@ type Props = {
   ticketCount: number;
   ticketPrice: number;
   snackImageUrl?: string;
-  onBook?: (payload: { email: string; snack: SnackKey | null }) => void;
+  onBook?: (payload: { email: string; snack: SnackKey | null; }) => void;
 };
 
 const snackOptions = [
@@ -59,17 +59,17 @@ export default function BookingSnackPanel({
 
   return (
     <div className="w-full">
-      <div className="relative w-full rounded-[26px] bg-[#3f3b3d] px-5 py-6 text-[#0f0f10] shadow-[0_10px_30px_rgba(0,0,0,0.35)] sm:px-8 sm:py-7 lg:px-10 lg:py-8">
+      <div className="relative w-full rounded-[26px] bg-surface px-5 py-6 text-accent shadow-[0_10px_30px_rgba(0,0,0,0.35)] sm:px-8 sm:py-7 lg:px-10 lg:py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr_220px] lg:gap-10">
           <div className="pt-2">
-            <div className="text-[18px] font-semibold text-[#0b0b0c]">
+            <div className="text-[18px] font-semibold text-accent">
               {movieTitle}
             </div>
-            <div className="mt-1 text-[16px] font-semibold text-[#0b0b0c]">
+            <div className="mt-1 text-[16px] font-semibold text-accent">
               {ticketCount} Biljetter
             </div>
 
-            <div className="mt-6 space-y-1 text-[14px] font-semibold text-[#0b0b0c]">
+            <div className="mt-6 space-y-1 text-[14px] font-semibold text-accent">
               {seatsLabelLines.map((line, idx) => (
                 <div key={idx}>{line}</div>
               ))}
@@ -88,13 +88,13 @@ export default function BookingSnackPanel({
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-[12px] font-semibold text-[#b9b0b4]">
+                  <div className="flex h-full w-full items-center justify-center text-[12px] font-semibold text-accent">
                     Snack-bild
                   </div>
                 )}
               </div>
 
-              <div className="text-[16px] font-semibold leading-snug text-[#0b0b0c]">
+              <div className="text-[16px] font-semibold leading-snug text-accent">
                 Förboka snackset redan nu
                 <br />
                 och få de serverat till din stol!
@@ -149,20 +149,20 @@ export default function BookingSnackPanel({
                       </span>
 
                       <span className="min-w-0 flex flex-col justify-center">
-                        <div className="text-[16px] font-semibold tracking-tight text-[#0b0b0c]">
+                        <div className="text-[16px] font-semibold tracking-tight text-accent">
                           {opt.title}
                         </div>
-                        <div className="mt-[2px] text-[14px] font-medium leading-snug text-[#0b0b0c]/70">
+                        <div className="mt-[2px] text-[14px] font-medium leading-snug text-accent/70">
                           {opt.desc}
                         </div>
                       </span>
                     </span>
 
                     <span className="ml-auto text-right lg:min-w-[170px] lg:shrink-0">
-                      <div className="whitespace-nowrap tabular-nums text-[15px] font-semibold text-[#0b0b0c]">
+                      <div className="whitespace-nowrap tabular-nums text-[15px] font-semibold text-accent">
                         {opt.prebookPrice.toFixed(2)} kr
                       </div>
-                      <div className="whitespace-nowrap tabular-nums text-[12px] text-[#0b0b0c]/60">
+                      <div className="whitespace-nowrap tabular-nums text-[12px] text-accent/60">
                         Pris på plats: {opt.onSitePrice} kr
                       </div>
                     </span>
@@ -175,10 +175,10 @@ export default function BookingSnackPanel({
           <div className="pt-6 text-left lg:pt-[80px] lg:text-right">
             <div className="flex flex-col items-start lg:items-end">
               <div className="flex items-baseline gap-4 whitespace-nowrap lg:justify-end">
-                <div className="tabular-nums text-[18px] font-semibold tracking-tight text-[#0b0b0c]">
+                <div className="tabular-nums text-[18px] font-semibold tracking-tight text-accent">
                   {selected ? `${selected.prebookPrice.toFixed(2)} kr` : "0 kr"}
                 </div>
-                <div className="text-[13px] font-medium text-[#0b0b0c]/60">
+                <div className="text-[13px] font-medium text-accent/60">
                   Pris på plats: {selected ? `${selected.onSitePrice} kr` : "-"}
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default function BookingSnackPanel({
               font-bold
               leading-none
               text-[#e8e1e5]
-              placeholder:text-[#e8e1e5]
+              placeholder:text-accent
               focus:ring-2
               focus:ring-primary
               outline-none
@@ -215,10 +215,10 @@ export default function BookingSnackPanel({
 
           <div className="grid justify-items-end gap-3">
             <div className="flex items-baseline gap-2 whitespace-nowrap">
-              <span className="text-[16px] font-semibold text-[#0b0b0c]">
+              <span className="text-[16px] font-semibold text-accent">
                 Totalt:
               </span>
-              <span className="tabular-nums text-[22px] font-bold text-[#0b0b0c]">
+              <span className="tabular-nums text-[22px] font-bold text-accent">
                 {Math.round(total)} kr
               </span>
             </div>
@@ -234,7 +234,7 @@ export default function BookingSnackPanel({
                 px-14
                 text-[22px]
                 font-extrabold
-                text-white
+                text-accent
                 transition-all
                 duration-300
                 shadow-[0_8px_20px_rgba(0,0,0,0.35)]
