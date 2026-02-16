@@ -57,7 +57,7 @@ export default function BookingSnackPanel({
     return ticketCount * ticketPrice + snacksPrice;
   }, [ticketCount, ticketPrice, snacksPrice]);
 
-  // 🔥 Fallback-bild om ingen skickas in
+
   const imageSrc = snackImageUrl || "/images/Commercials/popga.jpg";
 
   return (
@@ -82,12 +82,12 @@ export default function BookingSnackPanel({
 
           {/* Mitten sektion */}
           <div className="relative">
-            <div className="absolute -left-5 top-2 hidden h-[170px] w-[3px] rounded bg-[#2f2c2e] lg:block" />
+            <div className="absolute -left-5 top-2 hidden h-[50px] w-[3px] rounded bg-[#2f2c2e] lg:block" />
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-[220px_1fr] sm:items-center sm:gap-6">
 
-              {/* 🔥 Bilden — nu helt korrekt */}
-              <div className="h-[96px] w-full overflow-hidden rounded-[10px] bg-[#2b282a] sm:w-[220px]">
+
+              <div className="h-[50px] w-full overflow-hidden rounded-[10px] bg-[#2b282a] sm:w-[220px]">
                 <img
                   src={imageSrc}
                   alt="Snacks"
@@ -95,7 +95,7 @@ export default function BookingSnackPanel({
                 />
               </div>
 
-              <div className="text-[16px] font-semibold leading-snug text-accent">
+              <div className="text-[10px] font-semibold leading-snug text-accent">
                 Förboka snackset redan nu
                 <br />
                 och få de serverat till din stol!
@@ -103,7 +103,7 @@ export default function BookingSnackPanel({
             </div>
 
             {/* Snack-alternativ */}
-            <div className="mt-8 w-full space-y-6">
+            <div className="mt-4 w-full space-y-4">
               {snackOptions.map((opt) => {
                 const checked = opt.key === selectedSnack;
 
@@ -113,8 +113,8 @@ export default function BookingSnackPanel({
                     type="button"
                     onClick={() => setSelectedSnack(opt.key)}
                     className={[
-                      "group w-full rounded-2xl px-6 py-5 text-left transition-all duration-200",
-                      "min-h-[110px] flex items-center gap-5",
+                      "group w-full rounded-2xl px-6 text-left transition-all duration-200",
+                      "min-h-[10px] flex items-center gap-5",
                       "bg-[#4a4548] border border-black/10 hover:bg-[#524d50]",
                       checked ? "bg-[#524d50] border-black/20 ring-1 ring-black/20" : "",
                     ].join(" ")}
@@ -211,8 +211,8 @@ export default function BookingSnackPanel({
               type="button"
               onClick={() => onBook?.({ email, snack: selectedSnack })}
               className="
-                h-[56px] w-full rounded-full bg-primary px-14
-                text-[22px] font-extrabold text-accent
+                h-[25px] w-full rounded-full bg-primary px-14
+                text-[14px] font-extrabold text-accent
                 transition-all duration-300
                 shadow-[0_8px_20px_rgba(0,0,0,0.35)]
                 hover:shadow-[0_15px_35px_rgba(0,0,0,0.5)]
