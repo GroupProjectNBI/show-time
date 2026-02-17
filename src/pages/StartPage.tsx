@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import fetchJson from "../utils/fetchJson"; 
+import OfferBanner from "../parts/OfferBanner"; 
 
 function StartPage() {
   const [data, setData] = useState<any>(null);
@@ -42,7 +43,8 @@ function StartPage() {
           Poster 3
         </div>
       </div>
-
+      <OfferBanner />
+      
       {/* 2. SCHEMA SECTION (Den bruna som på Figma) */}
       <div className="w-[min(900px,calc(100%-32px))] bg-[#332f2e] rounded-[40px] p-10 shadow-2xl mb-20 border border-white/5">
         <h2 className="text-[#c0a060] text-2xl font-light tracking-widest mb-8 uppercase">
