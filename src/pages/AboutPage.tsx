@@ -6,10 +6,10 @@ AboutPage.route = {
 
 export default function AboutPage() {
   return (
-    <>
+    <div className="about-page">
 
-      {/* TEXT-CONTAINER (samma som innan) */}
-      <div className="w-full max-w-6xl mx-auto px-4 py-10">
+      {/* TEXT-CONTAINER */}
+      <div className="w-full max-w-6xl mx-auto px-4 pt-10 pb-2">
 
         {/* Rubrik */}
         <h3 className="text-2xl font-semibold mb-6 text-accent">
@@ -42,16 +42,16 @@ export default function AboutPage() {
       </div>
 
       {/* BILD-CONTAINER (EXAKT samma bredd som footern) */}
-      <div className="mt-10 mx-4 md:mx-12">
+      <div className="mx-4 md:mx-12">
         <div className="max-w-6xl mx-auto px-6">
           <img
             src="/images/Commercials/cinema.webp"
             alt="Biograf"
-            className="w-full rounded-3xl shadow-xl object-cover max-h-[520px]"
+            className="w-full rounded-none shadow-xl object-cover max-h-[520px]"
           />
         </div>
       </div>
 
-    </>
+    </div>
   );
 }

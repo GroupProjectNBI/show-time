@@ -12,6 +12,8 @@ export default function App() {
 
   // Denna hook fungerar eftersom App ligger inuti RouterProvider i main.tsx
   const location = useLocation();
+  const isAboutPage = location.pathname.startsWith("/om-oss");
+
 
   // Scroll to top vid sidbyte
   if (location.pathname) {
@@ -27,7 +29,9 @@ export default function App() {
 
         <Header />
         <Main />
-        <Footer />
+        <div className={isAboutPage ? "footer-about" : ""}>
+          <Footer />
+        </div>
 
       </div>
 
