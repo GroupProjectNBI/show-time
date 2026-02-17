@@ -2,7 +2,6 @@ import { Row, Col } from 'react-bootstrap';
 
 OurVisionPage.route = {
   path: '/our-vision',
-  menuLabel: 'Our Vision',
   index: -1
 };
 
