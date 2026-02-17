@@ -46,7 +46,7 @@ function StartPage() {
           Poster 3
         </div>
       </div>
-      <OfferBanner />
+      
 
       {/* 2. SCHEMA SECTION (Den bruna som på Figma) */}
 
@@ -54,6 +54,7 @@ function StartPage() {
       <section className="w-full mt-6">
         <MovieCarousel />
       </section>
+      <OfferBanner />
 
       {/* Schema-rutan från  Figma-design */}
 
