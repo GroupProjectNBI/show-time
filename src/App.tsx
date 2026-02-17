@@ -2,11 +2,6 @@ import { useLocation } from 'react-router-dom'; // Lagt till Outlet om Main inte
 import Header from "./partials/Header";
 import Main from './partials/Main';
 import Footer from './partials/Footer';
-import TicketSelector from "./Components/TicketSelector"; // Osäker på om denna behövs här, men vi behåller den
-
-
-
-
 
 
 // 1. IMPORTERA DINA PROVIDERS
@@ -32,11 +27,6 @@ export default function App() {
 
         <Header />
         <Main />
-
-        <div>
-          <TicketSelector />
-        </div>
-
         <Footer />
 
       </div>
