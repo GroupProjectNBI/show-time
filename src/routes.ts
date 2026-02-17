@@ -13,6 +13,7 @@ import TestDelux from './pages/UnknownPage.tsx';
 import ConfirmationPage from './pages/ConfirmationPage.tsx';
 import BookingPanelTestPage from './pages/BookingPanelTestPage.tsx';
 import WorkWithUs from "./pages/WorkWithUs.tsx";
+import Faq from "./pages/FaqPage.tsx";
 
 
 
@@ -29,7 +30,8 @@ export default [
   AnimalPage,
   ConfirmationPage,
   BookingPanelTestPage,
-  WorkWithUs
+  WorkWithUs,
+  Faq
 ]
   // map the route property of each page component to a Route
   .map(x => (({ element: createElement(x), ...x.route }) as Route))
