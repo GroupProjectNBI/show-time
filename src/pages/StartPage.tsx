@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import fetchJson from "../utils/fetchJson";
-import MovieCarousel from "../partials/MovieCarousel";
+import MovieCarousel from "../parts/MovieCarousel";
 
 function StartPage() {
   const [data, setData] = useState<any>(null);
