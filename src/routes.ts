@@ -11,10 +11,9 @@ import ProductsPage from './pages/ProductsPage.tsx';
 import ScreeningsPage from './pages/ScreeningsPage.tsx';
 import BookingPage from './pages/BookingPage.tsx';
 import ConfirmationPage from './pages/ConfirmationPage.tsx';
-//import BookingPanelTestPage from './pages/BookingPanelTestPage.tsx';
 import WorkWithUs from "./pages/WorkWithUs.tsx";
 import StartPage from './pages/StartPage.tsx';
-
+import MovieInfo from './pages/MovieInfo.tsx';
 
 
 
@@ -29,9 +28,9 @@ export default [
   BookingPage,
   AnimalPage,
   ConfirmationPage,
-  //BookingPanelTestPage,
   WorkWithUs,
-  StartPage
+  StartPage,
+  MovieInfo
 ]
   // map the route property of each page component to a Route
   .map(x => (({ element: createElement(x), ...x.route }) as Route))
