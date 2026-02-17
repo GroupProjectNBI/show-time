@@ -4,15 +4,13 @@ import { Row, Col, Form } from 'react-bootstrap';
 import { useStateContext } from '../utils/useStateObject';
 import Select from '../parts/Select';
 import ProductCard from '../parts/ProductCard';
-import productsLoader from '../utils/productsLoader';
+// import productsLoader from '../utils/productsLoader';
 import { getHelpers } from '../utils/productPageHelpers';
-//MovieListPage.tsx
+//MovieListPage.tsx  Ändtrat Path för att inte intersekta med StartPage.tsx
 ProductsPage.route = {
-  path: '/',
-  menuLabel: 'Products',
-  index: 1,
-  parent: '/',
-  loader: productsLoader
+  path: "/products-example", // Ändra från "/" till detta
+  menuLabel: "Products",
+  hideInMenu: false
 };
 
 export default function ProductsPage() {

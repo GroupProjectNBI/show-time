@@ -6,24 +6,24 @@ WorkWithUs.route = {
 
 export default function WorkWithUs() {
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-10">
+    <div className="w-full max-w-8xl mx-auto px-2 py-4">
 
       {/*hero-bild*/}
-      <div className="w-full mb-10">
+      <div className="w-full mb-8">
         <img
-          src="/images/Commercials/workwithus-hero.webp"
+          src="/images/Commercials/jobbahososs.png"
           alt="Arbeta hos oss"
-          className="w-full rounded-xl shadow-xl object-cover max-h-[380px]"
+          className="w-full rounded-xl shadow-xl object-cover max-h-[600px]"
         />
       </div>
 
       {/* Rubrik */}
-      <h1 className="text-3xl font-semibold text-center text-accent mb-8">
+      <h1 className="text-3xl font-semibold text-left text-accent mb-8">
         Jobba hos oss
       </h1>
 
       {/* Textblock centrerat */}
-      <div className="max-w-3xl mx-auto space-y-6 text-center leading-relaxed text-accent">
+      <div className="max-w-1xl mx-auto space-y-6 text-left leading-relaxed text-accent">
 
         <p>
           Hos oss är biobesöket mer än en film - det är en upplevelse.
@@ -47,14 +47,13 @@ export default function WorkWithUs() {
           Välkommen att söka till vårt team.
         </p>
       </div>
-      {/* Tre bilder under texten */}
-      <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-6">
+      {/* Två bilder under texten */}
+      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 justify-center">
 
-        <img src="/images/Commercials/cinema1.webp" alt="Biograf" className="w-full h-[220px] object-cover rounded-xl shadow-lg" />
+        <img src="/images/Commercials/salong1.png" alt="Biograf" className="w-full h-[500px] object-cover rounded-xl shadow-lg" />
+        <img src="/images/Commercials/salong2.png" alt="Biograf" className="w-full h-[500px] object-cover rounded-xl shadow-lg" />
 
-        <img src="/images/Commercials/cinema2.webp" alt="Biograf" className="w-full h-[220px] object-cover rounded-xl shadow-lg" />
 
-        <img src="/images/Commercials/cinema3.webp" alt="Biograf" className="w-full h-[220px] object-cover rounded-xl shadow-lg" />
       </div>
     </div>
   );
