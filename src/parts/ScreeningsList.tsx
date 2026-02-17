@@ -58,10 +58,10 @@ export default function ScreeningsList({ screenings }: Props) {
 
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button className="rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-accent transition hover:bg-white/20">
-                      <Link to={`/test/${id}`} >Boka nu</Link>
+                      <Link to={`/booking/${id}`} >Boka nu</Link>
                     </button>
                     <button className="rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-accent transition hover:bg-white/20">
-                      Mer info
+                      <Link to={`/film_info/${movieId}`} >Mer info</Link>
                     </button>
                   </div>
                 </div >
@@ -114,10 +114,10 @@ export default function ScreeningsList({ screenings }: Props) {
 
                   <div className="mt-3 flex gap-2">
                     <button className="rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-accent transition hover:bg-white/20">
-                      <Link to={`/test/${id}`} >Boka nu</Link>
+                      <Link to={`/booking/${id}`} >Boka nu</Link>
                     </button>
                     <button className="rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-accent transition hover:bg-white/20">
-                      Mer info
+                      <Link to={`/film_info/${movieId}`} >Mer info</Link>
                     </button>
                   </div>
                 </div >
