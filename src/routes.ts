@@ -30,11 +30,11 @@ export default [
   BookingPage,
   AnimalPage,
   ConfirmationPage,
-  BookingPanelTestPage,
-  WorkWithUs,
-  Faq
   //BookingPanelTestPage,
   WorkWithUs,
+  Faq,
+  //BookingPanelTestPage,
+  // WorkWithUs,
   StartPage
 ]
   // map the route property of each page component to a Route
