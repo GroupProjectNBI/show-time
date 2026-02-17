@@ -8,7 +8,7 @@ function StartPage() {
 
   useEffect(() => {
     // Vi anropar backend för att hämta filmer
-    fetchJson("/api/movies")
+    fetchJson("/api/v_getPopular")
       .then((json) => {
         setData(json);
         setLoading(false);
@@ -29,10 +29,9 @@ function StartPage() {
 
   return (
     <div className="flex-grow flex flex-col items-center bg-[#1a1a1a] text-white">
-      
       {/* Karusellen högst upp  */}
       <section className="w-full mt-6">
-        <MovieCarousel />
+        <MovieCarousel popularMovie={data} />
       </section>
 
       {/* Schema-rutan från  Figma-design */}
@@ -40,17 +39,17 @@ function StartPage() {
         <h2 className="text-[#c0a060] text-2xl font-light tracking-[0.2em] mb-8 uppercase">
           På bio denna veckan
         </h2>
-        
+
         <div className="space-y-4 border-t border-white/5 pt-6">
-           {data ? (
-             <p className="text-white/60 font-light">
-               Välkommen! Vi har {data.length} spännande filmer på schemat.
-             </p>
-           ) : (
-             <p className="text-white/40 italic font-light">
-               Kunde inte ladda schemat just nu.
-             </p>
-           )}
+          {data ? (
+            <p className="text-white/60 font-light">
+              Välkommen! Vi har {data.length} spännande filmer på schemat.
+            </p>
+          ) : (
+            <p className="text-white/40 italic font-light">
+              Kunde inte ladda schemat just nu.
+            </p>
+          )}
         </div>
       </div>
 
@@ -61,7 +60,7 @@ function StartPage() {
 // ROUTE INSTÄLLNINGAR
 StartPage.route = {
   path: "/",
-   // Ingen menuLabel så den inte syns i menyn
+  // Ingen menuLabel så den inte syns i menyn
   hideInMenu: true,
   index: -1
 };
