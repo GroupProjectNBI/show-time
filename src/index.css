@@ -1,6 +1,6 @@
 @tailwind base;
-@tailwind components;
 @tailwind utilities;
+@tailwind components;
 
 @layer base {
   body {
@@ -11,4 +11,11 @@
     @apply min-h-screen bg-surface;
   }
 
+}
+
+.about-page footer {
+  margin-top: -80px !important;
+  /* justera efter smak */
+  position: relative;
+  z-index: 10;
 }

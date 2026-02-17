@@ -1,33 +1,28 @@
-import { useState, useEffect } from "react";
-import { useParams } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
 import fetchJson from "../utils/fetchJson";
 import type { ITheater } from "../interfaces/Seats";
 import Chairs from "../parts/Chairs";
 
-// 1. IMPORTERA CONTEXT HOOKEN
 import { useBooking } from "../context/BookingContext";
 
-TestDelux.route = {
-    path: '/test/:id',
-    menuLabel: 'details',
-    index: 2
+import TicketSelector from "../parts/TicketSelector";
+import BookingSnackPanel from "../parts/BookingSnackPanel";
+
+BookingPage.route = {
+    path: "/booking/:id",
+    index: 2,
+    // Ingen menuLabel => ska inte synas som menyval
 };
 
-export default function TestDelux() {
+export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<ITheater[] | null>(null);
 
-    // Hämta id från URL:en (t.ex. /test/3 -> id blir "3")
-    const { id } = useParams<{ id: string }>();
+    // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
+    const { id } = useParams<{ id: string; }>();
 
-
-
-    // 2. HÄMTA DATA OCH FUNKTIONER FRÅN CONTEXT
-    const {
-        selectedSeats,
-        occupiedSeats,
-        toggleSeat,
-        setOccupied
-    } = useBooking();
+    const { selectedSeats, occupiedSeats, toggleSeat, setOccupied } = useBooking();
 
     useEffect(() => {
         if (!id) return;
@@ -35,18 +30,16 @@ export default function TestDelux() {
         const loadPageData = async () => {
             try {
                 const screeningResult = await fetchJson(`/api/v_screenings?where=id=${id}`);
-                const screening = screeningResult[0]; // Vi tar första (och enda) träffen
+                const screening = screeningResult[0];
 
                 if (screening) {
-                    // 2. Hämta layout (samma som förut, men vi kan använda where här med)
+                    // Hämta layout
                     const theaterId = screening.theaterName === "Stora" ? 1 : 2;
                     const layoutData = await fetchJson(`/api/Theater?where=id=${theaterId}`);
                     setSeatArray(layoutData);
 
-                    // 3. Hämta upptagna stolar för JUST denna visning direkt från DB
+                    // Hämta upptagna stolar för denna visning
                     const occupiedResult = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`);
-
-                    // Mappa om resultatet till en enkel lista med siffror
                     const occupiedIds = occupiedResult.map((occ: any) => occ.seatId);
 
                     setOccupied(occupiedIds);
@@ -57,25 +50,40 @@ export default function TestDelux() {
         };
 
         loadPageData();
-    }, [id]);
+    }, [id, setOccupied]);
 
     if (!seatArray) {
         return <div className="text-white text-center p-10">Laddar salong...</div>;
     }
 
+    // Enkel label-lista av valda säten (seatId). Kan senare göras om till "Rad X, Stol Y".
+    const seatsLabelLines = selectedSeats
+        .slice()
+        .sort((a, b) => a - b)
+        .map((seatId) => `Stol-ID ${seatId}`);
+
+    // returnerar alla komponenter, ingen logik är inlagd än så länge
     return (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center relative">
+            {/* =========================
+          TICKET SELECTOR 
+          ========================= */}
+            <div className="w-full max-w-4xl mb-10">
+                <TicketSelector />
+            </div>
+
+            {/* =========================
+          STOLSVAL 
+          ========================= */}
             <h1 className="text-white text-2xl mb-2">Biograf Layout</h1>
 
             {/* Duken / Scenen */}
-            <div className="w-full max-w-md h-1 bg-white/20 shadow-[0_-10px_20px_rgba(255,255,255,0.1)] mb-12 rounded-full"></div>
+            <div className="w-full max-w-md h-1 bg-white/20 shadow-[0_-10px_20px_rgba(255,255,255,0.1)] mb-12 rounded-full" />
 
             <div className="flex flex-col gap-1 w-full max-w-4xl">
                 {seatArray.map((theater) => (
                     <section key={theater.id} className="w-full">
                         {theater.seatsPerRow.map((count, rowIndex) => {
-
-                            // Logik för löpande numrering
                             const previousSeatsCount = theater.seatsPerRow
                                 .slice(0, rowIndex)
                                 .reduce((acc, curr) => acc + curr, 0);
@@ -85,12 +93,9 @@ export default function TestDelux() {
                                     <Chairs
                                         numberOfSeats={count}
                                         previousSeatsCount={previousSeatsCount}
-                                        // rowId={rowIndex}
-
-                                        // 3. SKICKA NER CONTEXT-DATA TILL STOLARNA
-                                        selectedSeats={selectedSeats} // Vilka är valda?
-                                        occupiedSeats={occupiedSeats} // Vilka är upptagna?
-                                        onToggle={toggleSeat}         // Funktion för att klicka
+                                        selectedSeats={selectedSeats}
+                                        occupiedSeats={occupiedSeats}
+                                        onToggle={toggleSeat}
                                     />
                                 </div>
                             );
@@ -99,13 +104,14 @@ export default function TestDelux() {
                 ))}
             </div>
 
-            {/* ======================================================== */}
-            {/* 4. DEBUG / INFO RUTA                                     */}
-            {/* ======================================================== */}
+            {/* =========================
+          DEBUG / INFO RUTA 
+          ========================= */}
             <div className="fixed bottom-6 right-6 bg-gray-900 border border-white/20 p-5 rounded-xl shadow-2xl text-white max-w-xs z-50 backdrop-blur-sm bg-opacity-90">
                 <h3 className="font-bold text-accent mb-2 border-b border-white/10 pb-2">
                     Boknings Context
                 </h3>
+
                 <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                         <span className="text-gray-400">Antal valda:</span>
@@ -116,7 +122,7 @@ export default function TestDelux() {
                         <span className="text-gray-400 block mb-1">Valda IDn:</span>
                         <div className="bg-black/40 p-2 rounded text-xs font-mono break-words min-h-[2rem]">
                             {selectedSeats.length > 0
-                                ? selectedSeats.sort((a, b) => a - b).join(", ")
+                                ? selectedSeats.slice().sort((a, b) => a - b).join(", ")
                                 : "Inga valda..."}
                         </div>
                     </div>
@@ -135,6 +141,7 @@ export default function TestDelux() {
                             className="w-full bg-accent text-primary font-bold py-1 px-3 rounded hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={selectedSeats.length === 0}
                             onClick={() => alert(`Går vidare till kassan med säten: ${selectedSeats.join(", ")}`)}
+                            type="button"
                         >
                             Gå till kassan
                         </button>
@@ -142,6 +149,23 @@ export default function TestDelux() {
                 </div>
             </div>
 
+            {/* =========================
+          BOOKING SNACK PANEL 
+          ========================= */}
+            <div className="w-full flex items-end mt-10">
+                <div className="mx-auto w-full max-w-[1200px] px-6 pb-10">
+                    <BookingSnackPanel
+                        movieTitle="Joker"
+                        // Placeholder tills TicketSelector skickar upp data:
+                        ticketCount={0}
+                        ticketPrice={0}
+                        seatsLabelLines={seatsLabelLines}
+                        onBook={({ email, snack }) => {
+                            console.log("BOOK:", { email, snack });
+                        }}
+                    />
+                </div>
+            </div>
         </div>
     );
 }
