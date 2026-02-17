@@ -1,4 +1,4 @@
-import BookingSnackPanel from "../Components/BookingSnackPanel";
+import BookingSnackPanel from "../parts/BookingSnackPanel";
 
 export default function BookingPanelTestPage() {
   return (
