@@ -47,7 +47,7 @@ export default function AboutPage() {
           <img
             src="/images/Commercials/cinema.webp"
             alt="Biograf"
-            className="w-full rounded-none shadow-xl object-cover max-h-[520px]"
+            className="w-full rounded-none shadow-xl object-cover max-h-[350px]"
           />
         </div>
       </div>
