@@ -1,6 +1,6 @@
 FAQPage.route = {
   path: '/faq',
-  menuLabel: 'FAQ',
+  // menuLabel: 'FAQ',
   index: 4
 };
 

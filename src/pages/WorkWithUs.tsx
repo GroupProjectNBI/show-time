@@ -1,6 +1,6 @@
 WorkWithUs.route = {
   path: '/jobba-hos-oss',
-  menuLabel: 'Jobba hos oss',
+  //menuLabel: 'Jobba hos oss',
   index: 3
 };
 

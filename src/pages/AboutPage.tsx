@@ -1,6 +1,6 @@
 AboutPage.route = {
   path: '/om-oss',
-  menuLabel: 'Om oss',
+  // menuLabel: 'Om oss',
   index: 2
 };
 
