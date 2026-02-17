@@ -11,6 +11,7 @@ import ProductsPage from './pages/ProductsPage.tsx';
 import ScreeningsPage from './pages/ScreeningsPage.tsx';
 import BookingPage from './pages/BookingPage.tsx';
 import ConfirmationPage from './pages/ConfirmationPage.tsx';
+import WorkWithUs from "./pages/WorkWithUs.tsx";
 import StartPage from './pages/StartPage.tsx';
 import MovieInfo from './pages/MovieInfo.tsx';
 
@@ -27,6 +28,7 @@ export default [
   BookingPage,
   AnimalPage,
   ConfirmationPage,
+  WorkWithUs,
   StartPage,
   MovieInfo
 ]
