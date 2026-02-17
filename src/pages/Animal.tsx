@@ -11,7 +11,7 @@ AnimalPage.route = {
 // adding a interface for screening
 interface AnimalMovie {
     theaterName: string,
-    amountOfSeats: number,
+    totalAmountOfSeats: number,
     movieId: number,
     movieTitle: string,
     poster: string,
