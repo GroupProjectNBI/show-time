@@ -8,7 +8,7 @@ export default function AboutPage() {
   return (
     <>
 
-      {/* TEXT-CONTAINER (samma som innan, smalare för läsbarhet) */}
+      {/* TEXT-CONTAINER (samma som innan) */}
       <div className="w-full max-w-6xl mx-auto px-4 py-10">
 
         {/* Rubrik */}
@@ -42,8 +42,8 @@ export default function AboutPage() {
       </div>
 
       {/* BILD-CONTAINER (EXAKT samma bredd som footern) */}
-      <div className="mt-5 mx-4 md:mx-2">
-        <div className="max-w-12xl mx-auto px-8">
+      <div className="mt-10 mx-4 md:mx-12">
+        <div className="max-w-6xl mx-auto px-6">
           <img
             src="/images/Commercials/cinema.webp"
             alt="Biograf"
