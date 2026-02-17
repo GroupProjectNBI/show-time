@@ -4,7 +4,7 @@ import fetchJson from "../utils/fetchJson";
 import ScreeningsList from "../parts/ScreeningsList";
 import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
-
+import { formatDate } from "../utils/formatTime";
 function ScreeningsPage() {
   //för drop down
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
@@ -15,16 +15,38 @@ function ScreeningsPage() {
   const [screenings, setScreenings] = useState<Screening[]>([]); // empty for now, will add mockdata
   useEffect(() => {
     async function loadData() {
-      // Anropar våra SQL-vy v_screenings via API:et
-      const data = await fetchJson("/api/v_screenings");
+      // om där finns data i selectedDateISO hömta akka filmer. WIP: hömta dem utifrn det datumet som kommer in. 
+      if (selectedDateISO) {
 
-      // Om hämtningen lyckas, spara filmerna i vår state
-      if (data && !data.error) {
-        setScreenings(data);
+        // Vi bygger URL:en dynamiskt.
+        // 1. "screeningDate_LIKE_" säger till backend att söka textmässigt.
+        // 2. Vi lägger till "%" på slutet för att säga "allt som börjar på detta datum".
+        // 3. Vi lägger även till "&orderby=startTime" för att få dem i tidsordning (om din backend stöder det).
+        const url = `/api/v_screenings?where=screeningDate_LIKE_${selectedDateISO}%&orderby=startTime`;
+
+        // Anropar våra SQL-vy v_screenings via API:et
+        const data = await fetchJson(url);
+
+        // Om hämtningen lyckas, spara filmerna i vår state
+        if (data && !data.error) {
+          setScreenings(data);
+        }
+      }
+      else {
+        /* 
+          Har skapat en funktion som skickar tillbaka new Date object: Tue Feb 17 2026 08:51:52 GMT+0100 (centraleuropeisk normaltid)
+          Den skickar tillbaka formatet YYYY-MM-DD som vi får från kalendern med. 
+          Sätter in den i setSelectedDateISO så att componene triggas om och hämtar data. 
+        */
+        setSelectedDateISO(formatDate(new Date()));
       }
     }
+
     loadData();
-  }, []);
+  }, [selectedDateISO]);
+
+
+
 
   return (
     <div className="min-h-screen pt-8">
