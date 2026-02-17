@@ -62,17 +62,18 @@ export default function BookingPage() {
         .sort((a, b) => a - b)
         .map((seatId) => `Stol-ID ${seatId}`);
 
+    // returnerar alla komponenter, ingen logik är inlagd än så länge
     return (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center relative">
             {/* =========================
-          TICKET SELECTOR (högst upp)
+          TICKET SELECTOR 
           ========================= */}
             <div className="w-full max-w-4xl mb-10">
                 <TicketSelector />
             </div>
 
             {/* =========================
-          STOLSVAL (centrerat)
+          STOLSVAL 
           ========================= */}
             <h1 className="text-white text-2xl mb-2">Biograf Layout</h1>
 
@@ -104,7 +105,7 @@ export default function BookingPage() {
             </div>
 
             {/* =========================
-          DEBUG / INFO RUTA (som du hade)
+          DEBUG / INFO RUTA 
           ========================= */}
             <div className="fixed bottom-6 right-6 bg-gray-900 border border-white/20 p-5 rounded-xl shadow-2xl text-white max-w-xs z-50 backdrop-blur-sm bg-opacity-90">
                 <h3 className="font-bold text-accent mb-2 border-b border-white/10 pb-2">
@@ -149,7 +150,7 @@ export default function BookingPage() {
             </div>
 
             {/* =========================
-          BOOKING SNACK PANEL (längst ner, samma sida)
+          BOOKING SNACK PANEL 
           ========================= */}
             <div className="w-full flex items-end mt-10">
                 <div className="mx-auto w-full max-w-[1200px] px-6 pb-10">
