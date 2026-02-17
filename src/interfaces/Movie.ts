@@ -1,4 +1,4 @@
-export default interface Product {
+export default interface Movie {
     movieId: number;
     title: string;
     duration: number;
