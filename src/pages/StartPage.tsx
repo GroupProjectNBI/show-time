@@ -54,11 +54,11 @@ function StartPage() {
       <section className="w-full mt-6">
         <MovieCarousel />
       </section>
-      <OfferBanner />
+    
 
       {/* Schema-rutan från  Figma-design */}
 
-      <div className="w-[min(900px,calc(100%-32px))] bg-[#332f2e] rounded-[40px] p-10 shadow-2xl mb-20 border border-white/5">
+      <div className="w-full max-w-[900px] mx-auto bg-[#332f2e] rounded-[40px] p-10 shadow-2xl mb-20 border border-white/5">
         <h2 className="text-[#c0a060] text-2xl font-light tracking-[0.2em] mb-8 uppercase">
           På bio denna veckan
         </h2>
@@ -75,8 +75,13 @@ function StartPage() {
           )}
         </div>
       </div>
+       
+      <div className="w-[min(900px,calc(100%-32px))] mx-auto mt-10 mb-20">
+      
+        <OfferBanner />
+      </div>
+      </div>
 
-    </div>
   );
 }
 

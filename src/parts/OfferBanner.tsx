@@ -1,11 +1,13 @@
 export default function OfferBanner() {
   return (
-    <section className="relative w-full h-[320px] sm:h-[360px] lg:h-[420px] rounded-3xl overflow-hidden">
-      {/* Bakgrundsbild */}
+    <section className="relative w-full h-[200px] sm:h-[230px] lg:h-[260px] rounded-3xl overflow-hidden">
+     
       <img
         src="/images/Commercials/popga.jpg"
         alt="Popcorn offer"
         className="absolute inset-0 w-full h-full object-cover scale-[1.03] brightness-105 contrast-110 saturate-110"
+     
+     
       />
 
       {/* Overlay/läsbarhet*/}
@@ -14,13 +16,13 @@ export default function OfferBanner() {
 
       <div className="absolute inset-0 flex items-center justify-center px-4 sm:px-6">
         {/* Wrappern */}
-        <div className="absolute w-full max-w-[900px] h-[220px] sm:h-[240px] lg:h-[260px] rounded-[32px] bg-black/35 blur-xl" />
+        <div className="absolute w-full max-w-[600px] mx-auto h-[110px] sm:h-[130px] lg:h-[150px] rounded-[32px] bg-black/35 blur-xl" />
 
         <div
           className="
-            relative w-full max-w-[900px]
-            rounded-[32px]
-            px-6 py-8 sm:px-10 sm:py-9 lg:px-12 lg:py-10
+            relative w-full max-w-[700px]
+            mx-auto rounded-[32px]
+            px-6 py-1 sm:px-8 sm:py-2 lg:px-10 lg:py-3
             text-center
             bg-[#332a24]/55
             shadow-[0_20px_70px_rgba(0,0,0,0.55)]
