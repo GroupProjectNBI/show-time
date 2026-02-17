@@ -121,51 +121,6 @@ export default function BookingPage() {
             </div>
 
             {/* =========================
-          DEBUG / INFO RUTA 
-          ========================= */}
-            <div className="fixed bottom-6 right-6 bg-gray-900 border border-white/20 p-5 rounded-xl shadow-2xl text-white max-w-xs z-50 backdrop-blur-sm bg-opacity-90">
-                <h3 className="font-bold text-accent mb-2 border-b border-white/10 pb-2">
-                    Boknings Context
-                </h3>
-
-                <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                        <span className="text-gray-400">Antal valda:</span>
-                        <span className="font-bold">{selectedSeats.length} st</span>
-                    </div>
-
-                    <div>
-                        <span className="text-gray-400 block mb-1">Valda IDn:</span>
-                        <div className="bg-black/40 p-2 rounded text-xs font-mono break-words min-h-[2rem]">
-                            {selectedSeats.length > 0
-                                ? selectedSeats.slice().sort((a, b) => a - b).join(", ")
-                                : "Inga valda..."}
-                        </div>
-                    </div>
-
-                    <div>
-                        <span className="text-gray-400 block mb-1">Upptagna IDn (Test):</span>
-                        <div className="bg-red-900/40 p-2 rounded text-xs font-mono break-words min-h-[2rem]">
-                            {occupiedSeats.length > 0
-                                ? occupiedSeats.slice(0, 10).join(", ") + (occupiedSeats.length > 10 ? "..." : "")
-                                : "Inga upptagna"}
-                        </div>
-                    </div>
-
-                    <div className="pt-2 mt-2 border-t border-white/10">
-                        <button
-                            className="w-full bg-accent text-primary font-bold py-1 px-3 rounded hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={selectedSeats.length === 0}
-                            onClick={() => alert(`Går vidare till kassan med säten: ${selectedSeats.join(", ")}`)}
-                            type="button"
-                        >
-                            Gå till kassan
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* =========================
           BOOKING SNACK PANEL 
           ========================= */}
             <div className="w-full flex items-end mt-10">
