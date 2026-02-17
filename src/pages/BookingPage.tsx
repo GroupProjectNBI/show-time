@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import fetchJson from "../utils/fetchJson";
-import type { ITheater } from "../interfaces/Seats";
+import type { Theater } from "../interfaces/Seats";
 import Chairs from "../parts/Chairs";
 
 import { useBooking } from "../context/BookingContext";
@@ -17,7 +17,7 @@ BookingPage.route = {
 };
 
 export default function BookingPage() {
-    const [seatArray, setSeatArray] = useState<ITheater[] | null>(null);
+    const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
 
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
