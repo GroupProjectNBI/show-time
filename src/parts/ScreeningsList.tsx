@@ -1,7 +1,7 @@
 import type { Screening } from "../interfaces/Screenings";
 import { calculatingTime } from "../utils/lengthcalc.ts";
 import { Link, } from "react-router-dom";
-
+import { formatTime } from "../utils/formatTime";
 type Props = {
   screenings: Screening[];
 };
@@ -21,7 +21,7 @@ export default function ScreeningsList({ screenings }: Props) {
                 <div className="text-sm font-semibold text-accent/70">
 
                   {/* === NY LOGIK: Hämtar klockslag från databasen (startTime) === */}
-                  KL. {new Date(startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  KL. {formatTime(startTime)}
                   {/* ========================================================== */}
                 </div>
 
@@ -76,7 +76,7 @@ export default function ScreeningsList({ screenings }: Props) {
                 < div className="text-accent/70" >
 
                   {/* === NY LOGIK: Formaterar tid för datorvy === */}
-                  KL. {new Date(startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  KL. {formatTime(startTime)}
                   {/* =========================================== */}
                 </div >
 
