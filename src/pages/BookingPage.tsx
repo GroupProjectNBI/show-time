@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+import MovieCard from "../parts/MovieCard";
+
 import fetchJson from "../utils/fetchJson";
 import type { ITheater } from "../interfaces/Seats";
 import Chairs from "../parts/Chairs";
@@ -65,6 +67,20 @@ export default function BookingPage() {
     // returnerar alla komponenter, ingen logik är inlagd än så länge
     return (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center relative">
+            {/*======================
+            MOVIECARD
+            ========================= */}
+            <div className="w-full flex justify-center mb-8">
+                <MovieCard
+                    title="Joker"
+                    genre="Thriller"
+                    ageLimit="15+"
+                    dateTimeLabel="Tisdag 5 februari, 17:00"
+                    theaterLabel="Stora Salongen"
+                    posterUrl="/posters/joker.jpg"
+                />
+            </div>
+
             {/* =========================
           TICKET SELECTOR 
           ========================= */}
