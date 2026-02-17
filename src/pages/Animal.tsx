@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 
 AnimalPage.route = {
     path: '/Animals',
-    menuLabel: 'Animal',
     index: 2
 };
 

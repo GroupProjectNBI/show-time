@@ -9,7 +9,6 @@ import { getHelpers } from '../utils/productPageHelpers';
 //MovieListPage.tsx
 ProductsPage.route = {
   path: '/',
-  menuLabel: 'Products',
   index: 1,
   parent: '/',
   loader: productsLoader
