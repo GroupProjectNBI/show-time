@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind utilities;
 
+
 @layer base {
   body {
     @apply bg-surface text-accent font-serif;
@@ -10,4 +11,11 @@
     @apply min-h-screen bg-surface;
   }
 
+}
+
+.about-page footer {
+  margin-top: -80px !important;
+  /* justera efter smak */
+  position: relative;
+  z-index: 10;
 }
