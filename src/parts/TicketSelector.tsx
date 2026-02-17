@@ -1,6 +1,5 @@
 import { useState } from "react";
 import ComponentTicket from "./ComponentTicket";
-import styles from "./TicketSelector.module.css";
 
 export default function TicketSelector() {
   const [total, setTotal] = useState<{
@@ -8,20 +7,19 @@ export default function TicketSelector() {
   }>({});
 
   const handleChange = (label: string, count: number, subtotal: number) => {
-    setTotal(prev => ({
+    setTotal((prev) => ({
       ...prev,
-      [label]: { count, subtotal }
+      [label]: { count, subtotal },
     }));
   };
 
-  const grandTotal = Object.values(total).reduce(
-    (sum, t) => sum + t.subtotal,
-    0
-  );
+  const grandTotal = Object.values(total).reduce((sum, t) => sum + t.subtotal, 0);
 
   return (
-    <div className={styles.wrapper}>
-      <h2 className={styles.title}>Välj biljetter</h2>
+    <div className="w-full max-w-[1420px] mx-auto p-5 bg-[#1a1a1a] rounded-xl">
+      <h2 className="text-[22px] mb-5 text-center text-[#C6A96A]">
+        Välj biljetter
+      </h2>
 
       <ComponentTicket
         label="Ordinarie"
@@ -44,7 +42,7 @@ export default function TicketSelector() {
         onChange={(count, subtotal) => handleChange("Barn", count, subtotal)}
       />
 
-      <div className={styles.totalRow}>
+      <div className="mt-5 flex justify-between text-xl font-semibold text-[#C6A96A]">
         <span>Total:</span>
         <span>{grandTotal} kr</span>
       </div>

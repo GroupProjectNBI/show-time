@@ -10,7 +10,7 @@ import { getHelpers } from '../utils/productPageHelpers';
 ProductsPage.route = {
   path: "/products-example", // Ändra från "/" till detta
   menuLabel: "Products",
-  hideInMenu: false 
+  hideInMenu: false
 };
 
 export default function ProductsPage() {
