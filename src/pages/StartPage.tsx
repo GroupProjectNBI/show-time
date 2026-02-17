@@ -104,7 +104,19 @@ function StartPage() {
           >
             Boka nu
           </button>
-          
+                  {/* 3. Boka-knapp (Längst ner i rutan) */}
+        <div className="mt-12 flex flex-col items-center gap-4">
+          <button
+            onClick={handleBooking}
+            disabled={!selectedScreening}
+            className={`px-16 py-4 rounded-full font-bold uppercase tracking-[0.2em] transition-all duration-500 shadow-2xl ${
+              selectedScreening 
+                ? "bg-[#e50914] text-white hover:bg-[#ff0000] hover:scale-105" 
+                : "bg-white/5 text-white/20 cursor-not-allowed"
+            }`}
+          >
+            Boka nu
+          </button>
           {!selectedScreening && (
             <p className="text-[#c0a060]/50 text-xs uppercase tracking-[0.1em]">Välj en tid för att fortsätta</p>
           )}
