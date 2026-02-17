@@ -43,3 +43,29 @@ export function formatDate(dateInput: string | Date | null | undefined): string 
     // Använder inbyggd svensk formatering (ger automatiskt YYYY-MM-DD)
     return date.toLocaleDateString('sv-SE');
 }
+
+
+
+export function formatScreeningDate(isoString: string): string {
+    if (!isoString) return "";
+
+    const date = new Date(isoString);
+
+    // Kontrollera att datumet är giltigt
+    if (isNaN(date.getTime())) return "";
+
+    // 1. Skapa grundsträngen: "tisdag 17 februari, 18:00"
+    const options: Intl.DateTimeFormatOptions = {
+        weekday: 'long', // tisdag
+        day: 'numeric',  // 17
+        month: 'long',   // februari
+        hour: '2-digit', // 18
+        minute: '2-digit'// 00
+    };
+
+    const formatted = date.toLocaleString('sv-SE', options);
+
+    // 2. Snygga till: Gör första bokstaven stor ("tisdag" -> "Tisdag")
+    // och ta bort eventuella sekunder om de smyger sig in.
+    return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+}
