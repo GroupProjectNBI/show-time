@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import fetchJson from "../utils/fetchJson"; 
+import fetchJson from "../utils/fetchJson";
 
 function StartPage() {
   const [data, setData] = useState<any>(null);
@@ -7,7 +7,7 @@ function StartPage() {
 
   useEffect(() => {
     // Vi anropar backendn. 
-    fetchJson("/api/movies")
+    fetchJson("/api/v_screenings")
       .then((json) => {
         setData(json);
         setLoading(false);
@@ -28,7 +28,6 @@ function StartPage() {
 
   return (
     <div className="flex-grow flex flex-col items-center bg-[#1a1a1a] text-white">
-      
       {/* 1. HERO / POSTERS SECTION */}
       <div className="w-full max-w-6xl px-4 py-12 flex justify-center gap-8">
         {/* Här mappar vi senare ut bilderna från  JSON */}
@@ -48,7 +47,6 @@ function StartPage() {
         <h2 className="text-[#c0a060] text-2xl font-light tracking-widest mb-8 uppercase">
           På bio denna veckan
         </h2>
-        
         <div className="space-y-6">
           {/* Om data finns, visar vi den här */}
           {data ? (
