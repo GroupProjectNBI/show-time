@@ -11,7 +11,7 @@ import ProductsPage from './pages/ProductsPage.tsx';
 import ScreeningsPage from './pages/ScreeningsPage.tsx';
 import BookingPage from './pages/BookingPage.tsx';
 import ConfirmationPage from './pages/ConfirmationPage.tsx';
-import BookingPanelTestPage from './pages/BookingPanelTestPage.tsx';
+//import BookingPanelTestPage from './pages/BookingPanelTestPage.tsx';
 import WorkWithUs from "./pages/WorkWithUs.tsx";
 import StartPage from './pages/StartPage.tsx';
 
@@ -29,7 +29,7 @@ export default [
   BookingPage,
   AnimalPage,
   ConfirmationPage,
-  BookingPanelTestPage,
+  //BookingPanelTestPage,
   WorkWithUs,
   StartPage
 ]
