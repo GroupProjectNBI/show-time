@@ -12,7 +12,7 @@ import ScreeningsPage from './pages/ScreeningsPage.tsx';
 import BookingPage from './pages/BookingPage.tsx';
 import ConfirmationPage from './pages/ConfirmationPage.tsx';
 import StartPage from './pages/StartPage.tsx';
-
+import MovieInfo from './pages/MovieInfo.tsx';
 
 
 
@@ -27,7 +27,8 @@ export default [
   BookingPage,
   AnimalPage,
   ConfirmationPage,
-  StartPage
+  StartPage,
+  MovieInfo
 ]
   // map the route property of each page component to a Route
   .map(x => (({ element: createElement(x), ...x.route }) as Route))

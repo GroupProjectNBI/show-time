@@ -5,6 +5,7 @@ import ScreeningsList from "../parts/ScreeningsList";
 import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
 import { formatDate } from "../utils/formatTime";
+
 function ScreeningsPage() {
   //för drop down
   const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
