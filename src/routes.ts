@@ -12,12 +12,13 @@ import ScreeningsPage from './pages/ScreeningsPage.tsx';
 import TestDelux from './pages/UnknownPage.tsx';
 import ConfirmationPage from './pages/ConfirmationPage.tsx';
 import BookingPanelTestPage from './pages/BookingPanelTestPage.tsx';
+import WorkWithUs from "./pages/WorkWithUs.tsx";
 
 
 
 
 export default [
-  
+
   AboutPage,
   NotFoundPage,
   OurVisionPage,
@@ -27,7 +28,8 @@ export default [
   TestDelux,
   AnimalPage,
   ConfirmationPage,
-  BookingPanelTestPage
+  BookingPanelTestPage,
+  WorkWithUs
 ]
   // map the route property of each page component to a Route
   .map(x => (({ element: createElement(x), ...x.route }) as Route))
