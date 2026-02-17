@@ -43,7 +43,7 @@ export default function BookingSnackPanel({
   snackImageUrl,
   onBook,
 }: Props) {
-  const [selectedSnack, setSelectedSnack] = useState<SnackKey | null>("large");
+  const [selectedSnack, setSelectedSnack] = useState<SnackKey | null>(null);
   const [email, setEmail] = useState("");
 
   const selected = useMemo(
@@ -138,7 +138,9 @@ export default function BookingSnackPanel({
                   <button
                     key={opt.key}
                     type="button"
-                    onClick={() => setSelectedSnack(opt.key)}
+                    onClick={() =>
+                      setSelectedSnack((prev) => (prev === opt.key ? null : opt.key))
+                    }
                     className={[
                       // ÄNDRING:
                       // Mindre padding (py-2.5 istället för 4)
