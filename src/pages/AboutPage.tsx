@@ -1,47 +1,57 @@
 AboutPage.route = {
-  path: '/about-us',
-  menuLabel: 'Om oss',
+  path: '/om-oss',
+  // menuLabel: 'Om oss',
   index: 2
 };
 
 export default function AboutPage() {
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 py-8">
+    <div className="about-page">
 
-      {/* Rubrik */}
-      <h3 className="text-xl font-semibold mb-4">Övrigt</h3>
+      {/* TEXT-CONTAINER */}
+      <div className="w-full max-w-6xl mx-auto px-4 pt-10 pb-2">
 
-      {/* Två kolumner på desktop, en kolumn på mobil */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Rubrik */}
+        <h3 className="text-2xl font-semibold mb-6 text-accent">
+          Om oss
+        </h3>
 
-        {/* Vänster kolumn */}
-        <div>
-          <p className="mb-4"></p>
-          <p className="leading-relaxed">
+        {/* Textblock – vänsterjusterat */}
+        <div className="space-y-6 leading-relaxed text-accent max-w-4xl">
+          <p>
             Välkommen till vår biograf - en lokal mötesplats för filmälskare.
           </p>
-        </div>
 
-        {/* Höger kolumn */}
-        <div className="space-y-4 leading-relaxed">
           <p>
             Vi är en småskalig biograf med två salonger, där fokus ligger på filmupplevelsen,
-            gemensakpen och närheten till vår publik.
+            gemenskapen och närheten till vår publik.
           </p>
 
           <p>
             Hos oss kan du se allt från aktuella storfilmer till utvalda visningar i en lugn och
-            personlig miljö, tack vare våra två salonger kan vi erbjuda variation i programmet och
+            personlig miljö. Tack vare våra två salonger kan vi erbjuda variation i programmet och
             skapa en bioupplevelse som passar både familjer, vänner och ensamma biobesökare.
           </p>
 
           <p>
             Som lokal biograf vill vi vara en del av området och bidra till kulturlivet. För oss
-            handlar bio inte bara om film - det handlar om upplevelse som delas tillsammans.
+            handlar bio inte bara om film - det handlar om upplevelser som delas tillsammans.
           </p>
         </div>
 
       </div>
+
+      {/* BILD-CONTAINER (EXAKT samma bredd som footern) */}
+      <div className="mx-4 md:mx-12">
+        <div className="max-w-6xl mx-auto px-6">
+          <img
+            src="/images/Commercials/cinema.webp"
+            alt="Biograf"
+            className="w-full rounded-none shadow-xl object-cover max-h-[350px]"
+          />
+        </div>
+      </div>
+
     </div>
   );
 }
