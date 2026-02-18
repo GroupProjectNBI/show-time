@@ -5,6 +5,8 @@ import fetchJson from "../utils/fetchJson";
 import { calculatingTime } from "../utils/lengthcalc";
 import { formatTime } from "../utils/formatTime"; // Din tid-formatterare
 import Trailer from "../parts/Trailer";
+import { useNavigate } from "react-router-dom";
+
 
 // 1. Vi definierar Interface baserat på din data-dump
 interface Review {
@@ -39,6 +41,7 @@ interface MovieDetails {
 function MovieInfo() {
     const [movie, setMovie] = useState<MovieDetails | null>(null);
     const { id } = useParams<{ id: string; }>();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -164,7 +167,8 @@ function MovieInfo() {
                                         <button
                                             key={screen.screeningId}
                                             className="flex flex-col items-center bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-lg transition"
-                                            onClick={() => console.log("Gå till bokning för ID:", screen.screeningId)}
+                                            onClick={() => navigate(`/booking/${screen.screeningId}`)}
+
                                         >
                                             <span className="font-bold text-lg">{formatTime(screen.startTime)}</span>
                                             <span className="text-xs opacity-80">{screen.date}</span>

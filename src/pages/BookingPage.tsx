@@ -153,3 +153,8 @@ export default function BookingPage() {
         </div>
     );
 }
+
+BookingPage.route = {
+    path: "/booking/:id"
+};
+
