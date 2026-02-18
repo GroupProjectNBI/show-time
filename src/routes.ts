@@ -15,12 +15,14 @@ import WorkWithUs from "./pages/WorkWithUs.tsx";
 import Faq from "./pages/FaqPage.tsx";
 import StartPage from './pages/StartPage.tsx';
 import MovieInfo from './pages/MovieInfo.tsx';
+import VisitInfoLink from './pages/VisitInfo.tsx';
 
 
 
 export default [
 
   AboutPage,
+  VisitInfoLink,
   NotFoundPage,
   OurVisionPage,
   ProductDetailsPage,
