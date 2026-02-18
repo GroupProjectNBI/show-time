@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 import fetchJson from "../utils/fetchJson";
 import OfferBanner from "../parts/OfferBanner";
-import MovieCarousel from "../parts/MovieCarousel";
 
+// IMPORTERA BÅDA KARUSELLERNA
+import MovieCarousel3D from "../parts/MovieCarousel3D";
+import MovieCarouselFlat from "../parts/MovieCarouselFlat";
 
 function StartPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const standardWidth = "w-[min(1200px,calc(100%-32px))]";
+
   useEffect(() => {
-    // Vi anropar backend för att hämta filmer
     fetchJson("/api/v_getPopular")
       .then((json) => {
         setData(json);
@@ -30,43 +33,52 @@ function StartPage() {
   }
 
   return (
-    <div className="flex-grow flex flex-col items-center bg-[#1a1a1a] text-white">
+    <div className="min-h-screen flex flex-col items-center bg-[#1a1a1a] text-white pb-40 pt-6 relative overflow-x-hidden">
 
+      {/* --- BAKGRUNDS-EFFEKT (Spotlight) --- */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#680909]/30 via-[#1a1a1a]/80 to-[#1a1a1a] pointer-events-none z-0" />
 
-      {/* 1. HERO / POSTERS SECTION */}
-      <div className="w-full max-w-6xl px-4 py-12 flex justify-center gap-8">
-        {/* Här mappar vi senare ut bilderna från  JSON */}
-        <div className="w-64 h-96 bg-gray-900 rounded-xl border border-white/5 flex items-center justify-center italic text-white/20 shadow-2xl">
-          Poster 1
-        </div>
-        <div className="w-64 h-96 bg-gray-900 rounded-xl border border-white/5 flex items-center justify-center italic text-white/20 shadow-2xl">
-          Poster 2
-        </div>
-        <div className="w-64 h-96 bg-gray-900 rounded-xl border border-white/5 flex items-center justify-center italic text-white/20 shadow-2xl">
-          Poster 3
-        </div>
+      {/* =======================================================
+          ALTERNATIV 1: DEN NYA 3D-KARUSELLEN
+         ======================================================= */}
+      <div className="w-full text-center mt-4 mb-2 z-20">
+        <span className="bg-white/10 text-xs px-3 py-1 rounded-full uppercase tracking-wider text-white/50">Alternativ 1: 3D Stack</span>
       </div>
 
-
-      {/* 2. SCHEMA SECTION (Den bruna som på Figma) */}
-
-      {/* Karusellen högst upp  */}
-      <section className="w-full mt-6">
-        <MovieCarousel popularMovie={data} />
+      <section className={`${standardWidth} mx-auto mb-16 z-10`}>
+        <MovieCarousel3D popularMovie={data} />
       </section>
 
 
-      {/* Schema-rutan från  Figma-design */}
+      {/* =======================================================
+          ALTERNATIV 2: DEN GAMLA PLATTA KARUSELLEN
+         ======================================================= */}
+      <div className="w-full border-t border-white/10 my-10" /> {/* En linje emellan */}
 
-      <div className="w-full max-w-[900px] mx-auto bg-[#332f2e] rounded-[40px] p-10 shadow-2xl mb-20 border border-white/5">
-        <h2 className="text-[#c0a060] text-2xl font-light tracking-[0.2em] mb-8 uppercase">
+      <div className="w-full text-center mb-6 z-20">
+        <span className="bg-white/10 text-xs px-3 py-1 rounded-full uppercase tracking-wider text-white/50">Alternativ 2: Standard Platt</span>
+      </div>
+
+      <section className={`${standardWidth} mx-auto mb-16 z-10`}>
+        <MovieCarouselFlat popularMovie={data} />
+      </section>
+
+      {/* =======================================================
+          ÖVRIGT INNEHÅLL
+         ======================================================= */}
+
+      {/* SCHEMA-RUTAN */}
+      <div className={`${standardWidth} mx-auto bg-surface rounded-[40px] p-10 shadow-2xl mb-16 border border-white/5 z-10 relative`}>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/5 to-transparent rounded-[40px] pointer-events-none" />
+
+        <h2 className="text-[#c0a060] text-2xl font-light tracking-[0.2em] mb-8 uppercase border-b border-white/5 pb-4 relative z-20">
           På bio denna veckan
         </h2>
 
-        <div className="space-y-4 border-t border-white/5 pt-6">
+        <div className="space-y-4 relative z-20">
           {data ? (
-            <p className="text-white/60 font-light">
-              Välkommen! Vi har {data.length} spännande filmer på schemat.
+            <p className="text-white/70 font-light text-lg leading-relaxed">
+              Välkommen! Just nu visar vi <span className="text-white font-bold">{data.length}</span> titlar som toppar listorna. Boka din favoritplats redan idag.
             </p>
           ) : (
             <p className="text-white/40 italic font-light">
@@ -76,21 +88,20 @@ function StartPage() {
         </div>
       </div>
 
-      <div className="w-[min(900px,calc(100%-32px))] mx-auto mt-10 mb-20">
-
+      {/* OFFER BANNER */}
+      <div className={`${standardWidth} mx-auto mb-10 z-10`}>
         <OfferBanner />
       </div>
-    </div>
 
+    </div>
   );
 }
 
-// ROUTE INSTÄLLNINGAR
 StartPage.route = {
   path: "/",
-  // Ingen menuLabel så den inte syns i menyn
   hideInMenu: true,
   index: -1
 };
-
+// skuggning på den äldre. .. 
+// nya : dra ut de andra posters lite mer så de syns mer. Och ge det mer spotlight 
 export default StartPage;
