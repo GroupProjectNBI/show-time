@@ -1,129 +1,154 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // För att kunna skicka användaren till bokningen
+import { useNavigate } from "react-router-dom";
 import fetchJson from "../utils/fetchJson";
-import { formatTime } from "../utils/formatTime"; 
+import { formatTime } from "../utils/formatTime";
 import OfferBanner from "../parts/OfferBanner";
-import MovieCarousel from "../parts/MovieCarousel";
 
-//Interface-tänket
-interface Screening {
-    screeningId: number;
-    date: string;
-    startTime: string;
-}
-interface Movie {
-    movieId: number;
-    title: string;
-    screenings: Screening[];
-}
+// IMPORTERA DINA KARUSELLER
+import MovieCarousel3D from "../parts/MovieCarousel3D";
+import MovieCarouselFlat from "../parts/MovieCarouselFlat";
 
 function StartPage() {
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [popularData, setPopularData] = useState<any>(null); // För karusellerna
+  const [moviesWithScreenings, setMoviesWithScreenings] = useState<any[]>([]); // För schemat
   const [loading, setLoading] = useState(true);
   const [selectedScreening, setSelectedScreening] = useState<any>(null);
   const navigate = useNavigate();
-  
-// Vi hämtar filmer och deras visningar.
-useEffect(() => {
-const getMovies = async () => {
-try {
-const result = await fetchJson("/api/v_getMovieDetailsView"); 
-if (result) setMovies(result);
-} catch (error) {
-console.error("Fel vid hämtning av filmer:", error);
-} finally {
-setLoading(false);
- }
- };
-getMovies();
-    }, []);
+
+  const standardWidth = "w-[min(1200px,calc(100%-32px))]";
+
+  useEffect(() => {
+    const loadAllData = async () => {
+      try {
+        // 1. Hämta data till karusellerna (din gamla fetch)
+        const popular = await fetchJson("/api/v_getPopular");
+        setPopularData(popular);
+
+        // 2. Hämta data till det interaktiva schemat (gruppmedlemmens fetch)
+        const detailed = await fetchJson("/api/v_getMovieDetailsView");
+        if (detailed) setMoviesWithScreenings(detailed);
+
+      } catch (error) {
+        console.error("Fel vid hämtning av data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAllData();
+  }, []);
 
   const handleBooking = () => {
     if (selectedScreening) {
-// Skickar användaren till bokningssidan med rätt ID:n
-navigate(`/booking/${selectedScreening.movieId}/${selectedScreening.id}`);
+      // Navigera till bokningen med valt screeningId
+      navigate(`/booking/${selectedScreening.screeningId}`);
     }
   };
 
- if (loading) return <div className="min-h-screen bg-[#1a1a1a] text-accent flex items-center justify-center uppercase tracking-widest">Laddar...</div>;
-
+  if (loading) {
     return (
-<div className="flex-grow flex flex-col items-center bg-[#1a1a1a] text-white font-light pb-10">
+      <div className="flex-grow flex items-center justify-center text-white bg-[#1a1a1a]">
+        <p className="animate-pulse font-light tracking-widest text-[#c0a060]">Hämtar bio-magi...</p>
+      </div>
+    );
+  }
 
+  return (
+    <div className="min-h-screen flex flex-col items-center bg-[#1a1a1a] text-white pb-40 pt-6 relative overflow-x-hidden">
 
-{/* 1. Karusellen sektion  (Prickarna syns bättre med mindre marginal)*/}
-<section className="w-full mt-4 mb-2">        
-  <MovieCarousel />
+      {/* --- BAKGRUNDS-EFFEKT --- */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#680909]/30 via-[#1a1a1a]/80 to-[#1a1a1a] pointer-events-none z-0" />
+
+      {/* --- ALTERNATIV 1: 3D STACK --- */}
+      <div className="w-full text-center mt-4 mb-2 z-20">
+        <span className="bg-white/5 border border-white/10 text-[10px] px-3 py-1 rounded-full uppercase tracking-[0.2em] text-white/40">
+          Alternativ 1: 3D Stack
+        </span>
+      </div>
+      <section className={`${standardWidth} mx-auto mb-16 z-10`}>
+        <MovieCarousel3D popularMovie={popularData} />
       </section>
-    
 
+      {/* --- SEPARATOR --- */}
+      <div className="w-full max-w-4xl border-t border-white/5 my-10 relative z-10" />
 
-{/* 2. Schema-sektion (Den kompakta kalendern) från  Figma-design (den bruna rutan med guld-text och logic för tider) */}
-<div className="w-[min(850px,calc(100%-32px))] bg-[#332f2e] rounded-[30px] p-6 shadow-2xl mb-8 border border-white/5">
-<h2 className="text-accent text-lg tracking-[0.2em] mb-6 uppercase font-normal">
-  På bio denna veckan
-   </h2>
-            
-<div className="space-y-4">
- {movies.slice(0, 2).map((movie) => (
- <div key={movie.movieId} className="grid grid-cols-[1fr_auto] items-center gap-4 bg-black/20 p-4 rounded-xl border border-white/5">
-    <div>
-  <h3 className="text-md font-normal uppercase tracking-wider text-white">{movie.title}</h3>
-  <p className="text-xs text-white/40 uppercase mt-1">Visningar idag:</p>
-     </div>
-            
-{/* Visningstiderna ..Här läggs tiderna till dynamiskt*/}
-<div className="flex gap-2">
-{movie.screenings?.slice(0, 3).map((s) => (                    
-<button
-key={s.screeningId}
-onClick={() => setSelectedScreening({ movieId: movie.movieId, screeningId: s.screeningId })}                      
-className={`flex flex-col items-center min-w-[60px] py-2 rounded-lg transition-all border ${ 
-selectedScreening?.screeningId === s.screeningId                       
-? "bg-primary border-primary text-white shadow-lg scale-105"
-: "bg-[#C6A96A]/10 border-[#C6A96A]/20 text-accent hover:bg-[#C6A96A]/20"
-  }`}   
->
-<span className="text-sm font-bold">{formatTime(s.startTime)}</span>
-<span className="text-[10px] opacity-60 uppercase">{s.date.split('-')[2]}/{s.date.split('-')[1]}</span>
-  </button>
-                  ))}
-                </div>
+      {/* --- ALTERNATIV 2: PLATT KARUSELL --- */}
+      <div className="w-full text-center mb-6 z-20">
+        <span className="bg-white/5 border border-white/10 text-[10px] px-3 py-1 rounded-full uppercase tracking-[0.2em] text-white/40">
+          Alternativ 2: Standard Platt
+        </span>
+      </div>
+      <section className={`${standardWidth} mx-auto mb-24 z-10`}>
+        <MovieCarouselFlat popularMovie={popularData} />
+      </section>
+
+      {/* --- INTERAKTIVT SCHEMA (Sammanslagen design) --- */}
+      <div className={`${standardWidth} mx-auto bg-white/[0.03] backdrop-blur-md rounded-[40px] p-8 md:p-12 shadow-2xl mb-16 border border-white/5 z-10 relative overflow-hidden`}>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#c0a060]/5 to-transparent pointer-events-none" />
+
+        <h2 className="text-[#c0a060] text-2xl font-light tracking-[0.2em] mb-10 uppercase border-b border-white/10 pb-4 relative z-20">
+          På bio denna veckan
+        </h2>
+
+        {/* Listan med filmer och tider */}
+        <div className="space-y-6 relative z-20">
+          {moviesWithScreenings.slice(0, 3).map((movie) => (
+            <div key={movie.movieId} className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-black/30 p-6 rounded-2xl border border-white/5 hover:border-[#c0a060]/30 transition-colors">
+              <div>
+                <h3 className="text-xl font-normal uppercase tracking-wider text-white">{movie.title}</h3>
+                <p className="text-xs text-[#c0a060]/60 uppercase mt-1 font-bold">Dagens visningar</p>
               </div>
-            ))}
+
+              {/* Tids-knappar */}
+              <div className="flex flex-wrap gap-3">
+                {movie.screenings?.slice(0, 4).map((s: any) => (
+                  <button
+                    key={s.screeningId}
+                    onClick={() => setSelectedScreening({ movieId: movie.movieId, screeningId: s.screeningId })}
+                    className={`flex flex-col items-center min-w-[70px] py-3 rounded-xl transition-all border ${selectedScreening?.screeningId === s.screeningId
+                      ? "bg-primary border-primary text-white shadow-[0_0_20px_rgba(239,68,68,0.4)] scale-105"
+                      : "bg-white/5 border-white/10 text-white/80 hover:bg-white/10"
+                      }`}
+                  >
+                    <span className="text-sm font-bold">{formatTime(s.startTime)}</span>
+                    <span className="text-[10px] opacity-50">{s.date.split('-')[2]}/{s.date.split('-')[1]}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
+        {/* Bokningsknapp sektion */}
+        <div className="mt-12 flex flex-col md:flex-row items-center justify-end gap-6 relative z-20">
+          {!selectedScreening && (
+            <p className="text-[#c0a060]/40 text-xs uppercase tracking-widest italic animate-pulse">
+              Välj en visning för att boka
+            </p>
+          )}
+          <button
+            onClick={handleBooking}
+            disabled={!selectedScreening}
+            className={`px-16 py-4 rounded-xl text-sm font-bold uppercase tracking-[0.2em] transition-all shadow-2xl ${selectedScreening
+              ? "bg-primary text-white hover:bg-red-700 hover:scale-105"
+              : "bg-white/5 text-white/20 border border-white/10 cursor-not-allowed"
+              }`}
+          >
+            Boka nu
+          </button>
+        </div>
+      </div>
 
-{/* 3. Boka-sektionen flyttad neråt höger för att ge plats åt Kiosken nedanför */}
-<div className="mt-8 flex justify-end items-center gap-6">
-  
-{!selectedScreening && (
-  //animate-pulse: Det är denna klass som gör att texten tonas in och ut (rör sig i styrka).
-<p className="text-accent/40 text-[10px] uppercase tracking-widest italic animate-pulse">
-Välj en visning för att boka</p>
-  )}
-<button
-onClick={handleBooking}
-disabled={!selectedScreening}
-className={`px-12 py-3 rounded-lg text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-xl ${
-selectedScreening 
-? "bg-primary text-white hover:bg-red-700 hover:scale-105"                
-: "bg-white/5 text-white/20 cursor-not-allowedborder border-white/10"
- }`}
->
- Boka nu
-</button>
-  </div>
-     </div>
-{/* Här lämnar vi plats för Kiosken */}
-       </div>
+      {/* ERBJUDANDEN */}
+      <div className={`${standardWidth} mx-auto mb-10 z-10 transition-transform hover:scale-[1.01] duration-500`}>
+        <OfferBanner />
+      </div>
+    </div>
   );
 }
 
-// ROUTE INSTÄLLNINGAR
 StartPage.route = {
   path: "/",
-  // Ingen menuLabel så den inte syns i menyn
   hideInMenu: true,
   index: -1
 };
