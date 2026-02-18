@@ -51,7 +51,22 @@ export default function AboutPage() {
           />
         </div>
       </div>
+      <div className="w-full max-w-6xl mx-auto px-4 pt-10 pb-2">
+        <h3 className="text-2xl font-semibold mb-6 text-accent">
+          Inför ditt biografbesök
+        </h3>
+        <div className="space-y-6 leading-relaxed text-accent max-w-4xl">
+          <p>Välkommen till vår biograf! Vi ser fram emot att ge dig en härlig filmupplevelse - här hittar du all information du beböver inför ditt besök. Vi rekommenderar att du är på plats minst 15 minuter före filmstart. Då hinner du ta plats i lugn och ro samt köpa popcorn och dryck i vår kiosk
 
+          </p>
+          <p>
+            Biljetter köps smidigast online via vår webbplats, men kan även köpas på plats i kassan i mån av tillgång. Betalning sker på plats, vi är en kontantfri verksamhet. Observera att åldersgränser gäller enligt Statens medieråd och att barn endast får se filmer som är godkända för deras ålder.
+          </p>
+          <p>
+            För allas trivsel ber vi dig att stänga av mobilen under filmens gång. Fotografering och filming i salongen är inte tillåtet. Biografen är tillgänglighetsanpassad. Vi frågor om rullstolsplatser, hörslinga eller andra behov är du varmt välkommen att kontakta oss i förväg. Slå dig ner, luta dig tillbaka och njut av filmen - trevlig visning!
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
