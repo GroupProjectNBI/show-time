@@ -100,8 +100,7 @@ function AboutPage() {
               <h3 className="text-xl font-semibold mb-4 text-accent">Biljetter & betalning</h3>
               <p className="text-accent leading-relaxed">
                 Biljetter köps smidigast online via vår webbplats, men kan även köpas på plats i
-                kassan i mån av tillgång. Vi är en kontantfri verksamhet och följer Statens
-                medieråds åldersgränser.
+                kassan i mån av tillgång.
               </p>
             </div>
 
@@ -109,7 +108,8 @@ function AboutPage() {
             <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl transition animate-fadeIn delay-200">
               <h3 className="text-xl font-semibold mb-4 text-accent">Regler & trivsel</h3>
               <p className="text-accent leading-relaxed">
-                Stäng av mobilen under filmen. Fotografering och filmning är inte tillåtet.
+                Vår biograf följer Statens medieråds åldersgränser och att barn endast får se filmer som är godkända för deras ålder.
+                <p></p>Vi ber er stänga av mobilen under filmen. Fotografering och filmning är inte tillåtet.
                 Biografen är tillgänglighetsanpassad — kontakta oss gärna i förväg vid särskilda
                 behov. Slå dig ner och njut av filmen!
               </p>
