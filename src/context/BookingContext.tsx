@@ -21,7 +21,8 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
     });
 
     // NYTT: snacks
-    const [selectedSnack, setSelectedSnack] = useState<string | null>(null);
+    const [selectedSnack, setSelectedSnack] =
+        useState<"large" | "medium" | "small" | null>(null);
 
     // NYTT: email
     const [email, setEmail] = useState<string>("");

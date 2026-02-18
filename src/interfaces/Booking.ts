@@ -16,7 +16,7 @@ export interface BookingContextType {
     };
 
     // Snacks
-    selectedSnack: string | null;
+    selectedSnack: "large" | "medium" | "small" | null;
 
     // Kontakt
     email: string;
@@ -39,7 +39,7 @@ export interface BookingContextType {
     }>>;
 
     // Snacks
-    setSelectedSnack: (value: string | null) => void;
+    setSelectedSnack: (value: "large" | "medium" | "small" | null) => void;
 
     // Email
     setEmail: (value: string) => void;

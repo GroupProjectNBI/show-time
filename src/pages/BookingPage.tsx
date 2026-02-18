@@ -156,9 +156,6 @@ export default function BookingPage() {
                 <div className="mx-auto w-full max-w-[1200px] px-6 pb-10">
                     <BookingSnackPanel
                         movieTitle="Joker"
-                        // Placeholder tills TicketSelector skickar upp data:
-                        ticketCount={0}
-                        ticketPrice={0}
                         seatsLabelLines={seatsLabelLines}
                         onBook={({ email, snack }) => {
                             console.log("BOOK:", { email, snack });

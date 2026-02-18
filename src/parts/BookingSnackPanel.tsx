@@ -1,14 +1,13 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useBooking } from "../context/BookingContext";
 
-type SnackKey = "large" | "medium" | "small";
+type SnackKey = "large" | "medium" | "small" | null;
 
 type Props = {
   movieTitle: string;
   seatsLabelLines: string[];
-  ticketCount: number;
-  ticketPrice: number;
   snackImageUrl?: string;
-  onBook?: (payload: { email: string; snack: SnackKey | null; }) => void;
+  onBook?: (payload: { email: string; snack: SnackKey; }) => void;
 };
 
 const snackOptions = [
@@ -16,21 +15,21 @@ const snackOptions = [
     key: "large" as const,
     title: "Stora menyn",
     desc: "Tre stora popcorn, tre utvalda snacks och tre stora drycker",
-    prebookPrice: 189.9,
+    prebookPrice: 189,
     onSitePrice: 250,
   },
   {
     key: "medium" as const,
     title: "Mellan menyn",
     desc: "Tre mellan popcorn, två utvalda snacks och tre medium drycker",
-    prebookPrice: 149.9,
+    prebookPrice: 149,
     onSitePrice: 210,
   },
   {
     key: "small" as const,
     title: "Lilla menyn",
     desc: "Tre små popcorn och tre medium drycker",
-    prebookPrice: 119.9,
+    prebookPrice: 129,
     onSitePrice: 170,
   },
 ];
@@ -38,13 +37,29 @@ const snackOptions = [
 export default function BookingSnackPanel({
   movieTitle,
   seatsLabelLines,
-  ticketCount,
-  ticketPrice,
   snackImageUrl,
   onBook,
 }: Props) {
-  const [selectedSnack, setSelectedSnack] = useState<SnackKey | null>("large");
-  const [email, setEmail] = useState("");
+
+  // NYTT hämta allt från context
+  const {
+    tickets,
+    selectedSnack,
+    setSelectedSnack,
+    email,
+    setEmail
+  } = useBooking();
+
+  //NYTT räkna totala biljetter från context
+  const ticketCount =
+    tickets.ordinarie +
+    tickets.pensionar +
+    tickets.barn;
+
+  const ticketPriceTotal =
+    tickets.ordinarie * 140 +
+    tickets.pensionar * 120 +
+    tickets.barn * 90;
 
   const selected = useMemo(
     () => snackOptions.find((s) => s.key === selectedSnack) ?? null,
@@ -54,8 +69,8 @@ export default function BookingSnackPanel({
   const snacksPrice = selected ? selected.prebookPrice : 0;
 
   const total = useMemo(() => {
-    return ticketCount * ticketPrice + snacksPrice;
-  }, [ticketCount, ticketPrice, snacksPrice]);
+    return ticketPriceTotal + snacksPrice;
+  }, [ticketPriceTotal, snacksPrice]);
 
 
   const imageSrc = snackImageUrl || "/images/Commercials/popga.jpg";
@@ -96,9 +111,7 @@ export default function BookingSnackPanel({
               </div>
 
               <div className="text-[10px] font-semibold leading-snug text-accent">
-                Förboka snackset redan nu
-                <br />
-                och få de serverat till din stol!
+                Förboka snackset redan nu och få de serverat till din stol!
               </div>
             </div>
 
@@ -190,11 +203,11 @@ export default function BookingSnackPanel({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Fyll i din email"
+            placeholder="show-time@example.com"
             className="
-              h-[56px] w-full rounded-full bg-[#2b282a] px-7
+              h-[48px] w-full rounded-full bg-[#2b282a] px-7
               text-[14px] font-bold text-[#e8e1e5]
-              placeholder:text-accent focus:ring-2 focus:ring-primary
+              placeholder:text-accent/60 focus:ring-2 focus:ring-primary
               outline-none shadow-inner sm:w-[380px]
             "
           />
