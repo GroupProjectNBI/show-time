@@ -126,8 +126,8 @@ function AboutPage() {
 /* ROUTE-DEFINITIONEN */
 AboutPage.route = {
   path: "/om-oss",
-  menuLabel: "Om oss",
-  index: 2
+  //menuLabel: "Om oss",
+  index: 3
 };
 
 export default AboutPage;
