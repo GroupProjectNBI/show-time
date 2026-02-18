@@ -163,7 +163,7 @@ function MovieInfo() {
                                     {movie.screenings.map((screen) => (
                                         <button
                                             key={screen.screeningId}
-                                            className="flex flex-col items-center bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-lg transition"
+                                            className="flex flex-col items-center bg-primary hover:bg-booked text-white px-5 py-3 rounded-lg transition"
                                             onClick={() => console.log("Gå till bokning för ID:", screen.screeningId)}
                                         >
                                             <span className="font-bold text-lg">{formatTime(screen.startTime)}</span>
