@@ -7,20 +7,26 @@ export default function TicketSelector() {
 
   const setTicketCount = useCallback(
     (key: "ordinarie" | "pensionar" | "barn", count: number) => {
-      setTickets((prev) => ({
-        ...prev,
-        [key]: count,
-      }));
+      setTickets((prev) => ({ ...prev, [key]: count }));
     },
     [setTickets]
   );
 
+  const onOrdinarie = useCallback(
+    (count: number) => setTicketCount("ordinarie", count),
+    [setTicketCount]
+  );
+  const onPensionar = useCallback(
+    (count: number) => setTicketCount("pensionar", count),
+    [setTicketCount]
+  );
+  const onBarn = useCallback(
+    (count: number) => setTicketCount("barn", count),
+    [setTicketCount]
+  );
+
   const grandTotal = useMemo(() => {
-    return (
-      tickets.ordinarie * 140 +
-      tickets.pensionar * 120 +
-      tickets.barn * 90
-    );
+    return tickets.ordinarie * 140 + tickets.pensionar * 120 + tickets.barn * 90;
   }, [tickets]);
 
   return (
@@ -30,24 +36,22 @@ export default function TicketSelector() {
       </h2>
 
       <ComponentTicket
-        label="ordinarie"
+        label="Ordinarie"
         price={140}
         initialCount={tickets.ordinarie}
-        onChange={(count) => setTicketCount("ordinarie", count)}
+        onChange={onOrdinarie}
       />
-
       <ComponentTicket
-        label="pensionar"
+        label="Pensionär"
         price={120}
         initialCount={tickets.pensionar}
-        onChange={(count) => setTicketCount("pensionar", count)}
+        onChange={onPensionar}
       />
-
       <ComponentTicket
-        label="barn"
+        label="Barn"
         price={90}
         initialCount={tickets.barn}
-        onChange={(count) => setTicketCount("barn", count)}
+        onChange={onBarn}
       />
 
       <div className="mt-5 flex justify-between text-xl font-semibold text-[#C6A96A]">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type TicketProps = {
   label: string;
@@ -14,15 +14,25 @@ export default function ComponentTicket({
   onChange,
 }: TicketProps) {
   const [count, setCount] = useState(initialCount);
+  const lastSentRef = useRef<number>(initialCount);
+
+  // Synka local state om initialCount ändras (t.ex. clearBooking)
+  useEffect(() => {
+    setCount(initialCount);
+    lastSentRef.current = initialCount;
+  }, [initialCount]);
+
+  // Loop-säker: kalla bara onChange när count faktiskt ändrats
+  useEffect(() => {
+    if (lastSentRef.current === count) return;
+    lastSentRef.current = count;
+    onChange(count);
+  }, [count, onChange]);
 
   const total = count * price;
 
   const increase = () => setCount((prev) => prev + 1);
   const decrease = () => setCount((prev) => (prev > 0 ? prev - 1 : 0));
-
-  useEffect(() => {
-    onChange(count);
-  }, [count, total, onChange]);
 
   return (
     <div className="border-b border-[#444] py-[14px] flex flex-col gap-[10px] md:flex-row md:items-center md:justify-between">

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { createContext, useState, useContext, useMemo, useCallback } from "react";
+import { createContext, useState, useContext, useMemo, useCallback, useEffect } from "react";
 
 import type { BookingContextType } from "../interfaces/Booking";
 
@@ -27,14 +27,36 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
     // NYTT: email
     const [email, setEmail] = useState<string>("");
 
+    // NYTT: antal biljetter = max antal stolar som får väljas
+    const maxSelectableSeats = tickets.ordinarie + tickets.pensionar + tickets.barn;
+
     const toggleSeat = useCallback((seatId: number) => {
-        setSelectedSeats(prev => {
+        setSelectedSeats((prev) => {
             if (prev.includes(seatId)) {
                 return prev.filter(id => id !== seatId);
             }
+
+            // Om inga biljetter valda så välj inga stolar
+            if (maxSelectableSeats === 0) return prev;
+
+            // Om max uppnått (alla platser blivit valda) välj inga fler
+            if (prev.length >= maxSelectableSeats) return prev;
+
+            //annars lägg till
             return [...prev, seatId];
         });
-    }, []);
+    }, [maxSelectableSeats]);
+
+    //NYTT: lagt till en useEffect om antal biljetter minskar när man valt stolar
+    // 3 biljetter = 3 stolar, minskar man till 2 försvinnedr den tredje automatiskt
+    // 0 biljetter = stolarna nollställs
+    useEffect(() => {
+        setSelectedSeats((prev) => {
+            if (maxSelectableSeats === 0) return [];
+            if (prev.length <= maxSelectableSeats) return prev;
+            return prev.slice(0, maxSelectableSeats);
+        });
+    }, [maxSelectableSeats]);
 
     const setOccupied = useCallback((seatIds: number[]) => {
         setOccupiedSeats(seatIds);
