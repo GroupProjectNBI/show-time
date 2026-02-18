@@ -15,6 +15,7 @@ import TicketSelector from "../parts/TicketSelector";
 import BookingSnackPanel from "../parts/BookingSnackPanel";
 
 
+
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
@@ -150,6 +151,6 @@ export default function BookingPage() {
 }
 
 BookingPage.route = {
-    path: "/booking/:id"
+  path: "/booking/:id"
 };
 
