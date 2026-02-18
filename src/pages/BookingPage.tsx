@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-
+import { formatScreeningDate } from "../utils/formatTime";
 import MovieCard from "../parts/MovieCard";
 
 import fetchJson from "../utils/fetchJson";
 import type { Theater } from "../interfaces/Seats";
+import type { Screening } from "../interfaces/Screenings";
+import type Movie from "../interfaces/Movie";
 import Chairs from "../parts/Chairs";
 
 import { useBooking } from "../context/BookingContext";
@@ -20,7 +22,8 @@ BookingPage.route = {
 
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
-
+    const [screening, setScreening] = useState<Screening | null>(null);
+    const [movie, setMovie] = useState<Movie | null>(null);
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
 
@@ -33,12 +36,21 @@ export default function BookingPage() {
             try {
                 const screeningResult = await fetchJson(`/api/v_screenings?where=id=${id}`);
                 const screening = screeningResult[0];
+                setScreening(screening);
 
                 if (screening) {
                     // Hämta layout
                     const theaterId = screening.theaterName === "Stora" ? 1 : 2;
                     const layoutData = await fetchJson(`/api/Theater?where=id=${theaterId}`);
                     setSeatArray(layoutData);
+
+                    // 3. Hämta Film-info (Movie) baserat på movieId från visningen
+                    // OBS: Använd currentScreening.movieId här!
+                    const movieResult = await fetchJson(`/api/v_getMovieDetailsView?where=movieId=${screening.movieId}`);
+
+                    if (movieResult && movieResult.length > 0) {
+                        setMovie(movieResult[0]); // Spara objektet
+                    }
 
                     // Hämta upptagna stolar för denna visning
                     const occupiedResult = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`);
@@ -65,19 +77,20 @@ export default function BookingPage() {
         .map((seatId) => `Stol-ID ${seatId}`);
 
     // returnerar alla komponenter, ingen logik är inlagd än så länge
-    return (
+    return screening && movie && (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center relative">
             {/*======================
             MOVIECARD
             ========================= */}
             <div className="w-full flex justify-center mb-8">
                 <MovieCard
-                    title="Joker"
-                    genre="Thriller"
-                    ageLimit="15+"
-                    dateTimeLabel="Tisdag 5 februari, 17:00"
-                    theaterLabel="Stora Salongen"
-                    posterUrl="/posters/joker.jpg"
+                    title={screening.movieTitle}
+                    genre={movie.categories}
+                    ageLimit={movie.ageLimit + " +"}
+                    dateTimeLabel={formatScreeningDate(screening.startTime)}
+
+                    theaterLabel={screening.theaterName + " Salongen"}
+                    posterUrl={`/images/posters/${screening.movieId}.webp`}
                 />
             </div>
 

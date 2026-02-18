@@ -6,5 +6,6 @@ export default interface Movie {
     categories: string;
     averageRating: number;
     reviewCount: number;
+    ageLimit: number;
     // behöver updatera för reviews object array och 
 }
