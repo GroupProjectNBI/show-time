@@ -4,7 +4,7 @@ type TicketProps = {
   label: string;
   price: number;
   initialCount?: number;
-  onChange: (count: number, total: number) => void;
+  onChange: (count: number) => void;
 };
 
 export default function ComponentTicket({
@@ -21,7 +21,7 @@ export default function ComponentTicket({
   const decrease = () => setCount((prev) => (prev > 0 ? prev - 1 : 0));
 
   useEffect(() => {
-    onChange(count, total);
+    onChange(count);
   }, [count, total, onChange]);
 
   return (

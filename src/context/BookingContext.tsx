@@ -1,55 +1,88 @@
 import type { ReactNode } from "react";
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useMemo, useCallback } from "react";
 
-// INTERFACE import 
 import type { BookingContextType } from "../interfaces/Booking";
 
-
-// 1. Använd interfacet när vi skapar contexten. 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
-export function BookingProvider({ children }: { children: ReactNode }) {
+export function BookingProvider({ children }: { children: ReactNode; }) {
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
     const [occupiedSeats, setOccupiedSeats] = useState<number[]>([]);
 
-    const toggleSeat = (seatId: number) => {
+    // NYTT: biljetter
+    const [tickets, setTickets] = useState<{
+        ordinarie: number;
+        pensionar: number;
+        barn: number;
+    }>({
+        ordinarie: 0,
+        pensionar: 0,
+        barn: 0,
+    });
+
+    // NYTT: snacks
+    const [selectedSnack, setSelectedSnack] = useState<string | null>(null);
+
+    // NYTT: email
+    const [email, setEmail] = useState<string>("");
+
+    const toggleSeat = useCallback((seatId: number) => {
         setSelectedSeats(prev => {
             if (prev.includes(seatId)) {
-                return prev.filter((id) => id !== seatId);
-            } else {
-                return [...prev, seatId];
+                return prev.filter(id => id !== seatId);
             }
+            return [...prev, seatId];
         });
-    };
+    }, []);
 
-    const setOccupied = (seatIds: number[]) => {
+    const setOccupied = useCallback((seatIds: number[]) => {
         setOccupiedSeats(seatIds);
-    }
+    }, []);
 
-    const clearBooking = () => {
+    const clearBooking = useCallback(() => {
         setSelectedSeats([]);
         setOccupiedSeats([]);
-    }
+        setTickets({ ordinarie: 0, pensionar: 0, barn: 0 });
+        setSelectedSnack(null);
+        setEmail("");
+    }, []);
 
-    const value = {
+    const value = useMemo(() => ({
         selectedSeats,
         occupiedSeats,
         toggleSeat,
         setOccupied,
-        clearBooking
-    }
+        clearBooking,
+
+        // NYTT
+        tickets,
+        setTickets,
+        selectedSnack,
+        setSelectedSnack,
+        email,
+        setEmail
+    }), [
+        selectedSeats,
+        occupiedSeats,
+        toggleSeat,
+        setOccupied,
+        clearBooking,
+        tickets,
+        selectedSnack,
+        email
+    ]);
 
     return (
         <BookingContext.Provider value={value}>
             {children}
         </BookingContext.Provider>
-    )
-
-
+    );
 }
+
 export function useBooking(): BookingContextType {
     const context = useContext(BookingContext);
-    if (!context) throw new Error("useBooking must be used within BookingProvider");
+    if (!context) {
+        throw new Error("useBooking must be used within BookingProvider");
+    }
     return context;
 }
-
