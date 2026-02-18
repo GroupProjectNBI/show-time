@@ -1,130 +1,114 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // För att kunna skicka användaren till bokningen
 import fetchJson from "../utils/fetchJson";
+import { formatTime } from "../utils/formatTime"; 
 import MovieCarousel from "../parts/MovieCarousel";
 
+//Interface-tänket
+interface Screening {
+    screeningId: number;
+    date: string;
+    startTime: string;
+}
+interface Movie {
+    movieId: number;
+    title: string;
+    screenings: Screening[];
+}
+
 function StartPage() {
-  const [data, setData] = useState<any>(null);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedScreening, setSelectedScreening] = useState<any>(null);
   const navigate = useNavigate();
   
 
-  useEffect(() => {
-    // Vi anropar backend för att hämta filmer
-    fetchJson("/api/movies")
-      .then((json) => {
-        setData(json);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Fetch failed:", err);
-        setLoading(false);
-      });
-  }, []);
+useEffect(() => {
+const getMovies = async () => {
+try {
+// Vi hämtar filmer och deras visningar
+const result = await fetchJson("/api/v_getMovieDetailsView"); 
+if (result) setMovies(result);
+} catch (error) {
+console.error("Fel vid hämtning av filmer:", error);
+} finally {
+setLoading(false);
+ }
+ };
+getMovies();
+    }, []);
 
   const handleBooking = () => {
     if (selectedScreening) {
-      // Skickar användaren till bokningssidan med rätt ID:n
-      navigate(`/booking/${selectedScreening.movieId}/${selectedScreening.id}`);
+// Skickar användaren till bokningssidan med rätt ID:n
+navigate(`/booking/${selectedScreening.movieId}/${selectedScreening.id}`);
     }
   };
 
+ if (loading) return <div className="min-h-screen bg-[#1a1a1a] text-accent flex items-center justify-center uppercase tracking-widest">Laddar...</div>;
 
-
-  if (loading) {
     return (
-      <div className="flex-grow flex items-center justify-center text-white bg-[#1a1a1a]">
-        <p className="animate-pulse font-light tracking-widest">Hämtar bio-magi...</p>
-      </div>
-    );
-  }
+<div className="flex-grow flex flex-col items-center bg-[#1a1a1a] text-white font-light pb-10">
 
-  return (
-    <div className="flex-grow flex flex-col items-center bg-[#1a1a1a] text-white">
-      
-      {/* 1. Karusellen sektion  */}
-      <section className="w-full mt-6">
-        <MovieCarousel />
+{/* 1. Karusellen sektion  (Prickarna syns bättre med mindre marginal)*/}
+<section className="w-full mt-4 mb-2">        
+  <MovieCarousel />
       </section>
 
-      {/* 2. Schema-rutan från  Figma-design */}
-<div className="w-[min(900px,calc(100%-32px))] bg-[#332f2e] rounded-[40px] p-10 shadow-2xl mb-20 border border-white/5 font-light"> 
-
-<h2 className="text-[#c0a060] text-2xl font-light tracking-[0.2em] mb-8 uppercase">
-            </h2>
-            På bio denna veckan
-        
-<div className="space-y-8 border-t border-white/5 pt-8">
-          {data && data.length > 0 ? (
-            // Om vi har filmer, loopa ut dem här
-            data.slice(0, 4).map((movie: any) => (
-              <div key={movie.id} className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-6 last:border-0">
-                <div>
-                  <h3 className="text-xl font-normal tracking-[0.1em] uppercase">{movie.title}</h3>
-                  <p className="text-white/40 text-sm italic">{movie.genre || "Drama"} • {movie.length || "120"} min</p>
-                </div>
-
-                {/* Knapparna för tider */}
-                <div className="flex flex-wrap gap-3">
-                  {movie.screenings?.map((screening: any) => (
-                    <button
-                      key={screening.id}
-                      onClick={() => setSelectedScreening({ ...screening, movieId: movie.id })}
-                      className={`px-4 py-2 rounded-lg border transition-all duration-300 text-sm tracking-widest ${
-                        selectedScreening?.id === screening.id
-                          ? "bg-[#c0a060] border-[#c0a060] text-[#1a1a1a] font-bold shadow-lg scale-105"
-                          : "border-white/10 hover:border-[#c0a060]/50 text-white/80"
-                      }`}
-                    >
-                      {screening.time}
-                    </button>
+{/* 2. Schema-sektion (Den kompakta kalendern) från  Figma-design (den bruna rutan med guld-text och logic för tider) */}
+<div className="w-[min(850px,calc(100%-32px))] bg-[#332f2e] rounded-[30px] p-6 shadow-2xl mb-8 border border-white/5">
+<h2 className="text-accent text-lg tracking-[0.2em] mb-6 uppercase font-normal">
+  På bio denna veckan
+   </h2>
+            
+<div className="space-y-4">
+ {movies.slice(0, 2).map((movie) => (
+ <div key={movie.movieId} className="grid grid-cols-[1fr_auto] items-center gap-4 bg-black/20 p-4 rounded-xl border border-white/5">
+    <div>
+  <h3 className="text-md font-normal uppercase tracking-wider text-white">{movie.title}</h3>
+  <p className="text-xs text-white/40 uppercase mt-1">Visningar idag:</p>
+     </div>
+            
+{/* Visningstiderna ..Här läggs tiderna till dynamiskt*/}
+<div className="flex gap-2">
+{movie.screenings?.slice(0, 3).map((s) => (                    
+<button
+key={s.screeningId}
+onClick={() => setSelectedScreening({ movieId: movie.movieId, screeningId: s.screeningId })}                      
+className={`flex flex-col items-center min-w-[60px] py-2 rounded-lg transition-all border ${ 
+selectedScreening?.screeningId === s.screeningId                       
+? "bg-primary border-primary text-white shadow-lg scale-105"
+: "bg-[#C6A96A]/10 border-[#C6A96A]/20 text-accent hover:bg-[#C6A96A]/20"
+  }`}   
+>
+<span className="text-sm font-bold">{formatTime(s.startTime)}</span>
+<span className="text-[10px] opacity-60 uppercase">{s.date.split('-')[2]}/{s.date.split('-')[1]}</span>
+  </button>
                   ))}
                 </div>
               </div>
-            ))
-          ) : (
-            // Om ingen data finns (det du ser i din bild just nu)
-            <div className="py-10 text-center">
-              <p className="text-white/40 italic tracking-widest">Inga filmer hittades i systemet.</p>
-            </div>
-          )}
+            ))}
         </div>
-
-        {/* 3. Boka-knapp (Längst ner i rutan) */}
-        <div className="mt-12 flex flex-col items-center gap-4">
-          <button
-            onClick={handleBooking}
-            disabled={!selectedScreening}
-            className={`px-16 py-4 rounded-full font-bold uppercase tracking-[0.2em] transition-all duration-500 shadow-2xl ${
-              selectedScreening 
-                ? "bg-[#e50914] text-white hover:bg-[#ff0000] hover:scale-105" 
-                : "bg-white/5 text-white/20 cursor-not-allowed"
-            }`}
-          >
-            Boka nu
-          </button>
-                  {/* 3. Boka-knapp (Längst ner i rutan) */}
-        <div className="mt-12 flex flex-col items-center gap-4">
-          <button
-            onClick={handleBooking}
-            disabled={!selectedScreening}
-            className={`px-16 py-4 rounded-full font-bold uppercase tracking-[0.2em] transition-all duration-500 shadow-2xl ${
-              selectedScreening 
-                ? "bg-[#e50914] text-white hover:bg-[#ff0000] hover:scale-105" 
-                : "bg-white/5 text-white/20 cursor-not-allowed"
-            }`}
-          >
-            Boka nu
-          </button>
-          {!selectedScreening && (
-            <p className="text-[#c0a060]/50 text-xs uppercase tracking-[0.1em]">Välj en tid för att fortsätta</p>
-          )}
-        </div>
-
-      </div>
-
-    </div>
+{/* 3. Boka-sektionen flyttad neråt höger för att ge plats åt Kiosken nedanför */}
+<div className="mt-8 flex justify-end items-center gap-6">
+{!selectedScreening && (
+<p className="text-accent/40 text-[10px] uppercase tracking-widest italic animate-pulse">Välj en visning för att boka</p>
+  )}
+<button
+onClick={handleBooking}
+disabled={!selectedScreening}
+className={`px-12 py-3 rounded-lg text-xs font-bold uppercase tracking-[0.2em] transition-all shadow-xl ${
+selectedScreening 
+? "bg-primary text-white hover:bg-red-700 hover:scale-105"                
+: "bg-white/5 text-white/20 cursor-not-allowedborder border-white/10"
+ }`}
+>
+ Boka nu
+</button>
+  </div>
+     </div>
+{/* Här lämnar vi plats för Kiosken */}
+       </div>
   );
 }
 
