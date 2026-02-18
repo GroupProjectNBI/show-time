@@ -14,11 +14,7 @@ import { useBooking } from "../context/BookingContext";
 import TicketSelector from "../parts/TicketSelector";
 import BookingSnackPanel from "../parts/BookingSnackPanel";
 
-BookingPage.route = {
-    path: "/booking/:id",
-    index: 2,
-    // Ingen menuLabel => ska inte synas som menyval
-};
+
 
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
@@ -190,3 +186,8 @@ export default function BookingPage() {
         </div>
     );
 }
+
+BookingPage.route = {
+  path: "/booking/:id"
+};
+
