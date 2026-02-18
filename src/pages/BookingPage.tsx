@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { formatScreeningDate } from "../utils/formatTime";
+import MovieCard from "../parts/MovieCard";
 
 import fetchJson from "../utils/fetchJson";
 import type { Theater } from "../interfaces/Seats";
+import type { Screening } from "../interfaces/Screenings";
+import type Movie from "../interfaces/Movie";
 import Chairs from "../parts/Chairs";
 
 import { useBooking } from "../context/BookingContext";
@@ -18,7 +22,8 @@ BookingPage.route = {
 
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
-
+    const [screening, setScreening] = useState<Screening | null>(null);
+    const [movie, setMovie] = useState<Movie | null>(null);
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
 
@@ -31,12 +36,21 @@ export default function BookingPage() {
             try {
                 const screeningResult = await fetchJson(`/api/v_screenings?where=id=${id}`);
                 const screening = screeningResult[0];
+                setScreening(screening);
 
                 if (screening) {
                     // Hämta layout
                     const theaterId = screening.theaterName === "Stora" ? 1 : 2;
                     const layoutData = await fetchJson(`/api/Theater?where=id=${theaterId}`);
                     setSeatArray(layoutData);
+
+                    // 3. Hämta Film-info (Movie) baserat på movieId från visningen
+                    // OBS: Använd currentScreening.movieId här!
+                    const movieResult = await fetchJson(`/api/v_getMovieDetailsView?where=movieId=${screening.movieId}`);
+
+                    if (movieResult && movieResult.length > 0) {
+                        setMovie(movieResult[0]); // Spara objektet
+                    }
 
                     // Hämta upptagna stolar för denna visning
                     const occupiedResult = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`);
@@ -63,8 +77,23 @@ export default function BookingPage() {
         .map((seatId) => `Stol-ID ${seatId}`);
 
     // returnerar alla komponenter, ingen logik är inlagd än så länge
-    return (
+    return screening && movie && (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center relative">
+            {/*======================
+            MOVIECARD
+            ========================= */}
+            <div className="w-full flex justify-center mb-8">
+                <MovieCard
+                    title={screening.movieTitle}
+                    genre={movie.categories}
+                    ageLimit={movie.ageLimit + " +"}
+                    dateTimeLabel={formatScreeningDate(screening.startTime)}
+
+                    theaterLabel={screening.theaterName + " Salongen"}
+                    posterUrl={`/images/posters/${screening.movieId}.webp`}
+                />
+            </div>
+
             {/* =========================
           TICKET SELECTOR 
           ========================= */}
@@ -102,51 +131,6 @@ export default function BookingPage() {
                         })}
                     </section>
                 ))}
-            </div>
-
-            {/* =========================
-          DEBUG / INFO RUTA 
-          ========================= */}
-            <div className="fixed bottom-6 right-6 bg-gray-900 border border-white/20 p-5 rounded-xl shadow-2xl text-white max-w-xs z-50 backdrop-blur-sm bg-opacity-90">
-                <h3 className="font-bold text-accent mb-2 border-b border-white/10 pb-2">
-                    Boknings Context
-                </h3>
-
-                <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                        <span className="text-gray-400">Antal valda:</span>
-                        <span className="font-bold">{selectedSeats.length} st</span>
-                    </div>
-
-                    <div>
-                        <span className="text-gray-400 block mb-1">Valda IDn:</span>
-                        <div className="bg-black/40 p-2 rounded text-xs font-mono break-words min-h-[2rem]">
-                            {selectedSeats.length > 0
-                                ? selectedSeats.slice().sort((a, b) => a - b).join(", ")
-                                : "Inga valda..."}
-                        </div>
-                    </div>
-
-                    <div>
-                        <span className="text-gray-400 block mb-1">Upptagna IDn (Test):</span>
-                        <div className="bg-red-900/40 p-2 rounded text-xs font-mono break-words min-h-[2rem]">
-                            {occupiedSeats.length > 0
-                                ? occupiedSeats.slice(0, 10).join(", ") + (occupiedSeats.length > 10 ? "..." : "")
-                                : "Inga upptagna"}
-                        </div>
-                    </div>
-
-                    <div className="pt-2 mt-2 border-t border-white/10">
-                        <button
-                            className="w-full bg-accent text-primary font-bold py-1 px-3 rounded hover:brightness-110 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={selectedSeats.length === 0}
-                            onClick={() => alert(`Går vidare till kassan med säten: ${selectedSeats.join(", ")}`)}
-                            type="button"
-                        >
-                            Gå till kassan
-                        </button>
-                    </div>
-                </div>
             </div>
 
             {/* =========================

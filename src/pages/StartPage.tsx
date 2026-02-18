@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; // För att kunna skicka användaren till bokningen
 import fetchJson from "../utils/fetchJson";
 import { formatTime } from "../utils/formatTime"; 
+import OfferBanner from "../parts/OfferBanner";
 import MovieCarousel from "../parts/MovieCarousel";
 
 //Interface-tänket
@@ -54,6 +55,7 @@ navigate(`/booking/${selectedScreening.movieId}/${selectedScreening.id}`);
 <section className="w-full mt-4 mb-2">        
   <MovieCarousel />
       </section>
+    
 
 
 {/* 2. Schema-sektion (Den kompakta kalendern) från  Figma-design (den bruna rutan med guld-text och logic för tider) */}
@@ -121,7 +123,7 @@ selectedScreening
 // ROUTE INSTÄLLNINGAR
 StartPage.route = {
   path: "/",
-   // Ingen menuLabel så den inte syns i menyn
+  // Ingen menuLabel så den inte syns i menyn
   hideInMenu: true,
   index: -1
 };
