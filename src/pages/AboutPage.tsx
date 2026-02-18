@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 function AboutPage() {
   const { hash } = useLocation();
 
-  // ⭐ Scrolla till hash när sidan laddas
+  //  Scrolla till hash när sidan laddas
   useEffect(() => {
     if (hash) {
       const el = document.querySelector(hash);
@@ -96,7 +96,7 @@ function AboutPage() {
   );
 }
 
-/* ⭐ ROUTE-DEFINITIONEN — måste ligga efter komponenten */
+/*  ROUTE-DEFINITIONEN — måste ligga efter komponenten */
 AboutPage.route = {
   path: "/om-oss",
   menuLabel: "Om oss",
