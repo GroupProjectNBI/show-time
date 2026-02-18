@@ -22,11 +22,10 @@ function StartPage() {
   const [selectedScreening, setSelectedScreening] = useState<any>(null);
   const navigate = useNavigate();
   
-
+// Vi hämtar filmer och deras visningar.
 useEffect(() => {
 const getMovies = async () => {
 try {
-// Vi hämtar filmer och deras visningar
 const result = await fetchJson("/api/v_getMovieDetailsView"); 
 if (result) setMovies(result);
 } catch (error) {
@@ -50,10 +49,12 @@ navigate(`/booking/${selectedScreening.movieId}/${selectedScreening.id}`);
     return (
 <div className="flex-grow flex flex-col items-center bg-[#1a1a1a] text-white font-light pb-10">
 
+
 {/* 1. Karusellen sektion  (Prickarna syns bättre med mindre marginal)*/}
 <section className="w-full mt-4 mb-2">        
   <MovieCarousel />
       </section>
+
 
 {/* 2. Schema-sektion (Den kompakta kalendern) från  Figma-design (den bruna rutan med guld-text och logic för tider) */}
 <div className="w-[min(850px,calc(100%-32px))] bg-[#332f2e] rounded-[30px] p-6 shadow-2xl mb-8 border border-white/5">
@@ -89,10 +90,15 @@ selectedScreening?.screeningId === s.screeningId
               </div>
             ))}
         </div>
+
+
 {/* 3. Boka-sektionen flyttad neråt höger för att ge plats åt Kiosken nedanför */}
 <div className="mt-8 flex justify-end items-center gap-6">
+  
 {!selectedScreening && (
-<p className="text-accent/40 text-[10px] uppercase tracking-widest italic animate-pulse">Välj en visning för att boka</p>
+  //animate-pulse: Det är denna klass som gör att texten tonas in och ut (rör sig i styrka).
+<p className="text-accent/40 text-[10px] uppercase tracking-widest italic animate-pulse">
+Välj en visning för att boka</p>
   )}
 <button
 onClick={handleBooking}
