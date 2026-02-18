@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Star, Clock, Calendar, Users, Ticket } from "lucide-react";
 import fetchJson from "../utils/fetchJson";
 import { calculatingTime } from "../utils/lengthcalc";
@@ -39,6 +39,7 @@ interface MovieDetails {
 function MovieInfo() {
     const [movie, setMovie] = useState<MovieDetails | null>(null);
     const { id } = useParams<{ id: string; }>();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -64,7 +65,6 @@ function MovieInfo() {
     const actorList = movie.actors ? movie.actors.split(', ') : [];
 
     return (
-        // FOOTER FIX: pb-40 garanterar att det finns massor av luft under sista elementet innan footern kommer
         <div className="min-h-screen bg-[#1a1a1a] text-stone-100 font-sans pb-40 relative overflow-x-hidden">
 
             {/* --- 1. CINEMATIC BACKGROUND --- */}
@@ -78,7 +78,6 @@ function MovieInfo() {
                         backgroundRepeat: 'no-repeat'
                     }}
                 />
-                {/* Gradient som tonar ut mot sidans bakgrundsfärg */}
                 <div className="absolute inset-0 bg-gradient-to-b from-[#1a1a1a]/30 via-[#1a1a1a]/60 to-[#1a1a1a]" />
             </div>
 
@@ -128,6 +127,7 @@ function MovieInfo() {
                                     {movie.title}
                                 </h1>
 
+                                {/* HÄR VALDE VI "HEAD"-DELEN EFTERSOM DEN INNEHÅLLER METADATA */}
                                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-6 gap-y-3 text-stone-300 text-sm md:text-base font-medium">
                                     <div className="flex items-center gap-1.5 text-[#C6A96A] bg-black/20 px-3 py-1 rounded-full border border-white/5 backdrop-blur-sm">
                                         <Star fill="currentColor" size={16} />
@@ -185,14 +185,12 @@ function MovieInfo() {
                                         {movie.screenings.map((screen) => (
                                             <button
                                                 key={screen.screeningId}
-                                                // ÄNDRING HÄR: bg-primary och hover-effekter
                                                 className="group relative flex flex-col items-center justify-center bg-primary hover:bg-red-800 hover:scale-105 border border-white/10 rounded-xl py-4 transition-all duration-300 shadow-lg"
-                                                onClick={() => console.log("Gå till bokning:", screen.screeningId)}
+                                                onClick={() => navigate(`/booking/${screen.screeningId}`)}
                                             >
                                                 <span className="text-lg font-bold text-white mb-1">
                                                     {formatTime(screen.startTime)}
                                                 </span>
-                                                {/* Datum-pluppen: Lite mörkare för kontrast */}
                                                 <span className="text-[10px] text-white/80 group-hover:text-white uppercase tracking-wider font-semibold bg-black/20 px-2 py-0.5 rounded">
                                                     {screen.date}
                                                 </span>
