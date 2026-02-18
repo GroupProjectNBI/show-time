@@ -1,97 +1,244 @@
-//Importerat fetchJson för att kommunicera med din backend
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import fetchJson from "../utils/fetchJson";
 import ScreeningsList from "../parts/ScreeningsList";
 import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
 import { formatDate } from "../utils/formatTime";
+import { Filter, ArrowUpDown, X } from "lucide-react";
 
-function ScreeningsPage() {
-  //för drop down
-  const [selectedDateISO, setSelectedDateISO] = useState<string | null>(null);
+export default function ScreeningsPage() {
+  // --- STATE ---
+  const [allScreenings, setAllScreenings] = useState<Screening[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // Datum
+  const [selectedDateISO, setSelectedDateISO] = useState<string>(formatDate(new Date()));
 
-  //Skapat en state-variabel som håller listan med filmer. Den är tom [] från början.
-  // Den här raden skapar både variabeln OCH funktionen (setScreenings) som uppdaterar den
-  const [screenings, setScreenings] = useState<Screening[]>([]); // empty for now, will add mockdata
+  // UI Toggle
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Filter & Sortering
+  const [filters, setFilters] = useState({
+    movie: "",
+    category: "",
+    theater: "",
+  });
+  const [sortOrder, setSortOrder] = useState("dateAsc");
+
+  // --- HÄMTA DATA ---
   useEffect(() => {
     async function loadData() {
-      // om där finns data i selectedDateISO hömta akka filmer. WIP: hömta dem utifrn det datumet som kommer in. 
-      if (selectedDateISO) {
+      // Hämta allt sorterat på tid
+      const url = `/api/v_screenings?orderby=startTime`;
+      const data = await fetchJson(url);
 
-        // Vi bygger URL:en dynamiskt.
-        // 1. "screeningDate_LIKE_" säger till backend att söka textmässigt.
-        // 2. Vi lägger till "%" på slutet för att säga "allt som börjar på detta datum".
-        // 3. Vi lägger även till "&orderby=startTime" för att få dem i tidsordning (om din backend stöder det).
-        const url = `/api/v_screenings?where=screeningDate_LIKE_${selectedDateISO}%&orderby=startTime`;
-
-        // Anropar våra SQL-vy v_screenings via API:et
-        const data = await fetchJson(url);
-
-        // Om hämtningen lyckas, spara filmerna i vår state
-        if (data && !data.error) {
-          setScreenings(data);
-        }
+      if (data && !data.error) {
+        setAllScreenings(data);
       }
-      else {
-        /* 
-          Har skapat en funktion som skickar tillbaka new Date object: Tue Feb 17 2026 08:51:52 GMT+0100 (centraleuropeisk normaltid)
-          Den skickar tillbaka formatet YYYY-MM-DD som vi får från kalendern med. 
-          Sätter in den i setSelectedDateISO så att componene triggas om och hämtar data. 
-        */
-        setSelectedDateISO(formatDate(new Date()));
+      setLoading(false);
+    }
+    loadData();
+  }, []);
+
+  // --- DYNAMISKA LISTOR ---
+  const uniqueMovies = useMemo(() =>
+    Array.from(new Set(allScreenings.map(s => s.movieTitle))).sort(),
+    [allScreenings]);
+
+  const uniqueTheaters = useMemo(() =>
+    Array.from(new Set(allScreenings.map(s => s.theaterName))).sort(),
+    [allScreenings]);
+
+  // FIX: Kategorier (Splittar "Action, Drama" till unika värden)
+  const uniqueCategories = useMemo(() => {
+    const cats = new Set<string>();
+    allScreenings.forEach(s => {
+      // Hantera olika namn i databasen (categories eller genre)
+      const catString = (s as any).categories || (s as any).genre;
+      if (catString) {
+        // Splitta på kommatecken och ta bort mellanslag
+        catString.split(",").forEach((c: string) => cats.add(c.trim()));
+      }
+    });
+    return Array.from(cats).sort();
+  }, [allScreenings]);
+
+  // --- FILTRERINGSLOGIK (Här är magin!) ---
+  const processedScreenings = useMemo(() => {
+    let result = [...allScreenings];
+
+    // 1. FILM & DATUM LOGIK (Det du frågade om)
+    if (filters.movie) {
+      // OM en film är vald -> Visa ALLA datum för den filmen (Ignorera datumväljaren)
+      result = result.filter(s => s.movieTitle === filters.movie);
+    } else {
+      // OM ingen film är vald -> Använd datumväljaren
+      if (selectedDateISO) {
+        result = result.filter(s => s.startTime.startsWith(selectedDateISO));
       }
     }
 
-    loadData();
-  }, [selectedDateISO]);
+    // 2. KATEGORI (Kollar om vald kategori finns i strängen)
+    if (filters.category) {
+      result = result.filter(s => {
+        const catString = (s as any).categories || (s as any).genre || "";
+        return catString.includes(filters.category);
+      });
+    }
 
+    // 3. SALONG
+    if (filters.theater) {
+      result = result.filter(s => s.theaterName === filters.theater);
+    }
 
+    // 4. SORTERING
+    result.sort((a, b) => {
+      switch (sortOrder) {
+        case "dateAsc": return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
+        case "nameAsc": return a.movieTitle.localeCompare(b.movieTitle);
+        case "lengthDesc": return (b.duration || 0) - (a.duration || 0);
+        default: return 0;
+      }
+    });
 
+    return result;
+  }, [allScreenings, selectedDateISO, filters, sortOrder]);
+
+  // --- HANDLERS ---
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilters({ ...filters, [e.target.name]: e.target.value });
+  };
+
+  const clearFilters = () => {
+    setFilters({ movie: "", category: "", theater: "" });
+    setSortOrder("dateAsc");
+    // Om du vill återställa datumet till idag när man rensar:
+    // setSelectedDateISO(formatDate(new Date()));
+  };
+
+  // CSS-klasser för inputs
+  const inputClass = "w-full bg-[#1a1a1a] text-white border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#c0a060] transition-colors appearance-none cursor-pointer";
 
   return (
-    <div className="min-h-screen pt-8">
+    <div className="min-h-screen pt-8 pb-20">
       <div className="mx-auto w-[min(1200px,calc(100%-32px))]">
-        {/* TITLE */}
-        <div className="mb-8">
+
+        {/* HEADER */}
+        <div className="mb-8 border-b border-white/10 pb-6">
           <h1 className="text-2xl font-semibold text-accent">Gå på bio</h1>
-          <br />
-          <p className="mt-1 text-accent/70">
-            Välkommen till oss! Med ett brett utbud av filmer kan du njuta av allt från de senaste bioreleaserna till tidlösa klassiker i världsklass. Oavsett om du är ute efter spänning, romantik, skratt eller äventyr har vi något som passar just dig. Utforska vårt utbud och hitta din nästa filmupplevelse redan idag – börja med att söka här nedan.
+          <p className="mt-1 text-accent/70 max-w-3xl">
+            Välkommen! Utforska vårt utbud och hitta din nästa filmupplevelse.
           </p>
-          <br />
         </div>
 
-        {/* FILTER ROW (responsive) */}
+        {/* KONTROLLPANEL */}
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
-          <DateDropdown
-            valueISO={selectedDateISO}
-            onChange={setSelectedDateISO}
-          />
 
-          {/* FILTER BUTTON primary color */}
-          <button className="w-full rounded-xl bg-primary px-10 py-2 text-sm font-semibold text-accent transition hover:opacity-90 md:w-auto">
-            Filtrera
+          {/* Datumväljare (Inaktiverad om film är vald för tydlighetens skull, valfritt) */}
+          <div className={filters.movie ? "opacity-50 pointer-events-none grayscale" : ""}>
+            <DateDropdown
+              valueISO={selectedDateISO}
+              onChange={setSelectedDateISO}
+            />
+          </div>
+
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`
+              w-full md:w-auto rounded-xl px-10 py-2 text-sm font-semibold text-accent transition flex items-center justify-center gap-2
+              ${showFilters ? 'bg-primary ring-2 ring-white/20' : 'bg-primary hover:opacity-90'}
+            `}
+          >
+            <Filter size={16} />
+            {showFilters ? "Göm filter" : "Filtrera"}
           </button>
 
-          <button className="w-full rounded-xl bg-white/10 px-5 py-2 text-sm font-semibold text-accent transition hover:bg-white/15 md:ml-auto md:w-auto">
-            Sök
-          </button>
+          {/* <span className="hidden md:block ml-auto text-sm text-accent/50 italic">
+            
+            text Sök knapp
+          </span> */}
         </div>
 
-        {/* TABLE HEADER for desktop row over movies time, title and theater */}
+        {/* FILTERPANEL */}
+        {showFilters && (
+          <div className="mb-8 bg-[#232323] border border-white/10 rounded-xl p-6 shadow-lg animate-in fade-in slide-in-from-top-2">
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+              {/* Film Select */}
+              <div>
+                <label className="text-[10px] text-white/40 uppercase tracking-wider mb-1 block">Film</label>
+                <div className="relative">
+                  <select name="movie" value={filters.movie} onChange={handleFilterChange} className={inputClass}>
+                    <option value="">Alla filmer</option>
+                    {uniqueMovies.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Genre Select */}
+              <div>
+                <label className="text-[10px] text-white/40 uppercase tracking-wider mb-1 block">Genre</label>
+                <div className="relative">
+                  <select name="category" value={filters.category} onChange={handleFilterChange} className={inputClass}>
+                    <option value="">Alla genrer</option>
+                    {uniqueCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Salong Select */}
+              <div>
+                <label className="text-[10px] text-white/40 uppercase tracking-wider mb-1 block">Salong</label>
+                <div className="relative">
+                  <select name="theater" value={filters.theater} onChange={handleFilterChange} className={inputClass}>
+                    <option value="">Alla salonger</option>
+                    {uniqueTheaters.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* Sortering */}
+              <div>
+                <label className="text-[10px] text-white/40 uppercase tracking-wider mb-1 block">Sortera</label>
+                <div className="relative">
+                  <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} className={inputClass}>
+                    <option value="dateAsc">Tid (Tidigast)</option>
+                    <option value="nameAsc">Namn (A-Ö)</option>
+                    <option value="lengthDesc">Längd (Längst)</option>
+                  </select>
+                  <ArrowUpDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" />
+                </div>
+              </div>
+            </div>
+
+            {/* Rensa Knapp */}
+            {(filters.movie || filters.category || filters.theater) && (
+              <div className="mt-4 flex justify-end">
+                <button onClick={clearFilters} className="text-red-400 hover:text-red-300 text-xs flex items-center gap-1 hover:underline">
+                  <X size={14} /> Rensa val
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TABELLRUBRIKER */}
         <div className="hidden md:grid md:grid-cols-[140px_1fr_280px] md:border-b md:border-white/10 md:pb-3 md:text-sm md:font-semibold md:text-accent/70">
           <div>Klockslag</div>
           <div>Titel</div>
           <div>Salong</div>
         </div>
 
-        {/* LIST */}
+        {/* LISTA */}
         <div className="divide-y divide-white/10">
-          <ScreeningsList screenings={screenings} />
+          {loading ? (
+            <p className="py-10 text-center text-accent/50">Laddar visningar...</p>
+          ) : (
+            <ScreeningsList screenings={processedScreenings} />
+          )}
         </div>
 
-        {/* bottom spacing */}
         <div className="h-10" />
       </div>
     </div>
@@ -103,5 +250,3 @@ ScreeningsPage.route = {
   menuLabel: "Gå på bio",
   index: 2
 };
-
-export default ScreeningsPage;
