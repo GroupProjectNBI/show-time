@@ -165,7 +165,7 @@ export default function FAQPage() {
             <label className="block text-accent mb-1">Meddelande</label>
             <textarea
               rows={4}
-              className="2-full px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-accent focus:outline-none"
+              className="w-full px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-accent focus:outline-none"
             ></textarea>
           </div>
 
