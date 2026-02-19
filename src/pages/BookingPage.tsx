@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { formatScreeningDate } from "../utils/formatTime";
 import MovieCard from "../parts/MovieCard";
 
@@ -20,10 +20,25 @@ export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
     const [movie, setMovie] = useState<Movie | null>(null);
+
+    const navigate = useNavigate(); // NYTT: för att navigera till confirmation
+
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
 
-    const { selectedSeats, occupiedSeats, toggleSeat, setOccupied } = useBooking();
+    // NYTT: hämtar även tickets + email för validering innan navigation
+    const {
+        selectedSeats,
+        occupiedSeats,
+        toggleSeat,
+        setOccupied,
+        tickets,
+        email,
+        selectedSnack,
+    } = useBooking();
+
+    // NYTT: antal biljetter (styr vad som måste vara valt innan man får boka)
+    const ticketCount = tickets.ordinarie + tickets.pensionar + tickets.barn;
 
     useEffect(() => {
         if (!id) return;
@@ -31,25 +46,28 @@ export default function BookingPage() {
         const loadPageData = async () => {
             try {
                 const screeningResult = await fetchJson(`/api/v_screenings?where=id=${id}`);
-                const screening = screeningResult[0];
-                setScreening(screening);
+                const currentScreening = screeningResult[0];
+                setScreening(currentScreening);
 
-                if (screening) {
+                if (currentScreening) {
                     // Hämta layout
-                    const theaterId = screening.theaterName === "Stora" ? 1 : 2;
+                    const theaterId = currentScreening.theaterName === "Stora" ? 1 : 2;
                     const layoutData = await fetchJson(`/api/Theater?where=id=${theaterId}`);
                     setSeatArray(layoutData);
 
-                    // 3. Hämta Film-info (Movie) baserat på movieId från visningen
-                    // OBS: Använd currentScreening.movieId här!
-                    const movieResult = await fetchJson(`/api/v_getMovieDetailsView?where=movieId=${screening.movieId}`);
+                    // Hämta Film-info (Movie) baserat på movieId från visningen
+                    const movieResult = await fetchJson(
+                        `/api/v_getMovieDetailsView?where=movieId=${currentScreening.movieId}`
+                    );
 
                     if (movieResult && movieResult.length > 0) {
-                        setMovie(movieResult[0]); // Spara objektet
+                        setMovie(movieResult[0]);
                     }
 
                     // Hämta upptagna stolar för denna visning
-                    const occupiedResult = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`);
+                    const occupiedResult = await fetchJson(
+                        `/api/v_occupied_seats?where=screeningId=${id}`
+                    );
                     const occupiedIds = occupiedResult.map((occ: any) => occ.seatId);
 
                     setOccupied(occupiedIds);
@@ -62,8 +80,8 @@ export default function BookingPage() {
         loadPageData();
     }, [id, setOccupied]);
 
-    if (!seatArray) {
-        return <div className="text-white text-center p-10">Laddar salong...</div>;
+    if (!seatArray || !screening || !movie) {
+        return <div className="text-white text-center p-10">Laddar...</div>;
     }
 
     // Enkel label-lista av valda säten (seatId). Kan senare göras om till "Rad X, Stol Y".
@@ -72,34 +90,53 @@ export default function BookingPage() {
         .sort((a, b) => a - b)
         .map((seatId) => `Stol-ID ${seatId}`);
 
-    // returnerar alla komponenter, ingen logik är inlagd än så länge
-    return screening && movie && (
+    // NYTT: validering + navigation när man trycker BOKA
+    const handleBook = () => {
+        if (!email.trim()) {
+            alert("Fyll i din email innan du bokar.");
+            return;
+        }
+
+        if (ticketCount === 0) {
+            alert("Välj minst en biljett innan du bokar.");
+            return;
+        }
+
+        if (selectedSeats.length !== ticketCount) {
+            alert(`Du måste välja ${ticketCount} plats(er) innan du bokar.`);
+            return;
+        }
+
+        // Allt ok -> gå till confirmation
+        navigate("/confirmation");
+    };
+
+    return (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center relative">
             {/*======================
-            MOVIECARD
-            ========================= */}
+        MOVIECARD
+      ========================= */}
             <div className="w-full flex justify-center mb-8">
                 <MovieCard
                     title={screening.movieTitle}
                     genre={movie.categories}
                     ageLimit={movie.ageLimit + " +"}
                     dateTimeLabel={formatScreeningDate(screening.startTime)}
-
                     theaterLabel={screening.theaterName + " Salongen"}
                     posterUrl={`/images/posters/${screening.movieId}.webp`}
                 />
             </div>
 
             {/* =========================
-          TICKET SELECTOR 
-          ========================= */}
+        TICKET SELECTOR 
+      ========================= */}
             <div className="w-full max-w-4xl mb-10">
                 <TicketSelector />
             </div>
 
             {/* =========================
-          STOLSVAL 
-          ========================= */}
+        STOLSVAL 
+      ========================= */}
             <h1 className="text-white text-2xl mb-2">Biograf Layout</h1>
 
             {/* Duken / Scenen */}
@@ -130,18 +167,18 @@ export default function BookingPage() {
             </div>
 
             {/* =========================
-          BOOKING SNACK PANEL 
-          ========================= */}
+        BOOKING SNACK PANEL 
+      ========================= */}
             <div className="w-full flex items-end mt-10">
                 <div className="mx-auto w-full max-w-[1200px] px-6 pb-10">
                     <BookingSnackPanel
-                        movieTitle="Joker"
-                        // Placeholder tills TicketSelector skickar upp data:
-                        ticketCount={0}
-                        ticketPrice={0}
+                        movieTitle={screening.movieTitle} // NYTT: använder rätt titel från screening
                         seatsLabelLines={seatsLabelLines}
-                        onBook={({ email, snack }) => {
-                            console.log("BOOK:", { email, snack });
+                        onBook={() => {
+                            // NYTT: vi bryr oss inte om payload här, allt finns redan i context
+                            // (selectedSnack finns i context om du vill använda den senare)
+                            void selectedSnack;
+                            handleBook();
                         }}
                     />
                 </div>
