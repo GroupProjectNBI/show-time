@@ -144,25 +144,32 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                 })}
 
 
-                {!user ? <div className="pt-2">
-                  <Link
-                    to="#"
-                    onClick={() => { openLogin(); closeMenu(); }}
-                    className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
-                  >
-                    Logga in
-                  </Link>
-                </div>
-                  : <div className="pt-2">
-                    <Link
-                      to="#"
-                      onClick={() => { logout(), closeMenu; }}
-                      className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
+                {!user ? (
+                  <>
+                    <button
+                      onClick={() => { openLogin(); closeMenu(); }}
+                      className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
                     >
-                      Logout: {user.userName}
-                    </Link>
-                  </div>
-                }
+                      Logga in
+                    </button>
+
+                    <button
+                      onClick={() => { openMembership(); closeMenu(); }}
+                      className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                    >
+                      Bli medlem
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => { logout(); closeMenu(); }}
+                    className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                  >
+                    Logout: {user.userName}
+                  </button>
+                )}
+
+
               </nav>
             </div>
           </div>
