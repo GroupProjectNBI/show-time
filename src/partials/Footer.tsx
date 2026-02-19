@@ -1,9 +1,15 @@
+type FooterProps = {
+  openMembership: () => void;
+};
+
+
+
 import { Link, useLocation } from 'react-router-dom';
 import { FaFacebookF, FaInstagram } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { useEffect } from 'react';
 
-export default function Footer() {
+export default function Footer({ openMembership }: FooterProps) {
   const { hash } = useLocation();
 
   useEffect(() => {
@@ -45,7 +51,15 @@ export default function Footer() {
             <p><Link to="/faq#kontakt" className="hover:text-white transition">Kontakta oss - formulär</Link></p>
             <p><Link to="/jobba-hos-oss" className="hover:text-white transition">Jobba hos oss</Link></p>
             <p><Link to="/faq" className="hover:text-white transition">FAQ</Link></p>
-            <p><Link to="/bli-medlem" className="hover:text-white transition">Bli medlem</Link></p>
+            <p>
+              <button
+                onClick={openMembership}
+                className="hover:text-white transition cursor-pointer"
+              >
+                Bli medlem
+              </button>
+            </p>
+
           </div>
         </div>
 

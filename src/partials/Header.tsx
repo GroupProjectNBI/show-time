@@ -3,7 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import routes from "../routes";
 import { useAuth } from "../context/AuthContext";
 
-export default function Header() {
+type HeaderProps = {
+  openMembership: () => void;
+};
+
+
+export default function Header({ openMembership }: HeaderProps) {
   const [expanded, setExpanded] = useState(false);
   const { logout, login, user } = useAuth();
   const pathName = useLocation().pathname;
@@ -81,7 +86,15 @@ export default function Header() {
                   >
                     Logga in
                   </Link>
+                  <button
+                    onClick={openMembership}
+                    className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary ml-4"
+                  >
+                    Bli medlem
+                  </button>
+
                 </div>
+
               }
 
 
@@ -136,7 +149,7 @@ export default function Header() {
                 {!user ? <div className="pt-2">
                   <Link
                     to="#"
-                    onClick={() => { login({}), closeMenu }}
+                    onClick={() => { login({}), closeMenu; }}
                     className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
                   >
                     Logga in
@@ -145,7 +158,7 @@ export default function Header() {
                   : <div className="pt-2">
                     <Link
                       to="#"
-                      onClick={() => { logout(), closeMenu }}
+                      onClick={() => { logout(), closeMenu; }}
                       className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
                     >
                       Logout: {user.userName}

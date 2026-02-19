@@ -1,4 +1,9 @@
-export default function MembershipOverlay() {
+type MembershipOverlayProps = {
+  onClose: () => void;
+};
+
+
+export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
   return (
     <div className="
     fixed inset-0 z-[9999]

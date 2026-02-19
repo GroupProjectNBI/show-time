@@ -8,11 +8,16 @@ import Footer from './partials/Footer';
 // import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
 import { AuthProvider } from './context/AuthContext';
+
+import { useState } from "react";
+import MembershipOverlay from "./parts/MembershipOverlay";
 export default function App() {
 
   // Denna hook fungerar eftersom App ligger inuti RouterProvider i main.tsx
   const location = useLocation();
   const isAboutPage = location.pathname.startsWith("/om-oss");
+
+  const [showOverlay, setShowOverlay] = useState(false);
 
 
   // Scroll to top vid sidbyte
@@ -24,13 +29,17 @@ export default function App() {
     // 2. WRAPPA HELA INNEHÅLLET HÄR
     <AuthProvider>
       <BookingProvider>
+        {showOverlay && <MembershipOverlay onClose={() => setShowOverlay(false)} />}
+
+
 
         <div className="min-h-screen flex flex-col">
 
-          <Header />
+          <Header openMembership={() => setShowOverlay(true)} />
+
           <Main />
           <div className={isAboutPage ? "footer-about" : ""}>
-            <Footer />
+            <Footer openMembership={() => setShowOverlay(true)} />
           </div>
 
         </div>
