@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import routes from "../routes";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
   const [expanded, setExpanded] = useState(false);
-
+  const { logout, login, user } = useAuth();
   const pathName = useLocation().pathname;
   const currentRoute = routes
     .slice()
@@ -69,14 +70,20 @@ export default function Header() {
               </div>
 
               {/* RIGHT: login pinned right */}
-              <div className="ml-auto hidden md:block">
-                <Link
-                  to="/login"
-                  className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
-                >
-                  Logga in
-                </Link>
-              </div>
+              {
+                user ? <div className="ml-auto hidden md:block">
+                  <Link to="#" onClick={() => logout()} className="shrink-0"><p>Logout: {user.role}</p></Link>
+
+                </div> : <div className="ml-auto hidden md:block">
+                  <Link
+                    to="/#" onClick={() => login({})}
+                    className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
+                  >
+                    Logga in
+                  </Link>
+                </div>
+              }
+
 
               {/* MOBILE TOGGLE pinned right */}
               <button
@@ -125,21 +132,46 @@ export default function Header() {
                   );
                 })}
 
-                <div className="pt-2">
+                {/* {
+                  user ? <div className="ml-auto hidden md:block">
+                    <Link to="#" onClick={() => logout()} className="shrink-0"><p>Welcome back : {user.role}</p></Link>
+
+                  </div> : <div className="ml-auto hidden md:block">
+                    <Link
+                      to="/#" onClick={() => login({})}
+                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
+                    >
+                      Logga in
+                    </Link>
+                  </div>
+                } */}
+
+
+
+                {!user ? <div className="pt-2">
                   <Link
-                    to="/login"
-                    onClick={closeMenu}
+                    to="#"
+                    onClick={() => { login({}), closeMenu }}
                     className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
                   >
                     Logga in
                   </Link>
-                  
                 </div>
+                  : <div className="pt-2">
+                    <Link
+                      to="#"
+                      onClick={() => { logout(), closeMenu }}
+                      className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
+                    >
+                      Logout: {user.role}
+                    </Link>
+                  </div>
+                }
               </nav>
             </div>
           </div>
         </div>
-      </div>
-    </header>
+      </div >
+    </header >
   );
 }

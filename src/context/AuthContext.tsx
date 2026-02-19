@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from "react";
-import fetchJson from "../utils/fetchJson"; // Antar att denna returnerar ett Response-objekt
+import fetchJson from "../utils/fetchJson";
 
 // 1. Definiera typer
 export interface User {
@@ -29,13 +29,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function checkLogin() {
         try {
             const response = await fetchJson("/api/login");
+            if (response && response.email) {
+                if (response.email) {
+                    setUser(response);
 
-            if (response.ok) {
-                const result = await response.json();
-                // OBS: Om fetchJson redan returnerar data, ta bort .json() ovan
-
-                if (result.email) {
-                    setUser(result);
                 } else {
                     setUser(null);
                 }
@@ -51,12 +48,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 4. Placeholder för Login (Måste finnas för att matcha Interface)
     async function login(credentials: any) {
         console.log("Login inte implementerat än", credentials);
+        const login = await fetchJson("/api/login", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ "email": "jail@example.com", "password": "123456789" })
+        });
+        setUser(login);
         // Här ska du sen göra din POST request
     }
 
     // 5. Placeholder för Logout (Måste finnas för att matcha Interface)
     async function logout() {
         console.log("Logout inte implementerat än");
+        fetchJson("/api/login", { method: 'DELETE' })
+        setUser(null);
         // Här ska du sen göra din DELETE request och sätta setUser(null)
     }
 
