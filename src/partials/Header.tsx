@@ -72,7 +72,7 @@ export default function Header() {
               {/* RIGHT: login pinned right */}
               {
                 user ? <div className="ml-auto hidden md:block">
-                  <Link to="#" onClick={() => logout()} className="shrink-0"><p>Logout: {user.role}</p></Link>
+                  <Link to="#" onClick={() => logout()} className="shrink-0"><p> <img src={user.avatar} className="w-10 h-10" alt="" /> Logout: {user.userName}</p></Link>
 
                 </div> : <div className="ml-auto hidden md:block">
                   <Link
@@ -132,21 +132,6 @@ export default function Header() {
                   );
                 })}
 
-                {/* {
-                  user ? <div className="ml-auto hidden md:block">
-                    <Link to="#" onClick={() => logout()} className="shrink-0"><p>Welcome back : {user.role}</p></Link>
-
-                  </div> : <div className="ml-auto hidden md:block">
-                    <Link
-                      to="/#" onClick={() => login({})}
-                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
-                    >
-                      Logga in
-                    </Link>
-                  </div>
-                } */}
-
-
 
                 {!user ? <div className="pt-2">
                   <Link
@@ -163,7 +148,7 @@ export default function Header() {
                       onClick={() => { logout(), closeMenu }}
                       className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
                     >
-                      Logout: {user.role}
+                      Logout: {user.userName}
                     </Link>
                   </div>
                 }

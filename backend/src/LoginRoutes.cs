@@ -23,14 +23,14 @@ public static class LoginRoutes
 
             // Find the user in the DB
             var dbUser = SQLQueryOne(
-                "SELECT * FROM users WHERE email = @email",
+                "SELECT * FROM User  WHERE email = @email",
                 new { body.email }
             );
             if (dbUser == null)
             {
                 return RestResult.Parse(context, new { error = "No such user." });
             }
-
+            // nyaste i desktop , äldre i mobil. 
             // If the password doesn't match
             if (!Password.Verify(
                 (string)body.password,
