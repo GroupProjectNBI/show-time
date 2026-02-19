@@ -18,7 +18,7 @@ function AboutPage() {
     <div className="about-page">
 
       {/* HERO SECTION */}
-      <section className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden">
+      <section className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden rounded-2xl -mb-10">
         <img
           src="/images/Commercials/biografhus.png"
           alt="Biograf"
@@ -27,19 +27,19 @@ function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/20" />
 
         <div className="relative z-10 flex flex-col justify-end h-full px-6 max-w-6xl mx-auto pb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-accent drop-shadow-lg animate-fadeIn">
+          <h1 className="text-4xl md:text-5xl font-bold text-white/75 drop-shadow-lg animate-fadeIn">
             Om oss
           </h1>
-          <p className="text-lg md:text-xl text-accent/80 mt-2 animate-fadeIn delay-150">
+          <p className="text-lg md:text-xl text-white/75 mt-2 animate-fadeIn delay-150">
             En premium bioupplevelse i hjärtat av Malmö
           </p>
         </div>
       </section>
 
       {/* ABOUT SECTION */}
-      <section className="w-full max-w-3xl mx-auto px-6 py-20">
-        <div className="space-y-8 leading-relaxed text-accent text-lg animate-fadeIn">
-          <p>
+      <section className="w-full max-w-6xl mx-auto px-6 py-20">
+        <div className="max-w-3xl space-y-8 leading-relaxed text-accent text-lg animate-fadeIn">
+          <p className="text-xl md:text-2xl font-semibold text-accent">
             Välkommen till vår biograf - en lokal mötesplats för filmälskare.
           </p>
 
@@ -62,12 +62,12 @@ function AboutPage() {
       </section>
 
       {/* CINEMATIC IMAGE */}
-      <section className="px-6 md:px-12 pb-20">
+      <section className="px-6 md:px-10 pb-20">
         <div className="max-w-6xl mx-auto overflow-hidden rounded-2xl shadow-2xl animate-fadeIn">
           <img
             src="/images/Commercials/salong1.png"
             alt="Biograf"
-            className="w-full h-[350px] md:h-[550px] object-cover hover:scale-[1.02] transition-transform duration-700"
+            className="w-full h-[350px] md:h-[550px] object-cover hover:scale-[1.05] transition-transform duration-700"
           />
         </div>
       </section>

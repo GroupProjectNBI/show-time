@@ -7,7 +7,7 @@ import Footer from './partials/Footer';
 // 1. IMPORTERA DINA PROVIDERS
 // import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
-
+import { AuthProvider } from './context/AuthContext';
 export default function App() {
 
   // Denna hook fungerar eftersom App ligger inuti RouterProvider i main.tsx
@@ -22,20 +22,20 @@ export default function App() {
 
   return (
     // 2. WRAPPA HELA INNEHÅLLET HÄR
-    // <AuthProvider>
-    <BookingProvider>
+    <AuthProvider>
+      <BookingProvider>
 
-      <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col">
 
-        <Header />
-        <Main />
-        <div className={isAboutPage ? "footer-about" : ""}>
-          <Footer />
+          <Header />
+          <Main />
+          <div className={isAboutPage ? "footer-about" : ""}>
+            <Footer />
+          </div>
+
         </div>
 
-      </div>
-
-    </BookingProvider>
-    // </AuthProvider >
+      </BookingProvider>
+    </AuthProvider >
   );
 };

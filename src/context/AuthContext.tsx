@@ -1,14 +1,15 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from "react";
-import fetchJson from "../utils/fetchJson"; // Antar att denna returnerar ett Response-objekt
+import fetchJson from "../utils/fetchJson";
 
 // 1. Definiera typer
 export interface User {
     id: string;
     userName: string;
-    avatarUrl: string;
+    avatarUrl: number;
     email: string;
     role: string;
+    avatar?: string;
 }
 
 // 2. Definiera Context-innehåll
@@ -16,6 +17,7 @@ interface AuthContextType {
     user: User | null;
     login: (credentials: any) => Promise<void>;
     logout: () => Promise<void>;
+    create: (credentials: any) => Promise<void>;
     checkLogin: () => Promise<void>;
 }
 
@@ -29,13 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function checkLogin() {
         try {
             const response = await fetchJson("/api/login");
+            if (response && response.email) {
+                if (response.email) {
+                    setUser(response);
 
-            if (response.ok) {
-                const result = await response.json();
-                // OBS: Om fetchJson redan returnerar data, ta bort .json() ovan
-
-                if (result.email) {
-                    setUser(result);
                 } else {
                     setUser(null);
                 }
@@ -51,13 +50,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 4. Placeholder för Login (Måste finnas för att matcha Interface)
     async function login(credentials: any) {
         console.log("Login inte implementerat än", credentials);
-        // Här ska du sen göra din POST request
+        const login = await fetchJson("/api/login", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ "email": "jail@example.com", "password": "123456789" })
+
+        });
+
+        if (login.email) {
+            // fetch avatar
+            if (login.avatarUrl) {
+                // fetch avatar genom id och returnerar objektet istället för arrayn, Här förutsätter vi att vi bara får ett svar 
+                const avatarURL = await fetchJson(`/api/Avatar?where=id=${login.avatarUrl}`).then(res => res[0]);
+                login.avatar = avatarURL.url;
+            }
+            console.log(login);
+            setUser(login);
+        }
+        else {
+            setUser(null);
+        }
+
+    }
+
+
+    async function create(credentials: any) {
+        console.log("Create user inte implementerat än", credentials);
+        await fetchJson("/api/User", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ "email": "jail@example.com", "userName": "Fantomen", "avatarUrl": 3, "password": "123456789" })
+        });
     }
 
     // 5. Placeholder för Logout (Måste finnas för att matcha Interface)
     async function logout() {
         console.log("Logout inte implementerat än");
-        // Här ska du sen göra din DELETE request och sätta setUser(null)
+        fetchJson("/api/login", { method: 'DELETE' })
+        setUser(null);
     }
 
     // 6. useEffect flyttad till roten av komponenten!
@@ -69,6 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         login,
         logout,
+        create,
         checkLogin
     };
 

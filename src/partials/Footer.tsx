@@ -1,8 +1,19 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { FaFacebookF, FaInstagram } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
+import { useEffect } from 'react';
 
 export default function Footer() {
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [hash]);
   return (
     <footer className="bg-footer text-accent py-8 rounded-3xl mx-4 md:mx-12 shadow-lg">
 
@@ -31,7 +42,7 @@ export default function Footer() {
 
           <div className="flex flex-col leading-relaxed">
             <p><Link to="/om-oss" className="hover:text-white transition">Om oss</Link></p>
-            <p><Link to="/kontakt" className="hover:text-white transition">Kontakta oss - formulär</Link></p>
+            <p><Link to="/faq#kontakt" className="hover:text-white transition">Kontakta oss - formulär</Link></p>
             <p><Link to="/jobba-hos-oss" className="hover:text-white transition">Jobba hos oss</Link></p>
             <p><Link to="/faq" className="hover:text-white transition">FAQ</Link></p>
             <p><Link to="/bli-medlem" className="hover:text-white transition">Bli medlem</Link></p>
