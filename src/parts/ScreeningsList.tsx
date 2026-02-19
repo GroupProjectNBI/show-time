@@ -1,7 +1,7 @@
 import type { Screening } from "../interfaces/Screenings";
 import { calculatingTime } from "../utils/lengthcalc.ts";
 import { useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { formatTime } from "../utils/formatTime";
 
 type Props = {
