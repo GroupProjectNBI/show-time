@@ -17,10 +17,10 @@ export default function WorkWithUs() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/20 rounded-3xl" />
 
         <div className="relative z-10 flex flex-col justify-end h-full px-6 max-w-6xl mx-auto pb-10">
-          <h1 className="text-4xl md:text-5xl font-bold text-accent drop-shadow-lg animate-fadeIn">
+          <h1 className="text-4xl md:text-5xl font-bold text-white/75 drop-shadow-lg animate-fadeIn">
             Jobba hos oss
           </h1>
-          <p className="text-lg md:text-xl text-accent/80 mt-2 animate-fadeIn delay-150">
+          <p className="text-lg md:text-xl text-white/75 mt-2 animate-fadeIn delay-150">
             Bli en del av vårt team och skapa bioupplevelser som stannar kvar
           </p>
 
