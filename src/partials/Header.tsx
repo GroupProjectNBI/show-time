@@ -6,34 +6,48 @@ export default function Header() {
   const [expanded, setExpanded] = useState(false);
 
   const pathName = useLocation().pathname;
+
+// 1. HITTA AKTIV RUTT (För att veta vilken länk som ska lysa i guld)
   const currentRoute = routes
-    .slice()
-    .filter((x) => x.index !== undefined && x.index >= 0) // ignore the catch-all 404 route
-    .sort((a, b) => (a.path.length > b.path.length ? -1 : 1))
-    .find((x) => pathName.indexOf(x.path.split(":")[0]) === 0);
+    .filter((x) => x.path)
+    .sort((a, b) => b.path.length - a.path.length)
+    .find((x) => pathName.startsWith(x.path.split(":")[0]));
 
   const isActive = (path: string) =>
     path === currentRoute?.path || path === currentRoute?.parent;
 
   const closeMenu = () => setTimeout(() => setExpanded(false), 150);
 
-  const menuRoutes = routes.filter((x) => x.menuLabel);
+  // 2. FIGMA-ORDNING & STÄDNING (Tar bort Products och sorterar rätt) Skapat Figma "karta"
+  const figmaOrder: Record<string, number> = {
+    "Gå på bio": 1,
+    "Inför besöket": 2,
+    "Bli medlem": 3,
+  };
+
+//Tidigare tog koden alla rutter som hade en menuLabel. 
+// Genom att lägga till && x.menuLabel !== "Products" säger vi till koden: 
+// "Hämta alla länkar som ska ligga i menyn, UTOM den som heter Products". 
+// På så sätt slipper du radera filer eller ändra i databasen – vi bara döljer den från användaren.
+  const menuRoutes = routes
+    .filter((x) => x.menuLabel && x.menuLabel !== "Products")
+    .sort((a, b) => (figmaOrder[a.menuLabel!] || 99) - (figmaOrder[b.menuLabel!] || 99));
 
   return (
     <header>
       <div className="fixed inset-x-0 top-0 z-50">
         {/* keep a wrapper so the mobile dropdown lines up with the pill */}
-        <div className="mx-auto mt-4 w-[min(1200px,calc(100%-32px))]">
-          {/* TOP PILL */}
-          <div className="rounded-full bg-primary shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
-            <div className="flex h-16 items-center px-6">
-              {/* LEFT: logo + nav close together */}
-              <div className="flex items-center gap-6">
+        <div className="mx-auto mt-6 w-[min(1200px,calc(100%-32px))]">
+          {/* TOP PILL -- Nu med glassmorphism (bg-primary/80 + blur)*/}
+          <div className="rounded-full bg-primary/80 backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.6)] border border-white/10">
+            <div className="flex h-16 items-center px-8">
+              {/* LEFT: logo + nav close together,  LOGO - Storleken anpassad för pillret */}
+              <div className="flex items-center gap-8">
                 <Link to="/" onClick={() => setExpanded(false)} className="shrink-0">
                   <img
                     src="/images/logos/show-time.png"
                     alt="Show-Time"
-                    className="h-48 w-auto mt-2 transition-transform duration-300 hover:scale-105"
+                    className="h-10 w-auto mt-2 transition-transform duration-300 hover:scale-105"
                     draggable={false}
                   />
                 </Link>
