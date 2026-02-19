@@ -139,7 +139,7 @@ export default function FAQPage() {
       </div>
 
       {/*CONTACT FORM */}
-      <div className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl">
+      <div id="kontakt" className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl">
         <h2 className="text-2xl font-semibold text-accent mb-6">
           Kontakta oss
         </h2>
