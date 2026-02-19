@@ -18,7 +18,7 @@ function AboutPage() {
     <div className="about-page">
 
       {/* HERO SECTION */}
-      <section className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden">
+      <section className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden rounded-2xl">
         <img
           src="/images/Commercials/biografhus.png"
           alt="Biograf"
@@ -37,9 +37,9 @@ function AboutPage() {
       </section>
 
       {/* ABOUT SECTION */}
-      <section className="w-full max-w-3xl mx-auto px-6 py-20">
-        <div className="space-y-8 leading-relaxed text-accent text-lg animate-fadeIn">
-          <p>
+      <section className="w-full max-w-6xl mx-auto px-6 py-20">
+        <div className="max-w-3xl space-y-8 leading-relaxed text-accent text-lg animate-fadeIn">
+          <p className="text-xl md:text-2xl font-semibold text-accent">
             Välkommen till vår biograf - en lokal mötesplats för filmälskare.
           </p>
 
@@ -62,12 +62,12 @@ function AboutPage() {
       </section>
 
       {/* CINEMATIC IMAGE */}
-      <section className="px-6 md:px-12 pb-20">
+      <section className="px-6 md:px-10 pb-20">
         <div className="max-w-6xl mx-auto overflow-hidden rounded-2xl shadow-2xl animate-fadeIn">
           <img
             src="/images/Commercials/salong1.png"
             alt="Biograf"
-            className="w-full h-[350px] md:h-[550px] object-cover hover:scale-[1.02] transition-transform duration-700"
+            className="w-full h-[350px] md:h-[550px] object-cover hover:scale-[1.05] transition-transform duration-700"
           />
         </div>
       </section>
