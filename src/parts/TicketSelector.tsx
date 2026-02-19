@@ -1,41 +1,33 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+import { useBooking } from "../context/BookingContext";
 import ComponentTicket from "./ComponentTicket";
 
 export default function TicketSelector() {
-  const [total, setTotal] = useState<{
-    [key: string]: { count: number; subtotal: number; };
-  }>({});
+  const { tickets, setTickets } = useBooking();
 
-  // Vi använder useCallback så funktionen inte skapas om varje gång komponenten renderas.
-  // Annars kan det orsaka en render-loop.
-  const handleChange = useCallback((label: string, count: number, subtotal: number) => {
-    setTotal((prev) => ({
-      ...prev,
-      [label]: { count, subtotal },
-    }));
-  }, []);
+  const setTicketCount = useCallback(
+    (key: "ordinarie" | "pensionar" | "barn", count: number) => {
+      setTickets((prev) => ({ ...prev, [key]: count }));
+    },
+    [setTickets]
+  );
 
-  // Dessa callbacks är nu "stabila".
-  // Innan skapades nya funktioner direkt i JSX → det orsakade loopen.
   const onOrdinarie = useCallback(
-    (count: number, subtotal: number) => handleChange("Ordinarie", count, subtotal),
-    [handleChange]
+    (count: number) => setTicketCount("ordinarie", count),
+    [setTicketCount]
   );
-
   const onPensionar = useCallback(
-    (count: number, subtotal: number) => handleChange("Pensionär", count, subtotal),
-    [handleChange]
+    (count: number) => setTicketCount("pensionar", count),
+    [setTicketCount]
   );
-
   const onBarn = useCallback(
-    (count: number, subtotal: number) => handleChange("Barn", count, subtotal),
-    [handleChange]
+    (count: number) => setTicketCount("barn", count),
+    [setTicketCount]
   );
 
-  // Räknar ut totalen. useMemo gör att den bara räknas om när total ändras.
   const grandTotal = useMemo(() => {
-    return Object.values(total).reduce((sum, t) => sum + t.subtotal, 0);
-  }, [total]);
+    return tickets.ordinarie * 140 + tickets.pensionar * 120 + tickets.barn * 90;
+  }, [tickets]);
 
   return (
     <div className="w-full max-w-[1420px] mx-auto p-5 bg-[#1a1a1a] rounded-xl">
@@ -46,21 +38,19 @@ export default function TicketSelector() {
       <ComponentTicket
         label="Ordinarie"
         price={140}
-        initialCount={0}
+        initialCount={tickets.ordinarie}
         onChange={onOrdinarie}
       />
-
       <ComponentTicket
         label="Pensionär"
         price={120}
-        initialCount={0}
+        initialCount={tickets.pensionar}
         onChange={onPensionar}
       />
-
       <ComponentTicket
         label="Barn"
         price={90}
-        initialCount={0}
+        initialCount={tickets.barn}
         onChange={onBarn}
       />
 
