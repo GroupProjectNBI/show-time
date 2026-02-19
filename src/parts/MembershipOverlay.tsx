@@ -7,11 +7,13 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
   return (
     <div className="
     fixed inset-0 z-[9999]
-    flex items-center jusify-center
+    flex items-center justify-center 
     backdrop-blur-xl bg-black/60
     animate-fadeIn
+    p-4
     ">
       <div className="
+      relative
       w-[90%] max-w-md
       bg-primary/90
       rounded-3xl
@@ -19,12 +21,16 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
       shadow-2xl
       border border-white/10
       ">
+        {/* CLOSE BUTTON */}
+        <button onClick={onClose} className="absolute top-6 right-6 text-accent text-4xl font-light hover:text-accent/80 transition" >
+          ×
+        </button>
 
         {/*Circles */}
         <div className="flex jusify-center gap-4 mb-8">
-          <div className="w-16 h16 rounded-full bg-white/10 border border-white/20" />
-          <div className="w-16 h16 rounded-full bg-white/10 border border-white/20" />
-          <div className="w-16 h16 rounded-full bg-white/10 border border-white/20" />
+          <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20" />
+          <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20" />
+          <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20" />
         </div>
 
         {/* Inputs */}
