@@ -147,7 +147,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                 {!user ? <div className="pt-2">
                   <Link
                     to="#"
-                    onClick={() => { login({}), closeMenu; }}
+                    onClick={() => { openLogin(); closeMenu(); }}
                     className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
                   >
                     Logga in
