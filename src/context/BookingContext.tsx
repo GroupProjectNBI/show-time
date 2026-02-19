@@ -1,11 +1,5 @@
 import type { ReactNode } from "react";
-import {
-    createContext,
-    useState,
-    useContext,
-    useCallback,  // Används för att memoiserar funktioner
-    useMemo       // Används för att memoiserar value-objektet
-} from "react";
+import { createContext, useState, useContext, useMemo, useCallback, useEffect } from "react";
 
 import type { BookingContextType } from "../interfaces/Booking";
 
@@ -15,57 +9,91 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
     const [occupiedSeats, setOccupiedSeats] = useState<number[]>([]);
 
-    /*
-      useCallback gör att funktionen inte skapas om vid varje render.
-      Utan useCallback får funktionen en ny referens varje gång state ändras.
-      Det kan trigga useEffect-loops i komponenter som använder den.
-    */
+    // NYTT: biljetter
+    const [tickets, setTickets] = useState<{
+        ordinarie: number;
+        pensionar: number;
+        barn: number;
+    }>({
+        ordinarie: 0,
+        pensionar: 0,
+        barn: 0,
+    });
+
+    // NYTT: snacks
+    const [selectedSnack, setSelectedSnack] =
+        useState<"large" | "medium" | "small" | null>(null);
+
+    // NYTT: email
+    const [email, setEmail] = useState<string>("");
+
+    // NYTT: antal biljetter = max antal stolar som får väljas
+    const maxSelectableSeats = tickets.ordinarie + tickets.pensionar + tickets.barn;
+
     const toggleSeat = useCallback((seatId: number) => {
         setSelectedSeats((prev) => {
             if (prev.includes(seatId)) {
-                return prev.filter((id) => id !== seatId);
+                return prev.filter(id => id !== seatId);
             }
+
+            // Om inga biljetter valda så välj inga stolar
+            if (maxSelectableSeats === 0) return prev;
+
+            // Om max uppnått (alla platser blivit valda) välj inga fler
+            if (prev.length >= maxSelectableSeats) return prev;
+
+            //annars lägg till
             return [...prev, seatId];
         });
-    }, []);
+    }, [maxSelectableSeats]);
 
-    /*
-      Memoiseras av samma anledning.
-      Annars får setOccupied en ny referens vid varje render,
-      vilket kan trigga useEffect om den finns med i dependency-arrayen.
-    */
+    //NYTT: lagt till en useEffect om antal biljetter minskar när man valt stolar
+    // 3 biljetter = 3 stolar, minskar man till 2 försvinnedr den tredje automatiskt
+    // 0 biljetter = stolarna nollställs
+    useEffect(() => {
+        setSelectedSeats((prev) => {
+            if (maxSelectableSeats === 0) return [];
+            if (prev.length <= maxSelectableSeats) return prev;
+            return prev.slice(0, maxSelectableSeats);
+        });
+    }, [maxSelectableSeats]);
+
     const setOccupied = useCallback((seatIds: number[]) => {
         setOccupiedSeats(seatIds);
     }, []);
 
-    /*
-      Även denna funktion memoiseras för stabil referens.
-    */
     const clearBooking = useCallback(() => {
         setSelectedSeats([]);
         setOccupiedSeats([]);
+        setTickets({ ordinarie: 0, pensionar: 0, barn: 0 });
+        setSelectedSnack(null);
+        setEmail("");
     }, []);
 
-    /*
-      Detta var den huvudsakliga orsaken till render-loopen.
-  
-      Utan useMemo skapas ett nytt value-objekt vid varje render.
-      React tolkar det som att context-värdet har ändrats,
-      vilket gör att alla components som använder context renderas igen.
-  
-      useMemo gör att objektet bara skapas om
-      när selectedSeats eller occupiedSeats faktiskt ändras.
-    */
-    const value = useMemo(
-        () => ({
-            selectedSeats,
-            occupiedSeats,
-            toggleSeat,
-            setOccupied,
-            clearBooking,
-        }),
-        [selectedSeats, occupiedSeats, toggleSeat, setOccupied, clearBooking]
-    );
+    const value = useMemo(() => ({
+        selectedSeats,
+        occupiedSeats,
+        toggleSeat,
+        setOccupied,
+        clearBooking,
+
+        // NYTT
+        tickets,
+        setTickets,
+        selectedSnack,
+        setSelectedSnack,
+        email,
+        setEmail
+    }), [
+        selectedSeats,
+        occupiedSeats,
+        toggleSeat,
+        setOccupied,
+        clearBooking,
+        tickets,
+        selectedSnack,
+        email
+    ]);
 
     return (
         <BookingContext.Provider value={value}>
