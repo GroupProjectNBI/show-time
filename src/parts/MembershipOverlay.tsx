@@ -23,7 +23,7 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
       ">
         {/* CLOSE BUTTON */}
         <button onClick={onClose} className="absolute top-6 right-6 text-accent text-4xl font-light hover:text-accent/80 transition" >
-          *
+          ×
         </button>
 
         {/*Circles */}

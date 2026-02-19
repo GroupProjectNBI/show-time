@@ -5,10 +5,11 @@ import { useAuth } from "../context/AuthContext";
 
 type HeaderProps = {
   openMembership: () => void;
+  openLogin: () => void;
 };
 
 
-export default function Header({ openMembership }: HeaderProps) {
+export default function Header({ openMembership, openLogin }: HeaderProps) {
   const [expanded, setExpanded] = useState(false);
   const { logout, login, user } = useAuth();
   const pathName = useLocation().pathname;
@@ -80,12 +81,9 @@ export default function Header({ openMembership }: HeaderProps) {
                   <Link to="#" onClick={() => logout()} className="shrink-0"><p> <img src={user.avatar} className="w-10 h-10" alt="" /> Logout: {user.userName}</p></Link>
 
                 </div> : <div className="ml-auto hidden md:block">
-                  <Link
-                    to="/#" onClick={() => login({})}
-                    className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
-                  >
+                  <button onClick={openLogin} className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary" >
                     Logga in
-                  </Link>
+                  </button>
                   <button
                     onClick={openMembership}
                     className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary ml-4"

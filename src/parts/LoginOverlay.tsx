@@ -1,36 +1,40 @@
 type LoginOverlayProps = {
   onClose: () => void;
+  openMembership: () => void;
 };
 
-
-export default function LoginOverlay({ onClose }: LoginOverlayProps) {
+export default function LoginOverlay({ onClose, openMembership }: LoginOverlayProps) {
   return (
     <div className="
-    fixed inset-0 z-[9999]
-    flex items-center justify-center
-    backdrop-blur-xl bg-black/60
-    animate-fadeIn
-    p-4
+      fixed inset-0 z-[9999]
+      flex items-center justify-center
+      backdrop-blur-xl bg-black/60
+      animate-fadeIn
+      p-4
     ">
       <div className="
-      relative
-      w-[90%] max-w-md
-      bg-primary/90
-      rounded-3xl
-      p-8
-      shadow-2xl
-      border border-white/10
+        relative
+        w-[90%] max-w-md
+        bg-primary/90
+        rounded-3xl
+        p-8
+        shadow-2xl
+        border border-white/10
       ">
-        {/*CLOSE BUTTON */}
-        <button onClick={onClose} className="absolute top-6 right-6 text-accent text-4xl font-light hover:text-accent/80 transition">
-          *
+        {/* CLOSE BUTTON */}
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 text-accent text-4xl font-light hover:text-accent/80 transition"
+        >
+          ×
         </button>
 
-        {/*CIRCLE*/}
+        {/* CIRCLE */}
         <div className="flex justify-center gap-4 mb-8">
           <div className="w-16 h-16 rounded-full bg-white/10 border border-white/20" />
         </div>
-        {/*INPUTS*/}
+
+        {/* INPUTS */}
         <div className="space-y-5">
           <div>
             <label className="block text-accent mb-1 font-semibold">Användarnamn</label>
@@ -50,14 +54,33 @@ export default function LoginOverlay({ onClose }: LoginOverlayProps) {
             />
           </div>
         </div>
-        {/*BUTTON*/}
-        <button className="
-        w-full mt-8 py-3 rounded-xl
-        bg-red-600 text-white font-semibold
-        hover:bg-red-700 transition
-        ">
-          Logga in
-        </button>
+
+        {/* BUTTONS */}
+        <div className="flex items-center gap-4 mt-8">
+          {/* LOGGA IN */}
+          <button
+            className="
+              flex-1 py-3 rounded-xl
+              bg-red-600 text-white font-semibold
+              hover:bg-red-700 transition
+            "
+          >
+            Logga in
+          </button>
+
+          {/* BLI MEDLEM */}
+          <button
+            onClick={openMembership}
+            className="
+              flex-1 py-3 rounded-xl
+              border border-accent/80
+              text-accent font-semibold
+              hover:bg-accent hover:text-primary transition
+            "
+          >
+            Bli medlem
+          </button>
+        </div>
       </div>
     </div>
   );
