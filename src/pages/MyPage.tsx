@@ -1,5 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { useBooking } from "../context/BookingContext";
+import ChangePasswordForm from "../parts/ChangePasswordForm";
+
 import { useState } from "react";
 
 export default function MyPage() {
