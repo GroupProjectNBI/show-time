@@ -57,8 +57,16 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Lösenorden matchar inte");
+      return;
+    }
+
     setIsSubmitting(true); // Starta loading
     setError("");
+
 
     try {
       const success = await create(formData);
@@ -146,16 +154,17 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
         </div>
 
 
-        {isSubmitting ? (
-          <span className="flex items-center gap-2">
-            <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-          </span>
-        ) : <button
+        <button
           type="submit"
-          className="w-full mt-8 py-4 rounded-xl bg-red-600 text-white font-bold uppercase text-xs tracking-[0.3em] hover:bg-red-700 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-red-900/20"
+          disabled={isSubmitting}
+          className="w-full mt-8 py-4 rounded-xl bg-red-600 text-white font-bold uppercase text-xs tracking-[0.3em] hover:bg-red-700 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-red-900/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-h-[52px]"
         >
-          Bli medlem
-        </button>}
+          {isSubmitting ? (
+            <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          ) : (
+            "Bli medlem"
+          )}
+        </button>
       </form>
     </div>
   );
