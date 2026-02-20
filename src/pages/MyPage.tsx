@@ -6,7 +6,7 @@ import { useState } from "react";
 
 export default function MyPage() {
   const { user, changePassword } = useAuth();
-  const { bookings, cancelBoking } = useBooking();
+  //const { bookings, cancelBoking } = useBooking();
 
   return (
     <div className="max-w-3xl mx-auto mt-32 px-4 pb-20 text-accent">
