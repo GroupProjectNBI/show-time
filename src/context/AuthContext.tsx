@@ -99,6 +99,10 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
     //Change password
     function changePassword(newPassword: string) {
         console.log("Byter lösenord till:", newPassword);
+        //TODO: implementera riktig API-logik
+        //exempelvis 
+        //await fetchJson("/api/cange-password", {
+        // method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({password: newPasswprd})});
     }
 
     const value = {
