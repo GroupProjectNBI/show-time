@@ -1,10 +1,17 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import routes from "../routes";
+import { useAuth } from "../context/AuthContext";
 
-export default function Header() {
+type HeaderProps = {
+  openMembership: () => void;
+  openLogin: () => void;
+};
+
+
+export default function Header({ openMembership, openLogin }: HeaderProps) {
   const [expanded, setExpanded] = useState(false);
-
+  const { logout, login, user } = useAuth();
   const pathName = useLocation().pathname;
 
 // 1. HITTA AKTIV RUTT (För att veta vilken länk som ska lysa i guld)
@@ -84,14 +91,25 @@ export default function Header() {
               </div>
 
               {/* RIGHT: login pinned right */}
-              <div className="ml-auto hidden md:block">
-                <Link
-                  to="/login"
-                  className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
-                >
-                  Logga in
-                </Link>
-              </div>
+              {
+                user ? <div className="ml-auto hidden md:block">
+                  <Link to="#" onClick={() => logout()} className="shrink-0"><p> <img src={user.avatar} className="w-10 h-10" alt="" /> Logout: {user.userName}</p></Link>
+
+                </div> : <div className="ml-auto hidden md:block">
+                  <button onClick={openLogin} className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary" >
+                    Logga in
+                  </button>
+                  <button
+                    onClick={openMembership}
+                    className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary ml-4"
+                  >
+                    Bli medlem
+                  </button>
+
+                </div>
+
+              }
+
 
               {/* MOBILE TOGGLE pinned right */}
               <button
@@ -140,21 +158,38 @@ export default function Header() {
                   );
                 })}
 
-                <div className="pt-2">
-                  <Link
-                    to="/login"
-                    onClick={closeMenu}
-                    className="block w-full rounded-xl border-accent/80 px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-accent hover:text-primary"
+
+                {!user ? (
+                  <>
+                    <button
+                      onClick={() => { openLogin(); closeMenu(); }}
+                      className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                    >
+                      Logga in
+                    </button>
+
+                    <button
+                      onClick={() => { openMembership(); closeMenu(); }}
+                      className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                    >
+                      Bli medlem
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => { logout(); closeMenu(); }}
+                    className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
                   >
-                    Logga in
-                  </Link>
-                  
-                </div>
+                    Logout: {user.userName}
+                  </button>
+                )}
+
+
               </nav>
             </div>
           </div>
         </div>
-      </div>
-    </header>
+      </div >
+    </header >
   );
 }
