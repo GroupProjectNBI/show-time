@@ -3,12 +3,11 @@
 
 
 @layer base {
-  body {
-    @apply bg-surface text-accent font-serif;
-  }
-
-  #root {
-    @apply min-h-screen bg-surface;
+body {
+    /* Vi använder exakt Jarls gradient-inställningar */
+    background: radial-gradient(ellipse at top, rgba(104, 9, 9, 0.3) 0%, rgba(26, 26, 26, 0.8) 50%, rgba(26, 26, 26, 1) 100%);
+    background-attachment: fixed; /* Gör att bakgrunden ligger still när man scrollar */
+    @apply bg-[#1a1a1a] text-white min-h-screen;
   }
 
 }
