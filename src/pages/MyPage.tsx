@@ -31,7 +31,7 @@ export default function MyPage() {
         {/*CHANGE PASSWORD*/}
         <div className="mt-8">
           <h2 className="text-2xl font-semibold mb-4">Byt lösenord</h2>
-          <changePassword onSubmit={changePassword} />
+          <ChangePasswordForm onSubmit={changePassword} />
         </div>
       </div>
 
