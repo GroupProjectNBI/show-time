@@ -31,7 +31,7 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
   useEffect(() => {
     async function getAvatars() {
       try {
-        const data = await fetchJson("/api/Avatar?limit=7");
+        const data = await fetchJson("/api/Avatar?limit=5");
         if (Array.isArray(data) && data.length > 0) {
           setAvatars(data);
 
@@ -145,18 +145,17 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
           </div>
         </div>
 
-        <button
+
+        {isSubmitting ? (
+          <span className="flex items-center gap-2">
+            <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+          </span>
+        ) : <button
           type="submit"
-          disabled={isSubmitting}
-          className="..."
+          className="w-full mt-8 py-4 rounded-xl bg-red-600 text-white font-bold uppercase text-xs tracking-[0.3em] hover:bg-red-700 hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-red-900/20"
         >
-          {isSubmitting ? (
-            <span className="flex items-center gap-2">
-              <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-              Skapar konto...
-            </span>
-          ) : "Bli medlem"}
-        </button>
+          Bli medlem
+        </button>}
       </form>
     </div>
   );
