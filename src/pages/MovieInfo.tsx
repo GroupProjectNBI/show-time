@@ -6,6 +6,7 @@ import { calculatingTime } from "../utils/lengthcalc";
 import { formatTime } from "../utils/formatTime";
 import Trailer from "../parts/Trailer";
 
+
 // --- Interfaces ---
 interface Review {
     reviewId: number;
@@ -41,6 +42,7 @@ function MovieInfo() {
     const { id } = useParams<{ id: string; }>();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [posterFit, setPosterFit] = useState<"contain" | "cover">("cover"); // // Bestämmer automatiskt om postern ska använda contain eller cover
 
     useEffect(() => {
         const getMovie = async () => {
@@ -100,12 +102,33 @@ function MovieInfo() {
 
                         {/* --- VÄNSTER (Poster) --- */}
                         <div className="flex flex-col items-center lg:items-start lg:sticky lg:top-24">
-                            <div className="relative w-[240px] md:w-[300px] lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group">
+                            <div className="relative w-[240px] md:w-[300px] lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group bg-black">   {/* group för hover-effekt, bg-black för att undvika de grå kanterna */}
+                            
+
+                                {/* Bakgrundsposter (fyller boxen så inga grå ytor syns) */}
                                 <img
                                     src={`/images/posters/${movie.movieId}.webp`}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-40"
+                                    alt=""
+                                    aria-hidden="true"
+                                />
+                                {/* Suddig bakgrund fyller hela boxen så inga tomma/grå ytor syns */}
+
+                                
+                                <img
+                                    src={`/images/posters/${movie.movieId}.webp`}
+                                    className={`relative z-10 w-full h-full object-${posterFit} transition-transform duration-700 group-hover:scale-105 ${posterFit === "cover" ? "scale-[1.08]" : ""}`}
                                     alt={movie.title}
-                                    onError={(e) => (e.target as HTMLImageElement).src = "https://via.placeholder.com/350x500"}
+                                    onLoad={(e) => {
+                                        const img = e.currentTarget;
+                                        const ratio = img.naturalWidth / img.naturalHeight;
+
+                                        // Udda ratio - contain (undviker ful crop)
+                                        // Normal poster-ratio, cover och zoom (döljer ramar/marginaler)
+                                        if (ratio < 0.55 || ratio > 0.9) setPosterFit("contain");
+                                        else setPosterFit("cover");
+                                    }}
+                                    onError={(e) => (e.currentTarget as HTMLImageElement).src = "https://via.placeholder.com/350x500"}
                                 />
                             </div>
 
