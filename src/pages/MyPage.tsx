@@ -4,9 +4,19 @@ import ChangePasswordForm from "../parts/ChangePasswordForm";
 
 import { useState } from "react";
 
+MyPage.route = {
+  path: "/mypage",
+  index: 99,          // valfritt, men bra för sortering
+  menuLabel: null     // visas inte i menyn
+};
+
 export default function MyPage() {
   const { user, changePassword } = useAuth();
   //const { bookings, cancelBoking } = useBooking();
+  // Temporär mock tills BookingContext är klar
+  const bookings: any[] = [];
+  const cancelBooking = () => { };
+
 
   return (
     <div className="max-w-3xl mx-auto mt-32 px-4 pb-20 text-accent">
@@ -39,7 +49,7 @@ export default function MyPage() {
       <div>
         <h2 className="text-2xl font-semibold mb-4">Kommande bokningar</h2>
 
-        {bookings.lenght === 0 && (
+        {bookings.length === 0 && (
           <p className="text-accent/60">Du har inga kommande bokningar</p>
         )}
 
@@ -60,7 +70,7 @@ export default function MyPage() {
 
               {/*CANCEL BUTTON */}
               <button
-                onClick={() => cancelBoking(b.id)}
+                onClick={() => cancelBooking()}
                 className="rounded-full border border-red-500 px-4 py-1.5 text-red-400 font-semibold hover:bg-red-600 hover:text-white transition"
               >
                 Avboka
@@ -72,3 +82,5 @@ export default function MyPage() {
     </div>
   );
 }
+
+
