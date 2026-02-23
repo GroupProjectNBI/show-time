@@ -11,8 +11,6 @@ interface Avatar {
   url: string;
 }
 
-
-
 export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
   const { create } = useAuth();
   const [avatars, setAvatars] = useState<Avatar[]>([]);
@@ -58,7 +56,6 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-
     if (formData.password !== formData.confirmPassword) {
       setError("Lösenorden matchar inte");
       return;
@@ -67,9 +64,13 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
     setIsSubmitting(true); // Starta loading
     setError("");
 
-
     try {
-      const success = await create(formData);
+      // HÄR ÄR FIXEN: Vi separerar confirmPassword från resten av datan
+      const { confirmPassword, ...dataToSubmit } = formData;
+
+      // Vi skickar in det rena "dataToSubmit"-objektet till create-funktionen
+      const success = await create(dataToSubmit);
+
       if (success) onClose();
     } catch (err: any) {
       setError(err.message || "Kunde inte skapa konto.");
@@ -152,7 +153,6 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
             />
           </div>
         </div>
-
 
         <button
           type="submit"
