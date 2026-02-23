@@ -83,12 +83,43 @@ export default function BookingPage() {
     if (!seatArray || !screening || !movie) {
         return <div className="text-white text-center p-10">Laddar...</div>;
     }
+    // 1. Räkna ut offset baserat på salong
+    const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
 
-    // Enkel label-lista av valda säten (seatId). Kan senare göras om till "Rad X, Stol Y".
+    // 2. Plocka ut den aktuella salongens layout (bör bara finnas en i arrayen)
+    const currentTheater = seatArray[0];
+
+    // 3. Skapa label-strängarna med Rad och Stol
     const seatsLabelLines = selectedSeats
         .slice()
         .sort((a, b) => a - b)
-        .map((seatId) => `Stol-ID ${seatId}`);
+        .map((seatId) => {
+            // Få fram ett relativt nummer (t.ex. ID 82 blir relativt nummer 1 i Lilla)
+            const relativeId = seatId - baseIdOffset;
+
+            let rowNumber = 1;
+            let seatNumberInRow = relativeId;
+
+            // Om vi har layout-datan, loopa igenom raderna för att hitta var stolen "bor"
+            if (currentTheater && currentTheater.seatsPerRow) {
+                let seatsPassed = 0;
+
+                for (let i = 0; i < currentTheater.seatsPerRow.length; i++) {
+                    const rowCapacity = currentTheater.seatsPerRow[i];
+
+                    // Om vårt relativa ID är mindre/lika med de stolar vi passerat + denna rad,
+                    // då har vi hittat rätt rad!
+                    if (relativeId <= seatsPassed + rowCapacity) {
+                        rowNumber = i + 1; // +1 för att användare vill se "Rad 1", inte "Rad 0"
+                        seatNumberInRow = relativeId - seatsPassed; // Stolens nummer på just den raden
+                        break;
+                    }
+                    seatsPassed += rowCapacity;
+                }
+            }
+
+            return `Rad ${rowNumber}, Stol ${seatNumberInRow}`;
+        });
 
     // NYTT: validering + navigation när man trycker BOKA
     const handleBook = () => {
@@ -146,15 +177,22 @@ export default function BookingPage() {
                 {seatArray.map((theater) => (
                     <section key={theater.id} className="w-full">
                         {theater.seatsPerRow.map((count, rowIndex) => {
-                            const previousSeatsCount = theater.seatsPerRow
+                            // 1. Räkna ut hur många stolar som finns på tidigare rader (alltid start på 0)
+                            const seatsBeforeThisRow = theater.seatsPerRow
                                 .slice(0, rowIndex)
                                 .reduce((acc, curr) => acc + curr, 0);
+
+                            // 2. ID-offset för databasen (81 om det är Lilla Salongen)
+                            const dbOffset = screening.theaterName === "Lilla" ? 81 : 0;
 
                             return (
                                 <div key={`${theater.id}-row-${rowIndex}`} className="w-full">
                                     <Chairs
                                         numberOfSeats={count}
-                                        previousSeatsCount={previousSeatsCount}
+                                        // Här skickar vi ID-basen för logiken (t.ex. 81 + tidigare stolar)
+                                        previousSeatsCount={seatsBeforeThisRow + dbOffset}
+                                        // HÄR ÄR NYCKELN: Vi skickar en ren offset för siffrorna (alltid start på 0)
+                                        visualOffset={seatsBeforeThisRow}
                                         selectedSeats={selectedSeats}
                                         occupiedSeats={occupiedSeats}
                                         onToggle={toggleSeat}
@@ -188,6 +226,6 @@ export default function BookingPage() {
 }
 
 BookingPage.route = {
-  path: "/booking/:id"
+    path: "/booking/:id"
 };
 

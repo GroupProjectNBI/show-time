@@ -3,6 +3,7 @@ interface ChairsProps {
     previousSeatsCount: number;
     // rowId: number; // <--- LÄGG TILL DENNA RAD!
     // NYA PROPS:
+    visualOffset: number; // <--- LÄGG TILL DENNA I INTERFACET
     selectedSeats: number[];    // Lista på alla valda stolar (från context)
     occupiedSeats: number[];    // Lista på upptagna stolar (från backend)
     onToggle: (id: number) => void; // Funktion för att klicka
@@ -12,6 +13,7 @@ export default function Chairs({
     numberOfSeats,
     previousSeatsCount,
     selectedSeats,
+    visualOffset,
     occupiedSeats,
     onToggle,
     // rowId // <--- LÄGG TILL DENNA OCKSÅ HÄR
@@ -24,7 +26,7 @@ export default function Chairs({
             {seats.map((_, index) => {
                 // Samma ID-logik som du hade
                 const seatId = previousSeatsCount + index + 1;
-
+                const displayNum = visualOffset + index + 1;
                 // Kolla status via props istället för lokalt
                 const isOccupied = occupiedSeats.includes(seatId);
                 const isSelected = selectedSeats.includes(seatId);
@@ -45,7 +47,7 @@ export default function Chairs({
                             ${isOccupied ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}
                         `}
                     >
-                        {seatId}
+                        {displayNum}
                         {isOccupied && (
                             <span className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden rounded-sm">
                                 <span className="w-[150%] h-[1.5px] sm:h-[2px] bg-primary -rotate-45 absolute shadow-sm"></span>
