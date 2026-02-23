@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+// useNavigate;
 import { formatScreeningDate } from "../utils/formatTime";
 import MovieCard from "../parts/MovieCard";
 
@@ -14,14 +15,12 @@ import { useBooking } from "../context/BookingContext";
 import TicketSelector from "../parts/TicketSelector";
 import BookingSnackPanel from "../parts/BookingSnackPanel";
 
-
-
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
     const [movie, setMovie] = useState<Movie | null>(null);
 
-    const navigate = useNavigate(); // NYTT: för att navigera till confirmation
+    // const navigate = useNavigate(); // NYTT: för att navigera till confirmation
 
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
@@ -35,6 +34,7 @@ export default function BookingPage() {
         tickets,
         email,
         selectedSnack,
+        clearBooking, // NYTT: nollställer context efter lyckad bokning
     } = useBooking();
 
     // NYTT: antal biljetter (styr vad som måste vara valt innan man får boka)
@@ -65,9 +65,7 @@ export default function BookingPage() {
                     }
 
                     // Hämta upptagna stolar för denna visning
-                    const occupiedResult = await fetchJson(
-                        `/api/v_occupied_seats?where=screeningId=${id}`
-                    );
+                    const occupiedResult = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`);
                     const occupiedIds = occupiedResult.map((occ: any) => occ.seatId);
 
                     setOccupied(occupiedIds);
@@ -121,8 +119,8 @@ export default function BookingPage() {
             return `Rad ${rowNumber}, Stol ${seatNumberInRow}`;
         });
 
-    // NYTT: validering + navigation när man trycker BOKA
-    const handleBook = () => {
+    // NYTT: validering + POST till backend när man trycker BOKA
+    const handleBook = async () => {
         if (!email.trim()) {
             alert("Fyll i din email innan du bokar.");
             return;
@@ -138,8 +136,64 @@ export default function BookingPage() {
             return;
         }
 
-        // Allt ok -> gå till confirmation
-        navigate("/confirmation");
+        try {
+
+            // NYTT: skapar bokningen i backend (Booking + Ticket + EmailsUserUndefined)
+            // Hantera detta utifrån vad tabellen ser ut. 
+            const resultBookingData = await fetchJson("/api/Booking", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    screeningId: screening.id,
+                    email: email.trim().toLowerCase(),
+                    snack: selectedSnack, //-> var sätter vi snacks hanteringen ?? sätts i bookingsnackpanel
+                    bookingRef: null,
+                    totalAmount: 10000, ///  hämta rätt amount 
+                    status: 1,
+                    //userId: 1, // ändra sen till email i databasen. DETTA ÄR ÄNDRAT I DB SÅ DENNA TAR VI BORT
+                    createdAtUTC: "2026-02-17 08:48:30",
+                }),
+            });
+
+            // NYTT: backend svarar med { error } om något gick fel
+            if (resultBookingData?.error) {
+                alert(resultBookingData.error);
+                return;
+            }
+            else {
+                // fortsätt med att skapa en skapa en ticket
+                // console.log(resultBookingData);
+                // här behöver vi hantera detta utifrån antalet säten som vi har valt
+                console.log(resultBookingData.id);
+                const resultTicketData = await fetchJson("/api/Ticket", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        bookingId: 1,
+                        screeningId: screening.id,
+                        SeatId: 1,
+                        TicketType: 1,
+                        price: 140
+                    }),
+                });
+                if (resultTicketData?.error) {
+                    alert(resultTicketData.error);
+                    return;
+                }
+                else {
+
+                }
+            }
+
+            // NYTT: nollställer context så man inte råkar ha gamla val kvar
+            clearBooking();
+
+            // NYTT: skickar med bokningsdata till confirmation via router-state
+            // navigate("/confirmation", { state: result }); // state får vi ändra sen med
+        } catch (err) {
+            console.error(err);
+            alert("Något gick fel vid bokningen.");
+        }
     };
 
     return (
@@ -212,12 +266,8 @@ export default function BookingPage() {
                     <BookingSnackPanel
                         movieTitle={screening.movieTitle} // NYTT: använder rätt titel från screening
                         seatsLabelLines={seatsLabelLines}
-                        onBook={() => {
-                            // NYTT: vi bryr oss inte om payload här, allt finns redan i context
-                            // (selectedSnack finns i context om du vill använda den senare)
-                            void selectedSnack;
-                            handleBook();
-                        }}
+                        // NYTT: BOKA-knappen kör samma handleBook som gör POST till backend
+                        onBook={handleBook}
                     />
                 </div>
             </div>
@@ -228,4 +278,3 @@ export default function BookingPage() {
 BookingPage.route = {
     path: "/booking/:id"
 };
-
