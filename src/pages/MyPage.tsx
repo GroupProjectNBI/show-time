@@ -1,9 +1,9 @@
 import { useAuth } from "../context/AuthContext";
-import { useBooking } from "../context/BookingContext";
+// import { useBooking } from "../context/BookingContext";
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 
-import { useState } from "react";
+// import { useState } from "react";
 
 MyPage.route = {
   path: "/mypage",
