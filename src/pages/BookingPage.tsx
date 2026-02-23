@@ -114,14 +114,13 @@ export default function BookingPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     screeningId: screening.id,
-                    // email: email.trim(),
-                    snack: selectedSnack, //-> var sätter vi snacks hanteringen ??
+                    email: email.trim().toLowerCase(),
+                    snack: selectedSnack, //-> var sätter vi snacks hanteringen ?? sätts i bookingsnackpanel
                     bookingRef: null,
                     totalAmount: 10000, ///  hämta rätt amount 
                     status: 1,
-                    userId: 1, // ändra sen till email i databasen. 
+                    //userId: 1, // ändra sen till email i databasen. DETTA ÄR ÄNDRAT I DB SÅ DENNA TAR VI BORT
                     createdAtUTC: "2026-02-17 08:48:30",
-                    bookingDate: "2026-02-17 08:48:30"
                 }),
             });
 
