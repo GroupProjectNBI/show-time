@@ -11,6 +11,8 @@ import { useEffect } from 'react';
 
 export default function Footer({ openMembership }: FooterProps) {
   const { hash } = useLocation();
+  // 1. STANDARD-BREDD (Samma som i Header)
+  const standardWidth = "w-[min(1200px,calc(100%-32px))]";
 
   useEffect(() => {
     if (hash) {
@@ -21,9 +23,11 @@ export default function Footer({ openMembership }: FooterProps) {
     }
   }, [hash]);
   return (
-    <footer className="bg-footer text-accent py-8 rounded-3xl mx-4 md:mx-12 shadow-lg">
-
-      <div className="max-w-6xl mx-auto px-6 flex flex-col gap-12 md:flex-row md:justify-between md:items-start">
+   // 1. YTTERSTA LAGRET: Tar upp hela bredden med bakgrundsfärg
+    <footer className="w-full bg-[#1a1a1a] text-accent py-12 mt-20 border-t border-white/5">
+      
+      {/* 2. INRE CONTAINER: Begränsar textens bredd så den matchar resten av sidan */}
+      <div className={`${standardWidth} mx-auto px-0 flex flex-col gap-12 md:flex-row md:justify-between md:items-start`}>
 
         {/* Hitta till oss */}
         <div className="w-full md:w-1/3">

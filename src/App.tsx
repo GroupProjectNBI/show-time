@@ -52,7 +52,10 @@ export default function App() {
             openLogin={() => setShowLogin(true)}
           />
 
-          <Main />
+          {/* Main tar upp allt ledigt utrymme och centrerar innehållet */}
+  <main className="flex-grow">
+    <Main />
+  </main>
           <div className={isAboutPage ? "footer-about" : ""}>
             <Footer openMembership={() => setShowMembership(true)} />
           </div>
