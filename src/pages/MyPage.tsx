@@ -1,6 +1,7 @@
 import { useAuth } from "../context/AuthContext";
 import { useBooking } from "../context/BookingContext";
 import ChangePasswordForm from "../parts/ChangePasswordForm";
+import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 
 import { useState } from "react";
 
@@ -18,6 +19,7 @@ export default function MyPage() {
   const cancelBooking = () => { };
 
 
+  
   return (
     <div className="max-w-3xl mx-auto mt-32 px-4 pb-20 text-accent">
 
@@ -48,6 +50,14 @@ export default function MyPage() {
       {/*BOOKINGS - NO DESIGN*/}
       <div>
         <h2 className="text-2xl font-semibold mb-4">Kommande bokningar</h2>
+        <UpcomingBookingCard
+          title="Dune: Messiah"
+          dateLabel="Lör 14 mars 2026"
+          timeLabel="19:30"
+          theaterLabel="Stora salongen"
+          ticketsLabel="2 biljetter"
+          seatsLabel="A5, A6"
+        />
 
         {bookings.length === 0 && (
           <p className="text-accent/60">Du har inga kommande bokningar</p>
