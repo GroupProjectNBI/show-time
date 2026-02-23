@@ -19,12 +19,13 @@ interface AuthContextType {
     logout: () => Promise<void>;
     create: (credentials: any) => Promise<boolean>;
     checkLogin: () => Promise<void>;
+    changePassword: (newPassword: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Rättade stavfel: AutProvider -> AuthProvider
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode; }) {
     const [user, setUser] = useState<User | null>(null);
 
     // 3. CheckLogin implementation
@@ -101,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 5. Placeholder för Logout (Måste finnas för att matcha Interface)
     async function logout() {
         console.log("Logout inte implementerat än");
-        fetchJson("/api/login", { method: 'DELETE' })
+        fetchJson("/api/login", { method: 'DELETE' });
         setUser(null);
     }
 
@@ -110,12 +111,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         checkLogin();
     }, []);
 
+    //Change password
+    function changePassword(newPassword: string) {
+        console.log("Byter lösenord till:", newPassword);
+        //TODO: implementera riktig API-logik
+        //exempelvis 
+        //await fetchJson("/api/cange-password", {
+        // method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({password: newPasswprd})});
+    }
+
     const value = {
         user,
         login,
         logout,
         create,
-        checkLogin
+        checkLogin,
+        changePassword
     };
 
     // 7. Return flyttad till roten av komponenten!
