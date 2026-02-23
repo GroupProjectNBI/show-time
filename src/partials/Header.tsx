@@ -11,10 +11,10 @@ type HeaderProps = {
 
 export default function Header({ openMembership, openLogin }: HeaderProps) {
   const [expanded, setExpanded] = useState(false);
-  const { logout, login, user } = useAuth();
+  const { logout, user } = useAuth();
   const pathName = useLocation().pathname;
 
-// 1. HITTA AKTIV RUTT (För att veta vilken länk som ska lysa i guld)
+  // 1. HITTA AKTIV RUTT (För att veta vilken länk som ska lysa i guld)
   const currentRoute = routes
     .filter((x) => x.path)
     .sort((a, b) => b.path.length - a.path.length)
@@ -31,23 +31,23 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
     "Inför besöket": 2,
     "Bli medlem": 3,
   };
-//// FILTRERING (tar bort Products) OCH SORTERING (enligt figmaOrder) av rutter som ska visas i menyn
-//Tidigare tog koden alla rutter som hade en menuLabel. 
-// Genom att lägga till && x.menuLabel !== "Products" säger vi till koden: 
-// "Hämta alla länkar som ska ligga i menyn, UTOM den som heter Products". 
-// På så sätt slipper vi radera filer eller ändra i databasen – vi bara döljer den från användaren.
+  //// FILTRERING (tar bort Products) OCH SORTERING (enligt figmaOrder) av rutter som ska visas i menyn
+  //Tidigare tog koden alla rutter som hade en menuLabel. 
+  // Genom att lägga till && x.menuLabel !== "Products" säger vi till koden: 
+  // "Hämta alla länkar som ska ligga i menyn, UTOM den som heter Products". 
+  // På så sätt slipper vi radera filer eller ändra i databasen – vi bara döljer den från användaren.
   const menuRoutes = routes
-    .filter((x) => x.menuLabel && x.menuLabel !== "Products" && 
-    x.menuLabel !== "Confirmation")
-  .sort((a, b) => (figmaOrder[a.menuLabel!] || 99) - (figmaOrder[b.menuLabel!] || 99));
+    .filter((x) => x.menuLabel && x.menuLabel !== "Products" &&
+      x.menuLabel !== "Confirmation")
+    .sort((a, b) => (figmaOrder[a.menuLabel!] || 99) - (figmaOrder[b.menuLabel!] || 99));
   return (
     <header>
       <div className="fixed inset-x-0 top-0 z-50">
         {/* keep a wrapper so the mobile dropdown lines up with the pill */}
         <div className="mx-auto mt-4 w-[min(1200px,calc(100%-32px))]">
           {/* TOP PILL */}
-          <div className="rounded-full bg-primary shadow-[0_8px_30px_rgba(0,0,0,0.4)]">           
-             <div className="flex h-16 items-center px-6">
+          <div className="rounded-full bg-primary shadow-[0_8px_30px_rgba(0,0,0,0.4)]">
+            <div className="flex h-16 items-center px-6">
               {/* LEFT: logo + nav close together, */}
               <div className="flex items-center gap-6">
 
