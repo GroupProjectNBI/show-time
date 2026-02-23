@@ -1,13 +1,13 @@
 import { useMemo } from "react";
 import { useBooking } from "../context/BookingContext";
 
-type SnackKey = "large" | "medium" | "small" | null;
+// type SnackKey = "large" | "medium" | "small" | null;
 
 type Props = {
   movieTitle: string;
   seatsLabelLines: string[];
   snackImageUrl?: string;
-  onBook?: (payload: { email: string; snack: SnackKey; }) => void;
+  onBook?: () => void; // ÄNDRAD: tar inte längre payload
 };
 
 const snackOptions = [
@@ -112,7 +112,7 @@ export default function BookingSnackPanel({
                     key={opt.key}
                     type="button"
                     onClick={() =>
-                      setSelectedSnack(opt.key)
+                      setSelectedSnack(checked ? null : opt.key)
                     }
                     className={[
                       "w-full rounded-xl px-3 py-2.5 text-left transition-all duration-200",
@@ -184,6 +184,8 @@ export default function BookingSnackPanel({
             </div>
 
             <input
+              name="email"
+              autoComplete="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -211,7 +213,7 @@ export default function BookingSnackPanel({
 
             <button
               type="button"
-              onClick={() => onBook?.({ email, snack: selectedSnack })}
+              onClick={() => onBook?.()} // ÄNDRAD: ingen payload skickas
               className="
                 h-[48px] w-full rounded-full bg-primary px-10
                 text-[14px] font-extrabold text-accent
