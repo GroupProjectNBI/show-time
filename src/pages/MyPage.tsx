@@ -42,7 +42,7 @@ export default function MyPage() {
         initialValue={user?.userName ?? ""}
         onSave={(newName) => {
           console.log("Spara nytt användarnamn:", newName);
-          //TODO: API-anrop + update user
+          //TODO: API-anrop + update user, And USERNAME MODAL
         }}
       />
 
@@ -50,7 +50,7 @@ export default function MyPage() {
         initialValue={user?.email ?? ""}
         onSave={(newEmail) => {
           console.log("Spara ny email:", newEmail);
-          //TODO: API-anrop + update user
+          //TODO: API-anrop + update user, And EMAIL MODAL
         }}
       />
 
@@ -58,7 +58,7 @@ export default function MyPage() {
         Medlem sedan 2024
       </p>
 
-      {/* ---------------- SECURITY SECTION ---------------- */}
+      {/* SECURITY SECTION */}
       <h2 className="text-2xl font-semibold mb-4">Säkerhet</h2>
 
       <PasswordDisplay password="********" />
@@ -67,7 +67,7 @@ export default function MyPage() {
         <ChangePasswordForm onSubmit={changePassword} />
       </div>
 
-      {/* ---------------- BOOKINGS SECTION ---------------- */}
+      {/* BOOKINGS SECTION*/}
       <h2 className="text-2xl font-semibold mt-12 mb-4">Kommande bokningar</h2>
 
       {bookings.length === 0 && (
@@ -84,7 +84,7 @@ export default function MyPage() {
         seatsLabel="A5, A6"
       />
 
-      {/* ---------------- ACCOUNT SECTION ---------------- */}
+      {/* ACCOUNT SECTION */}
       <AccountActions onLogout={logout} />
     </div>
   );

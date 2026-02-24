@@ -43,32 +43,6 @@ export default function EmailField({ initialValue, onSave }: EmailFieldProps) {
             ${editing ? "opacity-100" : "opacity-60 cursor-not-allowed"}
           `}
         />
-
-        {/* BUTTONS */}
-        {!editing ? (
-          <button
-            onClick={startEditing}
-            className="px-4 py-2 rounded-full border border-white/20 hover:bg-white/10 transition"
-          >
-            Byt
-          </button>
-        ) : (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={confirmEditing}
-              className="px-4 py-2 rounded-full bg-green-600 text-white hover:bg-green-700 transition"
-            >
-              Bekräfta
-            </button>
-
-            <button
-              onClick={cancelEditing}
-              className="px-4 py-2 rounded-full border border-white/20 hover:bg-white/10 transition"
-            >
-              Avbryt
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
