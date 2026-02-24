@@ -6,7 +6,7 @@ import AvatarSection from "../parts/AvatarSection";
 import PasswordDisplay from "../parts/PasswordDisplay";
 import AccountActions from "../parts/AccountActions";
 import UsernameField from "../parts/UsernameField";
-import EmailField from "./EmailField";
+import EmailField from "../parts/EmailField";
 
 export default function MyPage() {
   const { user, changePassword, logout } = useAuth();
@@ -61,7 +61,7 @@ export default function MyPage() {
       {/* SECURITY SECTION */}
       <h2 className="text-2xl font-semibold mb-4">Säkerhet</h2>
 
-      <PasswordDisplay password="********" />
+
 
       <div className="mt-6">
         <ChangePasswordForm onSubmit={changePassword} />

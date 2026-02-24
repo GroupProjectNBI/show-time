@@ -38,8 +38,7 @@ export default function EmailField({ initialValue, onSave }: EmailFieldProps) {
           disabled={!editing}
           onChange={(e) => setDraft(e.target.value)}
           className={`
-            bg-black/20 border border-white/20 px-3 py-2 rounded w-full
-            transition
+            w-full rounded-xl bg-white/10 border border-white/20 px-4 py-2 text-accent placeholder-accent/40 focus:outline-none
             ${editing ? "opacity-100" : "opacity-60 cursor-not-allowed"}
           `}
         />
