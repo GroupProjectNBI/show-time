@@ -91,24 +91,54 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
               </div>
 
               {/* RIGHT: login pinned right */}
-              {
-                user ? <div className="ml-auto hidden md:block">
-                  <Link to="#" onClick={() => logout()} className="shrink-0"><p> <img src={user.avatar} className="w-10 h-10" alt="" /> Logout: {user.userName}</p></Link>
+              {/* RIGHT SIDE DESKTOP BUTTONS */}
+              <div className="ml-auto hidden md:flex items-center gap-4">
 
-                </div> : <div className="ml-auto hidden md:block">
-                  <button onClick={openLogin} className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary" >
-                    Logga in
-                  </button>
-                  <button
-                    onClick={openMembership}
-                    className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary ml-4"
-                  >
-                    Bli medlem
-                  </button>
+                {/* INLOGGAD */}
+                {user && (
+                  <>
+                    <Link
+                      to="/mypage"
+                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
+                    >
+                      Min sida
+                    </Link>
 
-                </div>
+                    <button
+                      onClick={logout}
+                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
+                    >
+                      Logga ut
+                    </button>
 
-              }
+                    <img
+                      src={user.avatar}
+                      className="w-10 h-10 rounded-full border border-white/20"
+                      alt="avatar"
+                    />
+                  </>
+                )}
+
+                {/* UTLOGGAD */}
+                {!user && (
+                  <>
+                    <button
+                      onClick={openMembership}
+                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
+                    >
+                      Bli medlem
+                    </button>
+
+                    <button
+                      onClick={openLogin}
+                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
+                    >
+                      Logga in
+                    </button>
+                  </>
+                )}
+              </div>
+
 
 
               {/* MOBILE TOGGLE pinned right */}
@@ -159,30 +189,42 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                 })}
 
 
+                {/* MOBILE USER BUTTONS */}
                 {!user ? (
                   <>
                     <button
-                      onClick={() => { openLogin(); closeMenu(); }}
-                      className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
-                    >
-                      Logga in
-                    </button>
-
-                    <button
                       onClick={() => { openMembership(); closeMenu(); }}
-                      className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
                     >
                       Bli medlem
                     </button>
+
+                    <button
+                      onClick={() => { openLogin(); closeMenu(); }}
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                    >
+                      Logga in
+                    </button>
                   </>
                 ) : (
-                  <button
-                    onClick={() => { logout(); closeMenu(); }}
-                    className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
-                  >
-                    Logout: {user.userName}
-                  </button>
+                  <>
+                    <Link
+                      to="/mypage"
+                      onClick={closeMenu}
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                    >
+                      Min sida
+                    </Link>
+
+                    <button
+                      onClick={() => { logout(); closeMenu(); }}
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                    >
+                      Logga ut
+                    </button>
+                  </>
                 )}
+
 
 
               </nav>
