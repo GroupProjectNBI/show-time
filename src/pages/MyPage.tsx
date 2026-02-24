@@ -6,6 +6,7 @@ import AvatarSection from "../parts/AvatarSection";
 import EditableField from "../parts/EditableField";
 import PasswordDisplay from "../parts/PasswordDisplay";
 import AccountActions from "../parts/AccountActions";
+import UsernameField from "../parts/UsernameField";
 
 export default function MyPage() {
   const { user, changePassword, logout } = useAuth();
@@ -37,12 +38,11 @@ export default function MyPage() {
         }}
       />
 
-      <EditableField
-        label="Användarnamn"
-        value={user?.userName}
-        onSave={(v) => {
-          console.log("Spara nytt användarnamn:", v);
-          // TODO: API-anrop
+      <UsernameField
+        initialValue={user?.userName ?? ""}
+        onSave={(newName) => {
+          console.log("Spara nytt användarnamn:", newName);
+          //TODO: API-anrop + update user
         }}
       />
 
