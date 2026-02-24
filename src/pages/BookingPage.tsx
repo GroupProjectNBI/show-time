@@ -32,13 +32,13 @@ export default function BookingPage() {
         toggleSeat,
         setOccupied,
         tickets,
+        ticketCount, // nytt från context
+        selectedSnack, //nytt från context
         email,
-        // selectedSnack,
-        clearBooking, // NYTT: nollställer context efter lyckad bokning
+        totalAmount, //nytt från context
+        clearBooking,
     } = useBooking();
 
-    // NYTT: antal biljetter (styr vad som måste vara valt innan man får boka)
-    const ticketCount = tickets.ordinarie + tickets.pensionar + tickets.barn;
 
     useEffect(() => {
         if (!id) return;
@@ -118,9 +118,9 @@ export default function BookingPage() {
     // För att inte krascha dina nuvarande komponenter skapar vi en ren text-array till UI:t
     const seatsLabelLines = selectedSeatsData.map(s => s.label);
 
-    // NYTT: validering + POST till backend när man trycker BOKA
+    // Validering + POST till backend när man trycker BOKA
     const handleBook = async () => {
-        // 1. Valideringar (behåll som de är)
+        // 1. Valideringar 
         if (!email.trim() || ticketCount === 0 || selectedSeats.length !== ticketCount) {
             alert("Kontrollera email och antal valda platser.");
             return;
@@ -131,11 +131,10 @@ export default function BookingPage() {
             const bookingBody = {
                 screeningId: screening.id,
                 email: email.trim().toLowerCase(),
-                snack: "large", /// kunde inte hantera  selectedSnack
+                snack: selectedSnack,
                 bookingRef: null,
-                totalAmount: 140 * ticketCount, // Exempel på beräkning
+                totalAmount: totalAmount,
                 status: 1,
-                createdAtUTC: "2026-02-17 08:48:30" //new Date().toISOString().slice(0, 19).replace('T', ' '),
             };
 
             const resultBookingData = await fetchJson("/api/Booking", {
@@ -167,7 +166,7 @@ export default function BookingPage() {
 
                 if (ticketResult?.error) {
                     console.error("Fel vid biljett-post:", ticketResult.error);
-                    alert("Något gick fel med bokningen av en av sätena")
+                    alert("Något gick fel med bokningen av en av sätena");
                 }
             }
 
