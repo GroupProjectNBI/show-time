@@ -71,14 +71,9 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                         to={path}
                         aria-current={active ? "page" : undefined}
                         className={[
-                          // hover with a ''pill'' look
                           "rounded-full px-4 py-1.5 text-base font-semibold transition duration-200",
                           "hover:bg-white/5",
-
-                          // colors: active full accent, others dim
                           active ? "text-accent" : "text-accent/60 hover:text-accent/90",
-
-                          // active indicator: ONLY shadow under (no bg, no pill highlight)
                           active ? "bg-transparent shadow-none drop-shadow-[0_12px_16px_rgba(0,0,0,0.55)]" : "",
                         ].join(" ")}
                         onClick={() => setExpanded(false)}
@@ -87,7 +82,27 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                       </Link>
                     );
                   })}
+
+                  {/* --- NY PLACERING: Bli medlem / Min sida --- */}
+                  {!user && (
+                    <button
+                      onClick={openMembership}
+                      className="rounded-full px-4 py-1.5 text-base font-semibold text-accent/60 hover:text-accent/90 hover:bg-white/5 transition"
+                    >
+                      Bli medlem
+                    </button>
+                  )}
+
+                  {user && (
+                    <Link
+                      to="/mypage"
+                      className="rounded-full px-4 py-1.5 text-base font-semibold text-accent/60 hover:text-accent/90 hover:bg-white/5 transition"
+                    >
+                      Min sida
+                    </Link>
+                  )}
                 </nav>
+
               </div>
 
               {/* RIGHT: login pinned right */}
@@ -122,12 +137,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                 {/* UTLOGGAD */}
                 {!user && (
                   <>
-                    <button
-                      onClick={openMembership}
-                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
-                    >
-                      Bli medlem
-                    </button>
+
 
                     <button
                       onClick={openLogin}
