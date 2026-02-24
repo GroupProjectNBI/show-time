@@ -126,6 +126,38 @@ export default function BookingPage() {
             return;
         }
 
+        const ticketTypePool: string[] = [];
+        // Denna kommer att göra om tickets till en flat array, Tex: ['pensionar', 'barn']
+        Object.entries(tickets).forEach(([type, count]) => {
+            // Lägg till typen i listan lika många gånger som count säger
+            for (let i = 0; i < count; i++) {
+                ticketTypePool.push(type);
+            }
+        });
+
+        // 2. Mappa ihop stolarna med biljettyperna, då får vi ut en array som tex denna : [
+        //         {
+        //             "seatId": 130,
+        //                 "ticketType": "pensionar"
+        //         },
+        //         {
+        //             "seatId": 121,
+        //                 "ticketType": "barn"
+        //         }
+        // ]
+        const finalBookingRows = selectedSeats.map((seat, index) => {
+            return {
+                seatId: seat,
+                ticketType: ticketTypePool[index] // Hämta motsvarande typ från poolen
+            };
+        });
+        // 2. Mappning: Översätt text till ID (TicketTypeId)
+        const ticketTypeMap: Record<string, number> = {
+            ordinarie: 1,
+            pensionar: 2,
+            barn: 3
+        };
+
         try {
             // 2. Skapa bokningen
             const bookingBody = {
@@ -151,15 +183,15 @@ export default function BookingPage() {
 
             // 3. Skapa biljetter - Använd for...of för att säkerställa att de körs i ordning
             // och att vi väntar in alla innan vi går vidare.
-            for (const seat of selectedSeatsData) {
+            for (const { seatId, ticketType } of finalBookingRows) {
                 const ticketResult = await fetchJson("/api/Ticket", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         bookingId: bookingId,
                         screeningId: screening.id,
-                        SeatId: seat.id,
-                        TicketType: 1, // Här kan du mappa mot tickets.ordinarie etc senare
+                        SeatId: seatId,
+                        TicketType: ticketTypeMap[ticketType],
                         price: 140
                     }),
                 });
