@@ -78,6 +78,8 @@ export default function MyPage() {
         theaterLabel="Stora salongen"
         ticketsLabel="2 biljetter"
         seatsLabel="A5, A6"
+        onCancel={() => console.log("Avboka bokning")}
+        cancelDisabled={false}
       />
 
       <AccountActions onLogout={logout} />
