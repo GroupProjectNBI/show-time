@@ -105,20 +105,12 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
 
               </div>
 
-              {/* RIGHT: login pinned right */}
-              {/* RIGHT SIDE DESKTOP BUTTONS */}
+              {/* RIGHT: login/logout only */}
               <div className="ml-auto hidden md:flex items-center gap-4">
 
                 {/* INLOGGAD */}
                 {user && (
                   <>
-                    <Link
-                      to="/mypage"
-                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
-                    >
-                      Min sida
-                    </Link>
-
                     <button
                       onClick={logout}
                       className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
@@ -136,18 +128,16 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
 
                 {/* UTLOGGAD */}
                 {!user && (
-                  <>
-
-
-                    <button
-                      onClick={openLogin}
-                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
-                    >
-                      Logga in
-                    </button>
-                  </>
+                  <button
+                    onClick={openLogin}
+                    className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
+                  >
+                    Logga in
+                  </button>
                 )}
+
               </div>
+
 
 
 
