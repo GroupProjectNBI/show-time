@@ -135,7 +135,6 @@ export default function BookingPage() {
                 bookingRef: null,
                 totalAmount: 140 * ticketCount, // Exempel på beräkning
                 status: 1,
-                createdAtUTC: "2026-02-17 08:48:30" //new Date().toISOString().slice(0, 19).replace('T', ' '),
             };
 
             const resultBookingData = await fetchJson("/api/Booking", {
@@ -167,7 +166,7 @@ export default function BookingPage() {
 
                 if (ticketResult?.error) {
                     console.error("Fel vid biljett-post:", ticketResult.error);
-                    alert("Något gick fel med bokningen av en av sätena")
+                    alert("Något gick fel med bokningen av en av sätena");
                 }
             }
 
