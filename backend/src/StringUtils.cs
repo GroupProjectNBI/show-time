@@ -56,23 +56,20 @@ public static partial class StringUtils
     }
 
     //regex för email
-    [GeneratedRegex(@"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$")]
+    [GeneratedRegex(@"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$", RegexOptions.IgnoreCase)]
     private static partial Regex MatchEmail();
 
     public static bool IsValidEmail(this string? str)
     {
-        if (string.IsNullOrWhiteSpace(str))
-            return false;
+        if (string.IsNullOrWhiteSpace(str)) return false;
 
         //ta bort mellanslag innan/efter
         var email = str.Trim();
 
-        if (email.Length < 5 || email.Length > 254)
-            return false;
+        if (email.Length < 5 || email.Length > 254) return false;
 
         //ta bort whitespace i email-adressen
-        if (email.Any(char.IsWhiteSpace))
-            return false;
+        if (email.Any(char.IsWhiteSpace)) return false;
 
         // kolla format med regex
         return MatchEmail().IsMatch(email);
