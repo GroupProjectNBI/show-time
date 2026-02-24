@@ -1,4 +1,5 @@
 @tailwind base;
+@tailwind components;
 @tailwind utilities;
 
 
@@ -11,10 +12,8 @@ body {
   }
 
 }
-html {
-  box-sizing: border-box;
-}
-
-*, *:before, *:after {
-  box-sizing: inherit;
+@layer components {
+  .container-standard {
+    @apply mx-auto w-[min(1200px,calc(100%-32px))] px-6;
+  }
 }
