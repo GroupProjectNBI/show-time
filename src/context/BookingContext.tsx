@@ -24,7 +24,6 @@ const SNACK_PRICES: Record<"large" | "medium" | "small", number> = {
 export function BookingProvider({ children }: { children: ReactNode; }) {
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
     const [occupiedSeats, setOccupiedSeats] = useState<number[]>([]);
-    const [code, setCode] = useState<string>("");
 
     const [tickets, setTickets] = useState({
         ordinarie: 0,
@@ -36,10 +35,6 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
         useState<"large" | "medium" | "small" | null>(null);
 
     const [email, setEmail] = useState<string>("");
-
-    const handleCode = useCallback((code: string) => {
-        setCode(code);
-    }, []);
 
 
     // NYTT: antal biljetter = max antal stolar som får väljas
@@ -106,7 +101,6 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
         setTickets({ ordinarie: 0, pensionar: 0, barn: 0 });
         setSelectedSnack(null);
         setEmail("");
-        setCode(""); // Lade till rensning av kod också för säkerhets skull
     }, []);
 
     const value = useMemo(() => ({
@@ -128,18 +122,12 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
         setOccupied,
         clearBooking,
 
-        // Fixad merge här:
-        handleCode,
-        code, // <--- VIKTIGT: Här skickar vi variabeln 'code' istället för funktionen getCode
-
         setTickets,
         setSelectedSnack,
         setEmail,
     }), [
         selectedSeats,
         occupiedSeats,
-        handleCode,
-        code, // <--- VIKTIGT: Code ska vara med i dependency arrayen
         toggleSeat,
         setOccupied,
         clearBooking,

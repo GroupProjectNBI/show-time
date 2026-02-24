@@ -198,7 +198,7 @@ export default function BookingPage() {
 
             // 4. Avsluta
             clearBooking();
-            navigate("/confirmation", { state: { bookingId } });
+            navigate(`/confirmation/${code}`);
 
         } catch (err) {
             console.error("Bokningsfel:", err);
