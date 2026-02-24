@@ -15,6 +15,8 @@ import { useBooking } from "../context/BookingContext";
 import TicketSelector from "../parts/TicketSelector";
 import BookingSnackPanel from "../parts/BookingSnackPanel";
 
+import { isValidEmail, normalizeEmail } from "../utils/email"; //Nytt för att kunna använda validering
+
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
@@ -25,17 +27,17 @@ export default function BookingPage() {
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
 
-    // NYTT: hämtar även tickets + email för validering innan navigation
+    //validering innan navigation
     const {
         selectedSeats,
         occupiedSeats,
         toggleSeat,
         setOccupied,
         tickets,
-        ticketCount, // nytt från context
-        selectedSnack, //nytt från context
+        ticketCount,
+        selectedSnack,
         email,
-        totalAmount, //nytt från context
+        totalAmount,
         clearBooking,
     } = useBooking();
 
@@ -120,9 +122,16 @@ export default function BookingPage() {
 
     // Validering + POST till backend när man trycker BOKA
     const handleBook = async () => {
-        // 1. Valideringar 
-        if (!email.trim() || ticketCount === 0 || selectedSeats.length !== ticketCount) {
-            alert("Kontrollera email och antal valda platser.");
+        // 1. Validering av biljetter och stolar
+        if (ticketCount === 0 || selectedSeats.length !== ticketCount) {
+            alert("Kontrollera antal biljetter och valda platser.");
+            return;
+        }
+        //2. Email validering via utils email.ts
+        const cleanedEmail = normalizeEmail(email);
+
+        if (!isValidEmail(cleanedEmail)) {
+            alert("Skriv in en giltig emailadress.");
             return;
         }
 
@@ -162,7 +171,7 @@ export default function BookingPage() {
             // 2. Skapa bokningen
             const bookingBody = {
                 screeningId: screening.id,
-                email: email.trim().toLowerCase(),
+                email: cleanedEmail, //normaliserad email
                 snack: selectedSnack,
                 bookingRef: null,
                 totalAmount: totalAmount,
