@@ -42,6 +42,8 @@ export default function ConfirmationPage() {
       if (!bookingRef) return;
 
       try {
+        console.log("Hämtar bokning för ref:", bookingRef);
+
         // 1. Hämta bokningen via ref
         const bookingResult = await fetchJson(`/api/Booking?where=bookingRef=${bookingRef}`);
 
@@ -52,18 +54,37 @@ export default function ConfirmationPage() {
         }
 
         const foundBooking = bookingResult[0];
+        console.log("Bokning hittad:", foundBooking); // <--- KOLLA HÄR I KONSOLEN
         setBooking(foundBooking);
+
+        // --- HÄR ÄR FIXEN ---
+        // Vi kollar om det heter 'screeningId' ELLER 'ScreeningId' i datat
+        // (as any) låter oss fuska lite för att kolla båda stavningarna
+        const screeningIdToFetch = (foundBooking as any).screeningId || (foundBooking as any).ScreeningId;
+
+        console.log("Försöker hämta visning med ID:", screeningIdToFetch);
+
+        if (!screeningIdToFetch) {
+          console.error("Varning: Inget screeningId hittades på bokningsobjektet!");
+        }
 
         // 2. Hämta biljetter & Visning parallellt
         const ticketsPromise = fetchJson(`/api/Ticket?where=bookingId=${foundBooking.id}`);
-        const screeningPromise = fetchJson(`/api/v_screenings?where=id=${foundBooking.screeningId}`);
+
+        // Använd det säkra ID:t här:
+        const screeningPromise = fetchJson(`/api/v_screenings?where=id=${screeningIdToFetch}`);
 
         const [ticketsResult, screeningResult] = await Promise.all([ticketsPromise, screeningPromise]);
 
         setTickets(ticketsResult || []);
 
+        console.log("Visningsresultat:", screeningResult); // <--- KOLLA HÄR OCKSÅ
+
         if (screeningResult && screeningResult.length > 0) {
           setScreening(screeningResult[0]);
+        } else {
+          // Om listan är tom, dubbelkolla att tabellen/vyn faktiskt heter 'v_screenings'
+          console.warn("Ingen visning hittades. Kolla API-anropet.");
         }
 
       } catch (err) {
@@ -123,13 +144,13 @@ export default function ConfirmationPage() {
         {/* GRID */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.2fr_0.8fr]">
 
-          {/* VÄNSTER: INFO (Nu med den gamla texten tillbaka) */}
+          {/* VÄNSTER: INFO */}
           <div className="rounded-2xl bg-[#232323] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
             <div className="space-y-5 text-[15px] leading-relaxed text-accent/85 font-medium">
 
               <h3 className="text-white font-bold text-lg">Dina biljetter är bokade!</h3>
 
-              {/* FILMINFO - Bra att ha kvar för tydlighet */}
+              {/* FILMINFO - Visas tydligt till vänster */}
               {screening && (
                 <div className="p-4 bg-white/5 rounded-lg border border-white/10 mb-4">
                   <h3 className="text-white font-bold text-lg mb-1">{screening.movieTitle}</h3>
@@ -140,7 +161,7 @@ export default function ConfirmationPage() {
                 </div>
               )}
 
-              {/* --- HÄR ÄR DIN GAMLA TEXT --- */}
+              {/* STATISK TEXT (Tillbaka från gamla versionen) */}
               <p>
                 Vid eventuella frågor är du välkommen att kontakta oss via{" "}
                 <span className="text-accent underline underline-offset-4">
@@ -158,7 +179,7 @@ export default function ConfirmationPage() {
               </p>
             </div>
 
-            {/* CTA (Båda knapparna tillbaka) */}
+            {/* KNAPPAR (Både Startsida och Bli Medlem) */}
             <div className="pt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Link
                 to="/"
