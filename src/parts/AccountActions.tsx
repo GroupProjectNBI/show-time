@@ -4,7 +4,7 @@ interface AccountActionsProps {
 
 export default function AccountActions({ onLogout }: AccountActionsProps) {
   return (
-    <div className="mt-16 border-t border-white/10 pt-10 flex justify-center">
+    <div className="mt-16 border-t border-white/10 pt-10 flex justify-end">
       <button
         onClick={onLogout}
         className="
