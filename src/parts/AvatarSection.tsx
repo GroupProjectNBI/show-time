@@ -1,4 +1,3 @@
-// parts/AvatarSection.tsx
 import { useState } from "react";
 import AvatarSelector from "./AvatarSelector";
 
@@ -7,26 +6,35 @@ interface Avatar {
   url: string;
 }
 
-interface Props {
+interface AvatarSectionProps {
   currentAvatarId: number;
   avatars: Avatar[];
   onChange: (id: number) => void;
 }
 
-export default function AvatarSection({ currentAvatarId, avatars, onChange }: Props) {
+export default function AvatarSection({
+  currentAvatarId,
+  avatars,
+  onChange
+}: AvatarSectionProps) {
   const [open, setOpen] = useState(false);
+  const [previewId, setPreviewId] = useState<number>(currentAvatarId);
+  const [zoom, setZoom] = useState(false);
 
   const currentAvatar = avatars.find(a => a.id === currentAvatarId);
+  const previewAvatar = avatars.find(a => a.id === previewId);
 
   return (
     <div className="mb-12">
       <h2 className="text-2xl font-semibold mb-4">Profilbild</h2>
 
+      {/* --- AVATAR + BYT KNAPP --- */}
       <div className="flex items-center gap-6">
         <img
           src={currentAvatar?.url}
           alt="Avatar"
-          className="w-24 h-24 rounded-full border border-white/20"
+          onClick={() => setZoom(true)}
+          className="w-24 h-24 rounded-full border border-white/20 cursor-pointer hover:scale-105 transition"
         />
 
         <button
@@ -37,16 +45,40 @@ export default function AvatarSection({ currentAvatarId, avatars, onChange }: Pr
         </button>
       </div>
 
+      {/* --- ZOOM MODAL --- */}
+      {zoom && (
+        <div
+          onClick={() => setZoom(false)}
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 cursor-pointer"
+        >
+          <img
+            src={currentAvatar?.url}
+            className="w-72 h-72 rounded-full border border-white/20 shadow-2xl"
+          />
+        </div>
+      )}
+
+      {/* --- UTFÄLLBAR AVATAR-PICKER --- */}
       {open && (
-        <div className="mt-6">
+        <div className="mt-6 p-4 rounded-xl bg-white/5 border border-white/10">
           <AvatarSelector
             avatars={avatars}
-            selectedId={currentAvatarId}
-            onSelect={(id) => {
-              onChange(id);
-              setOpen(false);
-            }}
+            selectedId={previewId}
+            onSelect={(id) => setPreviewId(id)}
           />
+
+          {/* BEKRÄFTA-KNAPP */}
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={() => {
+                onChange(previewId);
+                setOpen(false);
+              }}
+              className="px-4 py-2 rounded-full bg-red-600 text-white font-semibold hover:bg-red-700 transition"
+            >
+              Bekräfta
+            </button>
+          </div>
         </div>
       )}
     </div>
