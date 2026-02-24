@@ -8,6 +8,7 @@ function ConfirmationPage() {
     tickets,
     selectedSnack,
     email,
+    code,
     // clearBooking, // om du vill nollställa efter bekräftelse
   } = useBooking();
 
@@ -99,7 +100,7 @@ function ConfirmationPage() {
           {/* HÖGER: Sammanfattning */}
           <div className="rounded-2xl bg-[#232323] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.35)]">
             <h2 className="text-[14px] font-extrabold uppercase tracking-wider text-accent/80">
-              Din bokning
+              Din bokning med din Kod : {code}. Glöm inte den.
             </h2>
 
             <div className="mt-5 space-y-4 text-[14px]">

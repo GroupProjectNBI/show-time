@@ -8,6 +8,7 @@ const BookingContext = createContext<BookingContextType | undefined>(undefined);
 export function BookingProvider({ children }: { children: ReactNode; }) {
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
     const [occupiedSeats, setOccupiedSeats] = useState<number[]>([]);
+    const [code, setCode] = useState<string>("")
 
     // NYTT: biljetter
     const [tickets, setTickets] = useState<{
@@ -26,6 +27,10 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
 
     // NYTT: email
     const [email, setEmail] = useState<string>("");
+
+    const handleCode = code => setCode(code);
+
+    const getCode = () => code;
 
     // NYTT: antal biljetter = max antal stolar som får väljas
     const maxSelectableSeats = tickets.ordinarie + tickets.pensionar + tickets.barn;
@@ -76,7 +81,8 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
         toggleSeat,
         setOccupied,
         clearBooking,
-
+        handleCode,
+        code,
         // NYTT
         tickets,
         setTickets,
@@ -87,6 +93,8 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
     }), [
         selectedSeats,
         occupiedSeats,
+        handleCode,
+        code,
         toggleSeat,
         setOccupied,
         clearBooking,

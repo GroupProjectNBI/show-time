@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 // useNavigate;
 import { formatScreeningDate } from "../utils/formatTime";
 import MovieCard from "../parts/MovieCard";
-
+import generate from "../utils/bookingNumberGeneratir";
 import fetchJson from "../utils/fetchJson";
 import type { Theater } from "../interfaces/Seats";
 import type { Screening } from "../interfaces/Screenings";
@@ -32,6 +32,7 @@ export default function BookingPage() {
         toggleSeat,
         setOccupied,
         tickets,
+        handleCode,
         email,
         // selectedSnack,
         clearBooking, // NYTT: nollställer context efter lyckad bokning
@@ -127,12 +128,14 @@ export default function BookingPage() {
         }
 
         try {
+            const code = generate();
+            handleCode(code);
             // 2. Skapa bokningen
             const bookingBody = {
                 screeningId: screening.id,
                 email: email.trim().toLowerCase(),
                 snack: "large", /// kunde inte hantera  selectedSnack
-                bookingRef: null,
+                bookingRef: code,
                 totalAmount: 140 * ticketCount, // Exempel på beräkning
                 status: 1,
             };
