@@ -171,7 +171,9 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
           {/* MOBILE MENU: separate dropdown panel */}
           <div id="mobile-nav" className={expanded ? "block md:hidden" : "hidden"}>
             <div className="mt-3 rounded-2xl bg-primary shadow-[0_18px_40px_rgba(0,0,0,0.55)] ring-1 ring-white/10">
-              <nav className="space-y-1 p-3" aria-label="Huvudmeny mobil">
+              <nav className="space-y-1 p-3 text-center" aria-label="Huvudmeny mobil">
+
+                {/* MENY-LÄNKAR (centrerade) */}
                 {menuRoutes.map(({ menuLabel, path }, i) => {
                   const active = isActive(path);
 
@@ -182,15 +184,10 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                       onClick={closeMenu}
                       className={[
                         "block w-full rounded-xl px-4 py-3 text-base font-semibold transition",
-
-                        // hover can have a soft background
                         "hover:bg-white/10",
-
-                        // dim others, keep active full accent
                         active ? "text-accent" : "text-accent/70 hover:text-accent",
-
-                        // active: shadow under
                         active ? "bg-transparent shadow-none drop-shadow-[0_12px_16px_rgba(0,0,0,0.55)]" : "",
+                        "text-center"
                       ].join(" ")}
                     >
                       {menuLabel}
@@ -198,48 +195,49 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                   );
                 })}
 
-
-                {/* MOBILE USER BUTTONS */}
-                {!user ? (
+                {/* --- INTE INLOGGAD --- */}
+                {!user && (
                   <>
                     <button
                       onClick={() => { openMembership(); closeMenu(); }}
-                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
                     >
                       Bli medlem
                     </button>
 
                     <button
                       onClick={() => { openLogin(); closeMenu(); }}
-                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
                     >
                       Logga in
                     </button>
                   </>
-                ) : (
+                )}
+
+                {/* --- INLOGGAD --- */}
+                {user && (
                   <>
                     <Link
                       to="/mypage"
                       onClick={closeMenu}
-                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
                     >
                       Min sida
                     </Link>
 
                     <button
                       onClick={() => { logout(); closeMenu(); }}
-                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
                     >
                       Logga ut
                     </button>
                   </>
                 )}
 
-
-
               </nav>
             </div>
           </div>
+
         </div>
       </div >
     </header >
