@@ -3,7 +3,6 @@ import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 
 import AvatarSection from "../parts/AvatarSection";
-import EditableField from "../parts/EditableField";
 import PasswordDisplay from "../parts/PasswordDisplay";
 import AccountActions from "../parts/AccountActions";
 import UsernameField from "../parts/UsernameField";
