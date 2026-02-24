@@ -1,9 +1,10 @@
 import fetchJson from '../utils/fetchJson';
 import { useState, useEffect } from 'react';
+import generate from "../utils/bookingNumberGeneratir";
 
 AnimalPage.route = {
     path: '/Animals',
-    index: 2
+    index: -1
 };
 
 
@@ -48,6 +49,7 @@ export default function AnimalPage() {
             <p>{movieTitle} in Theater: {theaterName}.</p>
             <p> Avaliable seats: {availableSeats} st.</p>
             <img src={`/images/posters/${movieId}.webp`} alt={movieTitle} />
+            <p>{generate()}</p>
             <hr />
         </article>)}
     </>;
