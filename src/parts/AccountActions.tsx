@@ -4,10 +4,18 @@ interface AccountActionsProps {
 
 export default function AccountActions({ onLogout }: AccountActionsProps) {
   return (
-    <div className="mt-12 border-t border-white/10 pt-8">
+    <div className="mt-16 border-t border-white/10 pt-10 flex justify-center">
       <button
         onClick={onLogout}
-        className="text-red-400 hover:text-red-200 transition"
+        className="
+          px-6 py-2 
+          rounded-full 
+          border border-red-500 
+          text-red-400 
+          font-semibold
+          hover:bg-red-600 hover:text-white 
+          transition
+        "
       >
         Logga ut
       </button>
