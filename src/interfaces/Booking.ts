@@ -21,6 +21,21 @@ export interface BookingContextType {
     // Kontakt
     email: string;
 
+    //=========================
+    // DERIVED VALUES (värden som hämtas och sätts i contexten)
+    //=========================
+
+    //Antal biljetter
+    ticketCount: number;
+
+    //Biljettpris totalt
+    ticketTotal: number;
+
+    //Snackpris
+    snackTotal: number;
+
+    // Totalbelopp biljetter + snack
+    totalAmount: number;
 
     // ========================
     // ACTIONS

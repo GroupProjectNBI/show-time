@@ -1,8 +1,6 @@
 import { useMemo } from "react";
 import { useBooking } from "../context/BookingContext";
 
-// type SnackKey = "large" | "medium" | "small" | null;
-
 type Props = {
   movieTitle: string;
   seatsLabelLines: string[];
@@ -40,13 +38,8 @@ export default function BookingSnackPanel({
   snackImageUrl,
   onBook,
 }: Props) {
-  const { tickets, selectedSnack, setSelectedSnack, email, setEmail } =
+  const { ticketCount, totalAmount, selectedSnack, setSelectedSnack, email, setEmail } =
     useBooking();
-
-  const ticketCount = tickets.ordinarie + tickets.pensionar + tickets.barn;
-
-  const ticketPriceTotal =
-    tickets.ordinarie * 140 + tickets.pensionar * 120 + tickets.barn * 90;
 
   const selected = useMemo(
     () => snackOptions.find((s) => s.key === selectedSnack) ?? null,
@@ -54,10 +47,6 @@ export default function BookingSnackPanel({
   );
 
   const snacksPrice = selected ? selected.prebookPrice : 0;
-
-  const total = useMemo(() => {
-    return ticketPriceTotal + snacksPrice;
-  }, [ticketPriceTotal, snacksPrice]);
 
   const imageSrc = snackImageUrl || "/images/Commercials/popga.jpg";
 
@@ -207,7 +196,7 @@ export default function BookingSnackPanel({
                 Totalt:
               </span>
               <span className="tabular-nums text-[20px] font-bold text-accent">
-                {Math.round(total)} kr
+                {Math.round(totalAmount)} kr
               </span>
             </div>
 
