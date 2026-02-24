@@ -90,7 +90,7 @@ export default function MyPage() {
 import ProtectedRoute from "../parts/ProtectedRoute";
 
 MyPage.route = {
-  path: "/mypage",
+  path: "/min-sida",
   index: 99,
   menuLabel: null,
   element: (

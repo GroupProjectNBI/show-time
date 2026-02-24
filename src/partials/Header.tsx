@@ -95,7 +95,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
 
                   {user && (
                     <Link
-                      to="/mypage"
+                      to="/min-sida"
                       className="rounded-full px-4 py-1.5 text-base font-semibold text-accent/60 hover:text-accent/90 hover:bg-white/5 transition"
                     >
                       Min sida
