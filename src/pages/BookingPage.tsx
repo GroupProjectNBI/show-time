@@ -33,7 +33,7 @@ export default function BookingPage() {
         setOccupied,
         tickets,
         email,
-        selectedSnack,
+        // selectedSnack,
         clearBooking, // NYTT: nollställer context efter lyckad bokning
     } = useBooking();
 
@@ -88,109 +88,95 @@ export default function BookingPage() {
     const currentTheater = seatArray[0];
 
     // 3. Skapa label-strängarna med Rad och Stol
-    const seatsLabelLines = selectedSeats
+    const selectedSeatsData = selectedSeats
         .slice()
         .sort((a, b) => a - b)
         .map((seatId) => {
-            // Få fram ett relativt nummer (t.ex. ID 82 blir relativt nummer 1 i Lilla)
             const relativeId = seatId - baseIdOffset;
-
             let rowNumber = 1;
             let seatNumberInRow = relativeId;
 
-            // Om vi har layout-datan, loopa igenom raderna för att hitta var stolen "bor"
             if (currentTheater && currentTheater.seatsPerRow) {
                 let seatsPassed = 0;
-
                 for (let i = 0; i < currentTheater.seatsPerRow.length; i++) {
                     const rowCapacity = currentTheater.seatsPerRow[i];
-
-                    // Om vårt relativa ID är mindre/lika med de stolar vi passerat + denna rad,
-                    // då har vi hittat rätt rad!
                     if (relativeId <= seatsPassed + rowCapacity) {
-                        rowNumber = i + 1; // +1 för att användare vill se "Rad 1", inte "Rad 0"
-                        seatNumberInRow = relativeId - seatsPassed; // Stolens nummer på just den raden
+                        rowNumber = i + 1;
+                        seatNumberInRow = relativeId - seatsPassed;
                         break;
                     }
                     seatsPassed += rowCapacity;
                 }
             }
 
-            return `Rad ${rowNumber}, Stol ${seatNumberInRow}`;
+            return {
+                id: seatId, // Detta ID använder vi för POST
+                label: `Rad ${rowNumber}, Stol ${seatNumberInRow}` // Detta visar vi i UI
+            };
         });
+
+    // För att inte krascha dina nuvarande komponenter skapar vi en ren text-array till UI:t
+    const seatsLabelLines = selectedSeatsData.map(s => s.label);
 
     // NYTT: validering + POST till backend när man trycker BOKA
     const handleBook = async () => {
-        if (!email.trim()) {
-            alert("Fyll i din email innan du bokar.");
-            return;
-        }
-
-        if (ticketCount === 0) {
-            alert("Välj minst en biljett innan du bokar.");
-            return;
-        }
-
-        if (selectedSeats.length !== ticketCount) {
-            alert(`Du måste välja ${ticketCount} plats(er) innan du bokar.`);
+        // 1. Valideringar (behåll som de är)
+        if (!email.trim() || ticketCount === 0 || selectedSeats.length !== ticketCount) {
+            alert("Kontrollera email och antal valda platser.");
             return;
         }
 
         try {
+            // 2. Skapa bokningen
+            const bookingBody = {
+                screeningId: screening.id,
+                email: email.trim().toLowerCase(),
+                snack: "large", /// kunde inte hantera  selectedSnack
+                bookingRef: null,
+                totalAmount: 140 * ticketCount, // Exempel på beräkning
+                status: 1,
+            };
 
-            // NYTT: skapar bokningen i backend (Booking + Ticket + EmailsUserUndefined)
-            // Hantera detta utifrån vad tabellen ser ut. 
             const resultBookingData = await fetchJson("/api/Booking", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    screeningId: screening.id,
-                    email: email.trim().toLowerCase(),
-                    snack: selectedSnack, //-> var sätter vi snacks hanteringen ?? sätts i bookingsnackpanel
-                    bookingRef: null,
-                    totalAmount: 10000, ///  hämta rätt amount 
-                    status: 1,
-                }),
+                body: JSON.stringify(bookingBody),
             });
 
-            // NYTT: backend svarar med { error } om något gick fel
-            if (resultBookingData?.error) {
-                alert(resultBookingData.error);
-                return;
+            if (resultBookingData?.error || !resultBookingData?.insertId) {
+                throw new Error(resultBookingData?.error || "Kunde inte skapa bokning");
             }
-            else {
-                // fortsätt med att skapa en skapa en ticket
-                // console.log(resultBookingData);
-                // här behöver vi hantera detta utifrån antalet säten som vi har valt
-                console.log(resultBookingData.id);
-                const resultTicketData = await fetchJson("/api/Ticket", {
+
+            const bookingId = resultBookingData.insertId;
+
+            // 3. Skapa biljetter - Använd for...of för att säkerställa att de körs i ordning
+            // och att vi väntar in alla innan vi går vidare.
+            for (const seat of selectedSeatsData) {
+                const ticketResult = await fetchJson("/api/Ticket", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        bookingId: 1,
+                        bookingId: bookingId,
                         screeningId: screening.id,
-                        SeatId: 1,
-                        TicketType: 1,
+                        SeatId: seat.id,
+                        TicketType: 1, // Här kan du mappa mot tickets.ordinarie etc senare
                         price: 140
                     }),
                 });
-                if (resultTicketData?.error) {
-                    alert(resultTicketData.error);
-                    return;
-                }
-                else {
 
+                if (ticketResult?.error) {
+                    console.error("Fel vid biljett-post:", ticketResult.error);
+                    alert("Något gick fel med bokningen av en av sätena");
                 }
             }
 
-            // NYTT: nollställer context så man inte råkar ha gamla val kvar
+            // 4. Avsluta
             clearBooking();
+            // navigate("/confirmation", { state: { bookingId } });
 
-            // NYTT: skickar med bokningsdata till confirmation via router-state
-            // navigate("/confirmation", { state: result }); // state får vi ändra sen med
         } catch (err) {
-            console.error(err);
-            alert("Något gick fel vid bokningen.");
+            console.error("Bokningsfel:", err);
+            alert("Något gick fel vid kommunikation med servern.");
         }
     };
 
