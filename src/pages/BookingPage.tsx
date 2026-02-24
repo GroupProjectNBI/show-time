@@ -150,8 +150,6 @@ export default function BookingPage() {
                     bookingRef: null,
                     totalAmount: 10000, ///  hämta rätt amount 
                     status: 1,
-                    //userId: 1, // ändra sen till email i databasen. DETTA ÄR ÄNDRAT I DB SÅ DENNA TAR VI BORT
-                    createdAtUTC: "2026-02-17 08:48:30",
                 }),
             });
 
