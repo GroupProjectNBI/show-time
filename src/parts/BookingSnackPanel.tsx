@@ -1,13 +1,11 @@
 import { useMemo } from "react";
 import { useBooking } from "../context/BookingContext";
 
-type SnackKey = "large" | "medium" | "small" | null;
-
 type Props = {
   movieTitle: string;
   seatsLabelLines: string[];
   snackImageUrl?: string;
-  onBook?: (payload: { email: string; snack: SnackKey; }) => void;
+  onBook?: () => void; // ÄNDRAD: tar inte längre payload
 };
 
 const snackOptions = [
@@ -40,13 +38,8 @@ export default function BookingSnackPanel({
   snackImageUrl,
   onBook,
 }: Props) {
-  const { tickets, selectedSnack, setSelectedSnack, email, setEmail } =
+  const { ticketCount, totalAmount, selectedSnack, setSelectedSnack, email, setEmail } =
     useBooking();
-
-  const ticketCount = tickets.ordinarie + tickets.pensionar + tickets.barn;
-
-  const ticketPriceTotal =
-    tickets.ordinarie * 140 + tickets.pensionar * 120 + tickets.barn * 90;
 
   const selected = useMemo(
     () => snackOptions.find((s) => s.key === selectedSnack) ?? null,
@@ -54,10 +47,6 @@ export default function BookingSnackPanel({
   );
 
   const snacksPrice = selected ? selected.prebookPrice : 0;
-
-  const total = useMemo(() => {
-    return ticketPriceTotal + snacksPrice;
-  }, [ticketPriceTotal, snacksPrice]);
 
   const imageSrc = snackImageUrl || "/images/Commercials/popga.jpg";
 
@@ -112,7 +101,7 @@ export default function BookingSnackPanel({
                     key={opt.key}
                     type="button"
                     onClick={() =>
-                      setSelectedSnack(opt.key)
+                      setSelectedSnack(checked ? null : opt.key)
                     }
                     className={[
                       "w-full rounded-xl px-3 py-2.5 text-left transition-all duration-200",
@@ -184,6 +173,8 @@ export default function BookingSnackPanel({
             </div>
 
             <input
+              name="email"
+              autoComplete="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -205,13 +196,13 @@ export default function BookingSnackPanel({
                 Totalt:
               </span>
               <span className="tabular-nums text-[20px] font-bold text-accent">
-                {Math.round(total)} kr
+                {Math.round(totalAmount)} kr
               </span>
             </div>
 
             <button
               type="button"
-              onClick={() => onBook?.({ email, snack: selectedSnack })}
+              onClick={() => onBook?.()} // ÄNDRAD: ingen payload skickas
               className="
                 h-[48px] w-full rounded-full bg-primary px-10
                 text-[14px] font-extrabold text-accent

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
+// useNavigate;
 import { formatScreeningDate } from "../utils/formatTime";
 import MovieCard from "../parts/MovieCard";
 
@@ -14,14 +15,12 @@ import { useBooking } from "../context/BookingContext";
 import TicketSelector from "../parts/TicketSelector";
 import BookingSnackPanel from "../parts/BookingSnackPanel";
 
-
-
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
     const [movie, setMovie] = useState<Movie | null>(null);
 
-    const navigate = useNavigate(); // NYTT: för att navigera till confirmation
+    // const navigate = useNavigate(); // NYTT: för att navigera till confirmation
 
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
@@ -33,12 +32,13 @@ export default function BookingPage() {
         toggleSeat,
         setOccupied,
         tickets,
+        ticketCount, // nytt från context
+        selectedSnack, //nytt från context
         email,
-        selectedSnack,
+        totalAmount, //nytt från context
+        clearBooking,
     } = useBooking();
 
-    // NYTT: antal biljetter (styr vad som måste vara valt innan man får boka)
-    const ticketCount = tickets.ordinarie + tickets.pensionar + tickets.barn;
 
     useEffect(() => {
         if (!id) return;
@@ -65,9 +65,7 @@ export default function BookingPage() {
                     }
 
                     // Hämta upptagna stolar för denna visning
-                    const occupiedResult = await fetchJson(
-                        `/api/v_occupied_seats?where=screeningId=${id}`
-                    );
+                    const occupiedResult = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`);
                     const occupiedIds = occupiedResult.map((occ: any) => occ.seatId);
 
                     setOccupied(occupiedIds);
@@ -83,32 +81,135 @@ export default function BookingPage() {
     if (!seatArray || !screening || !movie) {
         return <div className="text-white text-center p-10">Laddar...</div>;
     }
+    // 1. Räkna ut offset baserat på salong
+    const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
 
-    // Enkel label-lista av valda säten (seatId). Kan senare göras om till "Rad X, Stol Y".
-    const seatsLabelLines = selectedSeats
+    // 2. Plocka ut den aktuella salongens layout (bör bara finnas en i arrayen)
+    const currentTheater = seatArray[0];
+
+    // 3. Skapa label-strängarna med Rad och Stol
+    const selectedSeatsData = selectedSeats
         .slice()
         .sort((a, b) => a - b)
-        .map((seatId) => `Stol-ID ${seatId}`);
+        .map((seatId) => {
+            const relativeId = seatId - baseIdOffset;
+            let rowNumber = 1;
+            let seatNumberInRow = relativeId;
 
-    // NYTT: validering + navigation när man trycker BOKA
-    const handleBook = () => {
-        if (!email.trim()) {
-            alert("Fyll i din email innan du bokar.");
+            if (currentTheater && currentTheater.seatsPerRow) {
+                let seatsPassed = 0;
+                for (let i = 0; i < currentTheater.seatsPerRow.length; i++) {
+                    const rowCapacity = currentTheater.seatsPerRow[i];
+                    if (relativeId <= seatsPassed + rowCapacity) {
+                        rowNumber = i + 1;
+                        seatNumberInRow = relativeId - seatsPassed;
+                        break;
+                    }
+                    seatsPassed += rowCapacity;
+                }
+            }
+
+            return {
+                id: seatId, // Detta ID använder vi för POST
+                label: `Rad ${rowNumber}, Stol ${seatNumberInRow}` // Detta visar vi i UI
+            };
+        });
+
+    // För att inte krascha dina nuvarande komponenter skapar vi en ren text-array till UI:t
+    const seatsLabelLines = selectedSeatsData.map(s => s.label);
+
+    // Validering + POST till backend när man trycker BOKA
+    const handleBook = async () => {
+        // 1. Valideringar 
+        if (!email.trim() || ticketCount === 0 || selectedSeats.length !== ticketCount) {
+            alert("Kontrollera email och antal valda platser.");
             return;
         }
 
-        if (ticketCount === 0) {
-            alert("Välj minst en biljett innan du bokar.");
-            return;
-        }
+        const ticketTypePool: string[] = [];
+        // Denna kommer att göra om tickets till en flat array, Tex: ['pensionar', 'barn']
+        Object.entries(tickets).forEach(([type, count]) => {
+            // Lägg till typen i listan lika många gånger som count säger
+            for (let i = 0; i < count; i++) {
+                ticketTypePool.push(type);
+            }
+        });
 
-        if (selectedSeats.length !== ticketCount) {
-            alert(`Du måste välja ${ticketCount} plats(er) innan du bokar.`);
-            return;
-        }
+        // 2. Mappa ihop stolarna med biljettyperna, då får vi ut en array som tex denna : [
+        //         {
+        //             "seatId": 130,
+        //                 "ticketType": "pensionar"
+        //         },
+        //         {
+        //             "seatId": 121,
+        //                 "ticketType": "barn"
+        //         }
+        // ]
+        const finalBookingRows = selectedSeats.map((seat, index) => {
+            return {
+                seatId: seat,
+                ticketType: ticketTypePool[index] // Hämta motsvarande typ från poolen
+            };
+        });
+        // 2. Mappning: Översätt text till ID (TicketTypeId)
+        const ticketTypeMap: Record<string, number> = {
+            ordinarie: 1,
+            pensionar: 2,
+            barn: 3
+        };
 
-        // Allt ok -> gå till confirmation
-        navigate("/confirmation");
+        try {
+            // 2. Skapa bokningen
+            const bookingBody = {
+                screeningId: screening.id,
+                email: email.trim().toLowerCase(),
+                snack: selectedSnack,
+                bookingRef: null,
+                totalAmount: totalAmount,
+                status: 1,
+            };
+
+            const resultBookingData = await fetchJson("/api/Booking", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(bookingBody),
+            });
+
+            if (resultBookingData?.error || !resultBookingData?.insertId) {
+                throw new Error(resultBookingData?.error || "Kunde inte skapa bokning");
+            }
+
+            const bookingId = resultBookingData.insertId;
+
+            // 3. Skapa biljetter - Använd for...of för att säkerställa att de körs i ordning
+            // och att vi väntar in alla innan vi går vidare.
+            for (const { seatId, ticketType } of finalBookingRows) {
+                const ticketResult = await fetchJson("/api/Ticket", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        bookingId: bookingId,
+                        screeningId: screening.id,
+                        SeatId: seatId,
+                        TicketType: ticketTypeMap[ticketType],
+                        price: 140
+                    }),
+                });
+
+                if (ticketResult?.error) {
+                    console.error("Fel vid biljett-post:", ticketResult.error);
+                    alert("Något gick fel med bokningen av en av sätena");
+                }
+            }
+
+            // 4. Avsluta
+            clearBooking();
+            // navigate("/confirmation", { state: { bookingId } });
+
+        } catch (err) {
+            console.error("Bokningsfel:", err);
+            alert("Något gick fel vid kommunikation med servern.");
+        }
     };
 
     return (
@@ -146,15 +247,22 @@ export default function BookingPage() {
                 {seatArray.map((theater) => (
                     <section key={theater.id} className="w-full">
                         {theater.seatsPerRow.map((count, rowIndex) => {
-                            const previousSeatsCount = theater.seatsPerRow
+                            // 1. Räkna ut hur många stolar som finns på tidigare rader (alltid start på 0)
+                            const seatsBeforeThisRow = theater.seatsPerRow
                                 .slice(0, rowIndex)
                                 .reduce((acc, curr) => acc + curr, 0);
+
+                            // 2. ID-offset för databasen (81 om det är Lilla Salongen)
+                            const dbOffset = screening.theaterName === "Lilla" ? 81 : 0;
 
                             return (
                                 <div key={`${theater.id}-row-${rowIndex}`} className="w-full">
                                     <Chairs
                                         numberOfSeats={count}
-                                        previousSeatsCount={previousSeatsCount}
+                                        // Här skickar vi ID-basen för logiken (t.ex. 81 + tidigare stolar)
+                                        previousSeatsCount={seatsBeforeThisRow + dbOffset}
+                                        // HÄR ÄR NYCKELN: Vi skickar en ren offset för siffrorna (alltid start på 0)
+                                        visualOffset={seatsBeforeThisRow}
                                         selectedSeats={selectedSeats}
                                         occupiedSeats={occupiedSeats}
                                         onToggle={toggleSeat}
@@ -174,12 +282,8 @@ export default function BookingPage() {
                     <BookingSnackPanel
                         movieTitle={screening.movieTitle} // NYTT: använder rätt titel från screening
                         seatsLabelLines={seatsLabelLines}
-                        onBook={() => {
-                            // NYTT: vi bryr oss inte om payload här, allt finns redan i context
-                            // (selectedSnack finns i context om du vill använda den senare)
-                            void selectedSnack;
-                            handleBook();
-                        }}
+                        // NYTT: BOKA-knappen kör samma handleBook som gör POST till backend
+                        onBook={handleBook}
                     />
                 </div>
             </div>
@@ -188,6 +292,5 @@ export default function BookingPage() {
 }
 
 BookingPage.route = {
-  path: "/booking/:id"
+    path: "/booking/:id"
 };
-

@@ -1,33 +1,64 @@
 import type { ReactNode } from "react";
 import { createContext, useState, useContext, useMemo, useCallback, useEffect } from "react";
-
+// import generate from "../utils/bookingNumberGeneratir";
 import type { BookingContextType } from "../interfaces/Booking";
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
+
+/*==================================
+ENDA KÄLLAN FÖR PRISER ISTÄLLET FÖR UPPREPNING
+====================================*/
+
+const TICKET_PRICES = {
+    ordinarie: 140,
+    pensionar: 120,
+    barn: 90,
+} as const;
+
+const SNACK_PRICES: Record<"large" | "medium" | "small", number> = {
+    large: 189,
+    medium: 149,
+    small: 129,
+};
 
 export function BookingProvider({ children }: { children: ReactNode; }) {
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
     const [occupiedSeats, setOccupiedSeats] = useState<number[]>([]);
 
-    // NYTT: biljetter
-    const [tickets, setTickets] = useState<{
-        ordinarie: number;
-        pensionar: number;
-        barn: number;
-    }>({
+    const [tickets, setTickets] = useState({
         ordinarie: 0,
         pensionar: 0,
         barn: 0,
     });
 
-    // NYTT: snacks
     const [selectedSnack, setSelectedSnack] =
         useState<"large" | "medium" | "small" | null>(null);
 
-    // NYTT: email
+
     const [email, setEmail] = useState<string>("");
 
-    // NYTT: antal biljetter = max antal stolar som får väljas
+    /* "derived values" data som räknas ut från befintliga state/prop värden istället för att lagras separat
+     i egen useState-variabel. För att hålla koden "DRY" så vi håller oss till Single Source of Truth */
+
+    //Antal biljetter
+    const ticketCount = tickets.ordinarie + tickets.pensionar + tickets.barn;
+
+    //Biljett-total
+    const ticketTotal =
+        tickets.ordinarie * TICKET_PRICES.ordinarie +
+        tickets.pensionar * TICKET_PRICES.pensionar +
+        tickets.barn * TICKET_PRICES.barn;
+
+    // Snack-total
+    const snackTotal =
+        selectedSnack ? SNACK_PRICES[selectedSnack] : 0;
+
+    // TOTALT
+    const totalAmount = ticketTotal + snackTotal;
+
+    /*==============================
+    LOGIK FÖR STOLAR
+    ================================*/
     const maxSelectableSeats = tickets.ordinarie + tickets.pensionar + tickets.barn;
 
     const toggleSeat = useCallback((seatId: number) => {
@@ -71,19 +102,26 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
     }, []);
 
     const value = useMemo(() => ({
+        // state
         selectedSeats,
         occupiedSeats,
+        tickets,
+        selectedSnack,
+        email,
+
+        // derived
+        ticketCount,
+        ticketTotal,
+        snackTotal,
+        totalAmount,
+
+        // actions
         toggleSeat,
         setOccupied,
         clearBooking,
-
-        // NYTT
-        tickets,
         setTickets,
-        selectedSnack,
         setSelectedSnack,
-        email,
-        setEmail
+        setEmail,
     }), [
         selectedSeats,
         occupiedSeats,
@@ -92,7 +130,11 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
         clearBooking,
         tickets,
         selectedSnack,
-        email
+        email,
+        ticketCount,
+        ticketTotal,
+        snackTotal,
+        totalAmount,
     ]);
 
     return (
