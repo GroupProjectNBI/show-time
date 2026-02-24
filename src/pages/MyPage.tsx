@@ -7,6 +7,7 @@ import EditableField from "../parts/EditableField";
 import PasswordDisplay from "../parts/PasswordDisplay";
 import AccountActions from "../parts/AccountActions";
 import UsernameField from "../parts/UsernameField";
+import EmailField from "./EmailField";
 
 export default function MyPage() {
   const { user, changePassword, logout } = useAuth();
@@ -46,12 +47,11 @@ export default function MyPage() {
         }}
       />
 
-      <EditableField
-        label="Email"
-        value={user?.email}
-        onSave={(v) => {
-          console.log("Spara ny email:", v);
-          // TODO: API-anrop
+      <EmailField
+        initialValue={user?.email ?? ""}
+        onSave={(newEmail) => {
+          console.log("Spara ny email:", newEmail);
+          //TODO: API-anrop + update user
         }}
       />
 
