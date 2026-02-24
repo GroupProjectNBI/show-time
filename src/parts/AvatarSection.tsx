@@ -34,7 +34,7 @@ export default function AvatarSection({
           src={currentAvatar?.url}
           alt="Avatar"
           onClick={() => setZoom(true)}
-          className="w-24 h-24 rounded-full border border-white/20 cursor-pointer hover:scale-105 transition"
+          className="w-40 h-40 rounded-full border border-white/20 cursor-pointer hover:scale-105 transition"
         />
 
         <button
