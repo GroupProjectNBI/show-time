@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-// useNavigate;
+import { useParams, useNavigate } from "react-router-dom"; // Lade till useNavigate här
 import { formatScreeningDate } from "../utils/formatTime";
 import MovieCard from "../parts/MovieCard";
 import generate from "../utils/bookingNumberGeneratir";
@@ -20,26 +19,25 @@ export default function BookingPage() {
     const [screening, setScreening] = useState<Screening | null>(null);
     const [movie, setMovie] = useState<Movie | null>(null);
 
-    // const navigate = useNavigate(); // NYTT: för att navigera till confirmation
+    const navigate = useNavigate(); // Används för navigering efter bokning
 
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
 
-    // NYTT: hämtar även tickets + email för validering innan navigation
+    // HÄR VAR KONFLIKTEN: Nu hämtar vi allt vi behöver från context
     const {
         selectedSeats,
         occupiedSeats,
         toggleSeat,
         setOccupied,
         tickets,
-        handleCode,
+        handleCode,      // Från HEAD
+        ticketCount,     // Från dev
+        selectedSnack,   // Från dev
         email,
-        // selectedSnack,
-        clearBooking, // NYTT: nollställer context efter lyckad bokning
+        totalAmount,     // Från dev
+        clearBooking,
     } = useBooking();
-
-    // NYTT: antal biljetter (styr vad som måste vara valt innan man får boka)
-    const ticketCount = tickets.ordinarie + tickets.pensionar + tickets.barn;
 
     useEffect(() => {
         if (!id) return;
@@ -119,24 +117,50 @@ export default function BookingPage() {
     // För att inte krascha dina nuvarande komponenter skapar vi en ren text-array till UI:t
     const seatsLabelLines = selectedSeatsData.map(s => s.label);
 
-    // NYTT: validering + POST till backend när man trycker BOKA
+    // Validering + POST till backend när man trycker BOKA
     const handleBook = async () => {
-        // 1. Valideringar (behåll som de är)
+        // 1. Valideringar 
         if (!email.trim() || ticketCount === 0 || selectedSeats.length !== ticketCount) {
             alert("Kontrollera email och antal valda platser.");
             return;
         }
 
+        const ticketTypePool: string[] = [];
+        // Denna kommer att göra om tickets till en flat array, Tex: ['pensionar', 'barn']
+        Object.entries(tickets).forEach(([type, count]) => {
+            // Lägg till typen i listan lika många gånger som count säger
+            for (let i = 0; i < count; i++) {
+                ticketTypePool.push(type);
+            }
+        });
+
+        // 2. Mappa ihop stolarna med biljettyperna
+        const finalBookingRows = selectedSeats.map((seat, index) => {
+            return {
+                seatId: seat,
+                ticketType: ticketTypePool[index] // Hämta motsvarande typ från poolen
+            };
+        });
+
+        // 2. Mappning: Översätt text till ID (TicketTypeId)
+        const ticketTypeMap: Record<string, number> = {
+            ordinarie: 1,
+            pensionar: 2,
+            barn: 3
+        };
+
         try {
             const code = generate();
             handleCode(code);
+
             // 2. Skapa bokningen
+            // Konfliktlöst: Vi använder koden från HEAD men snacks och totalAmount från dev
             const bookingBody = {
                 screeningId: screening.id,
                 email: email.trim().toLowerCase(),
-                snack: "large", /// kunde inte hantera  selectedSnack
-                bookingRef: code,
-                totalAmount: 140 * ticketCount, // Exempel på beräkning
+                snack: selectedSnack, // Från dev
+                bookingRef: code,     // Från HEAD
+                totalAmount: totalAmount, // Från dev
                 status: 1,
             };
 
@@ -153,16 +177,15 @@ export default function BookingPage() {
             const bookingId = resultBookingData.insertId;
 
             // 3. Skapa biljetter - Använd for...of för att säkerställa att de körs i ordning
-            // och att vi väntar in alla innan vi går vidare.
-            for (const seat of selectedSeatsData) {
+            for (const { seatId, ticketType } of finalBookingRows) {
                 const ticketResult = await fetchJson("/api/Ticket", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         bookingId: bookingId,
                         screeningId: screening.id,
-                        SeatId: seat.id,
-                        TicketType: 1, // Här kan du mappa mot tickets.ordinarie etc senare
+                        SeatId: seatId,
+                        TicketType: ticketTypeMap[ticketType],
                         price: 140
                     }),
                 });
@@ -175,7 +198,7 @@ export default function BookingPage() {
 
             // 4. Avsluta
             clearBooking();
-            // navigate("/confirmation", { state: { bookingId } });
+            navigate("/confirmation", { state: { bookingId } });
 
         } catch (err) {
             console.error("Bokningsfel:", err);
@@ -186,8 +209,8 @@ export default function BookingPage() {
     return (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center relative">
             {/*======================
-        MOVIECARD
-      ========================= */}
+            MOVIECARD
+          ========================= */}
             <div className="w-full flex justify-center mb-8">
                 <MovieCard
                     title={screening.movieTitle}
@@ -200,15 +223,15 @@ export default function BookingPage() {
             </div>
 
             {/* =========================
-        TICKET SELECTOR 
-      ========================= */}
+            TICKET SELECTOR 
+          ========================= */}
             <div className="w-full max-w-4xl mb-10">
                 <TicketSelector />
             </div>
 
             {/* =========================
-        STOLSVAL 
-      ========================= */}
+            STOLSVAL 
+          ========================= */}
             <h1 className="text-white text-2xl mb-2">Biograf Layout</h1>
 
             {/* Duken / Scenen */}
@@ -246,8 +269,8 @@ export default function BookingPage() {
             </div>
 
             {/* =========================
-        BOOKING SNACK PANEL 
-      ========================= */}
+            BOOKING SNACK PANEL 
+          ========================= */}
             <div className="w-full flex items-end mt-10">
                 <div className="mx-auto w-full max-w-[1200px] px-6 pb-10">
                     <BookingSnackPanel
