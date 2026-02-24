@@ -1,57 +1,51 @@
-import { useState } from "react";
-import AvatarSelector from "./AvatarSelector";
+import React from "react";
 
 interface Avatar {
     id: number;
     url: string;
 }
 
-interface AvatarSectionProps {
-    currentAvatarId: number;
+interface AvatarSelectorProps {
     avatars: Avatar[];
-    onChange: (id: number) => void;
+    selectedId: number;
+    onSelect: (id: number) => void;
 }
 
-export default function AvatarSection({
-    currentAvatarId,
+// AvatarSelector visar alla tillgängliga profilbilder i en grid.
+// skickar bara tillbaka vilket avatar-id användaren klickade på.
+// Själva sparandet sker i (AvatarSection/MyPage/AuthContext)
+export default function AvatarSelector({
     avatars,
-    onChange
-}: AvatarSectionProps) {
-    const [open, setOpen] = useState(false);
-
-    const currentAvatar = avatars.find(a => a.id === currentAvatarId);
-
+    selectedId,
+    onSelect
+}: AvatarSelectorProps) {
     return (
-        <div className="mb-12">
-            <h2 className="text-2xl font-semibold mb-4">Profilbild</h2>
+        <div className="grid grid-cols-4 gap-3 sm:grid-cols-6 sm:gap-4">
+            {avatars.map((avatar) => {
+                const isSelected = avatar.id === selectedId;
 
-            <div className="flex items-center gap-6">
-                <img
-                    src={currentAvatar?.url}
-                    alt="Avatar"
-                    className="w-24 h-24 rounded-full border border-white/20"
-                />
-
-                <button
-                    onClick={() => setOpen(!open)}
-                    className="px-4 py-2 rounded-full border border-white/20 hover:bg-white/10 transition"
-                >
-                    Byt avatar
-                </button>
-            </div>
-
-            {open && (
-                <div className="mt-6">
-                    <AvatarSelector
-                        avatars={avatars}
-                        selectedId={currentAvatarId}
-                        onSelect={(id) => {
-                            onChange(id);
-                            setOpen(false);
-                        }}
-                    />
-                </div>
-            )}
+                return (
+                    <button
+                        key={avatar.id}
+                        type="button"
+                        // När en avatar klickas skickas id tillbaka till AvatarSection.
+                        // Uppdaterar bara förhandsvalet (inte databasen än).
+                        onClick={() => onSelect(avatar.id)}
+                        className={`
+              rounded-2xl p-2 border transition
+              active:scale-[0.98]
+              ${isSelected ? "border-white/70 bg-white/10" : "border-white/10 hover:bg-white/5"}
+            `}
+                        aria-label={`Välj avatar ${avatar.id}`}
+                    >
+                        <img
+                            src={avatar.url}
+                            alt={`Avatar ${avatar.id}`}
+                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full mx-auto"
+                        />
+                    </button>
+                );
+            })}
         </div>
     );
 }
