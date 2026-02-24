@@ -212,16 +212,17 @@ export default function BookingSnackPanel({
             <button
               type="button"
               disabled={!emailIsValid}
-              onClick={() => onBook?.()} // ÄNDRAD: ingen payload skickas
-              className={[
-                "h-[48px] w-full rounded-full px-10",
-                "text-[14px] font-extrabold transition-all duration-300",
-                "sm:w-auto",
-                emailIsValid
-                  ? "bg-primary text-axxent hover:-translate-y-0.5 aktive:scale-95"
-                  : "bg-primary/40 text-accent/50 cursor-not-allowed",
-              ].join("")}
-
+              onClick={() => onBook?.()}
+              className={`
+              h-[48px] w-full rounded-full px-10
+              text-[14px] font-extrabold
+              transition-all duration-300
+              sm:w-auto
+              bg-primary text-accent
+              ${emailIsValid
+                  ? "hover:-translate-y-0.5 active:scale-95"
+                  : "opacity-50 cursor-not-allowed"}
+            `}
             >
               BOKA
             </button>
