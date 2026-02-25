@@ -39,7 +39,7 @@ public static class DbQuery
 
         db.Close();
     }
-    // IS THIS QUERIES STILL IN USE
+    // IS THIS QUERIES STILL IN USE delete!
     private static void CreateTablesIfNotExist(MySqlConnection db)
     {
         var createTablesSql = @"
@@ -101,7 +101,7 @@ public static class DbQuery
         var command = db.CreateCommand();
 
         // Seed ACL rules
-        command.CommandText = "SELECT COUNT(*) FROM acl"; // IS THIS QUERIES STILL IN USE
+        command.CommandText = "SELECT COUNT(*) FROM acl"; // IS THIS QUERIES STILL IN USE, används
         if (Convert.ToInt32(command.ExecuteScalar()) == 0)
         {
             var aclData = @"

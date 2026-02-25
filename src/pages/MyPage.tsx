@@ -5,7 +5,7 @@ import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
-import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
+//import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
 import AccountActions from "../parts/AccountActions";
 
 export default function MyPage() {

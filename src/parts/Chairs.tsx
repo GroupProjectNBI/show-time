@@ -1,7 +1,6 @@
 interface ChairsProps {
     numberOfSeats: number;
     previousSeatsCount: number;
-    // rowId: number; // <--- LÄGG TILL DENNA RAD! har vi lagt till denna raden? 
     // NYA PROPS:
     visualOffset: number; // <--- LÄGG TILL DENNA I INTERFACET, är detta gjort?
     selectedSeats: number[];    // Lista på alla valda stolar (från context)
@@ -16,7 +15,7 @@ export default function Chairs({
     visualOffset,
     occupiedSeats,
     onToggle,
-    // rowId // <--- LÄGG TILL DENNA OCKSÅ HÄR, ska detta göras?
+
 }: ChairsProps) {
 
     const seats = [...Array(numberOfSeats)];

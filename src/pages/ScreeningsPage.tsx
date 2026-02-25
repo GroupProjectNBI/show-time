@@ -138,7 +138,7 @@ export default function ScreeningsPage() {
 
         {/* HEADER */}
         <div className="mb-8 border-b border-white/10 pb-6">
-          <h1 className="text-2xl font-semibold text-accent uppercase tracking-widest"><Link to="#" onClick={() => create({})} className="shrink-0">Bioprogram</Link></h1>
+          <h1 className="text-2xl font-semibold text-accent uppercase tracking-widest"><Link to="#" className="shrink-0">Bioprogram</Link></h1>
           <p className="mt-1 text-accent/70 max-w-3xl font-light">
             Hitta rätt film för kvällen. Filtrera på genre, salong eller välj ett specifikt datum.
           </p>

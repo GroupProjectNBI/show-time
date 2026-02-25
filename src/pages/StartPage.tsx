@@ -59,28 +59,7 @@ function StartPage() {
       {/* --- BAKGRUNDS-EFFEKT --- */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#680909]/30 via-[#1a1a1a]/80 to-[#1a1a1a] pointer-events-none z-0" />
 
-      {/* --- ALTERNATIV 1: 3D STACK --- */}
-      {/* <div className="w-full text-center mt-4 mb-2 z-20">
-        <span className="bg-white/5 border border-white/10 text-[10px] px-3 py-1 rounded-full uppercase tracking-[0.2em] text-white/40">
-          Alternativ 1: 3D Stack
-        </span>
-      </div>
-      <section className={`${standardWidth} mx-auto mb-16 z-10`}>
-        <MovieCarousel3D popularMovie={popularData} />
-      </section> */}
 
-      {/* --- SEPARATOR --- */}
-      {/* <div className="w-full max-w-4xl border-t border-white/5 my-10 relative z-10" /> */}
-
-      {/* --- ALTERNATIV 2: PLATT KARUSELL --- */}
-      {/* <div className="w-full text-center mb-6 z-20">
-        <span className="bg-white/5 border border-white/10 text-[10px] px-3 py-1 rounded-full uppercase tracking-[0.2em] text-white/40">
-          Alternativ 2: Standard Platt
-        </span>
-      </div>
-      <section className={`${standardWidth} mx-auto mb-24 z-10`}>
-        <MovieCarouselFlat popularMovie={popularData} />
-      </section> */}
 
       {/* KARUSELL-SEKTION */}
       <section className={`${standardWidth} mx-auto mb-16 z-10`}>
