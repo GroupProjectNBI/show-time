@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useBooking } from "../context/BookingContext";
+import { isValidEmail } from "../utils/email";
 
 type Props = {
   movieTitle: string;
@@ -40,6 +41,8 @@ export default function BookingSnackPanel({
 }: Props) {
   const { ticketCount, totalAmount, selectedSnack, setSelectedSnack, email, setEmail } =
     useBooking();
+
+  const emailIsValid = useMemo(() => isValidEmail(email), [email]);
 
   const selected = useMemo(
     () => snackOptions.find((s) => s.key === selectedSnack) ?? null,
@@ -188,6 +191,12 @@ export default function BookingSnackPanel({
                 outline-none
               "
             />
+
+            {email.length > 0 && !emailIsValid && (
+              <div className="mt-1 text-[12px] text-red-500 font-semibold">
+                Ange en giltig emailadress
+              </div>
+            )}
           </div>
 
           <div className="grid gap-2 sm:justify-items-end">
@@ -202,14 +211,18 @@ export default function BookingSnackPanel({
 
             <button
               type="button"
-              onClick={() => onBook?.()} // ÄNDRAD: ingen payload skickas
-              className="
-                h-[48px] w-full rounded-full bg-primary px-10
-                text-[14px] font-extrabold text-accent
-                transition-all duration-300
-                hover:-translate-y-0.5 active:scale-95
-                sm:w-auto
-              "
+              disabled={!emailIsValid}
+              onClick={() => onBook?.()}
+              className={`
+              h-[48px] w-full rounded-full px-10
+              text-[14px] font-extrabold
+              transition-all duration-300
+              sm:w-auto
+              bg-primary text-accent
+              ${emailIsValid
+                  ? "hover:-translate-y-0.5 active:scale-95"
+                  : "opacity-50 cursor-not-allowed"}
+            `}
             >
               BOKA
             </button>
