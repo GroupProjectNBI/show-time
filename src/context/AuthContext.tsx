@@ -111,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         checkLogin();
     }, []);
 
-    //Change password
+    //Change password ?? 
     function changePassword(newPassword: string) {
         console.log("Byter lösenord till:", newPassword);
         //TODO: implementera riktig API-logik

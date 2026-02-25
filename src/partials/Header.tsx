@@ -138,9 +138,6 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
 
               </div>
 
-
-
-
               {/* MOBILE TOGGLE pinned right */}
               <button
                 className="ml-auto md:hidden inline-flex items-center justify-center rounded-full p-2 text-accent hover:bg-white/10"

@@ -1,3 +1,5 @@
+// Kommer denna att användas efter Kiffle är klar?
+
 import { useState } from "react";
 import AvatarSelector from "./AvatarSelector";
 
@@ -58,7 +60,7 @@ export default function AvatarSection({
         </div>
       )}
 
-      {/* --- UTFÄLLBAR AVATAR-PICKER --- */}
+      {/* --- UTFÄLLBAR AVATAR-PICKER --- HÄMTA FRÅN DATABAS*/}
       {open && (
         <div className="mt-6 p-4 rounded-xl bg-white/5 border border-white/10">
           <AvatarSelector

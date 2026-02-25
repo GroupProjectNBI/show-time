@@ -1,3 +1,6 @@
+//anvönds denna? 
+
+
 import type { SortOption } from '../utils/productPageHelpers';
 import { useLoaderData } from 'react-router-dom';
 import { Row, Col, Form } from 'react-bootstrap';

@@ -96,7 +96,7 @@ export default function UpcomingBookingCard({
             )}
           </div>
 
-          {/* Actions */}
+          {/* Actions -- hur hittar denna QR-koden?*/}
           {(onViewTicket || onCancel) && (
             <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
               {onViewTicket && (

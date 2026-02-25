@@ -1,3 +1,5 @@
+//Ska vi bygga mer logik i denna? 
+
 type FooterProps = {
   openMembership: () => void;
 };

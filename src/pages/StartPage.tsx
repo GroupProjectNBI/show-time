@@ -52,7 +52,7 @@ function StartPage() {
       </div>
     );
   }
-
+  //Ska något av detta nedanför rensas? 
   return (
     <div className="min-h-screen flex flex-col items-center bg-[#1a1a1a] text-white pb-40 pt-6 relative overflow-x-hidden">
 

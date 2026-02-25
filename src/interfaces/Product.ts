@@ -1,3 +1,5 @@
+// Ska detta finnas kvar, då det står products? 
+
 export default interface Product {
   id: number;
   name: string;
@@ -7,3 +9,4 @@ export default interface Product {
   description: string;
   categories: string[];
 }
+

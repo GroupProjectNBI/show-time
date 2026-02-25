@@ -1,3 +1,5 @@
+//Kolla med databs
+
 import { useState } from "react";
 import AvatarSelector from "./AvatarSelector";
 

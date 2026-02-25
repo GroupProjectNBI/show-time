@@ -1,3 +1,5 @@
+//ska det finnas alternativ till barnfilm i filtrering?
+
 import { useState, useEffect, useMemo } from "react";
 import fetchJson from "../utils/fetchJson";
 import ScreeningsList from "../parts/ScreeningsList";
@@ -256,7 +258,7 @@ export default function ScreeningsPage() {
     </div>
   );
 }
-
+//Är denna den mest optimala? 
 ScreeningsPage.route = {
   path: "/screenings",
   menuLabel: "Gå på bio",

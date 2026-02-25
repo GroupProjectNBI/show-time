@@ -103,7 +103,7 @@ function MovieInfo() {
                         {/* --- VÄNSTER (Poster) --- */}
                         <div className="flex flex-col items-center lg:items-start lg:sticky lg:top-24">
                             <div className="relative w-[240px] md:w-[300px] lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group bg-black">   {/* group för hover-effekt, bg-black för att undvika de grå kanterna */}
-                            
+
 
                                 {/* Bakgrundsposter (fyller boxen så inga grå ytor syns) */}
                                 <img
@@ -114,7 +114,7 @@ function MovieInfo() {
                                 />
                                 {/* Suddig bakgrund fyller hela boxen så inga tomma/grå ytor syns */}
 
-                                
+
                                 <img
                                     src={`/images/posters/${movie.movieId}.webp`}
                                     className={`relative z-10 w-full h-full object-${posterFit} transition-transform duration-700 group-hover:scale-105 ${posterFit === "cover" ? "scale-[1.08]" : ""}`}
@@ -263,7 +263,7 @@ function MovieInfo() {
         </div>
     );
 }
-
+// Är detta den mest optimala? 
 export default MovieInfo;
 
 MovieInfo.route = {

@@ -45,7 +45,7 @@ export default function BookingSnackPanel({
     () => snackOptions.find((s) => s.key === selectedSnack) ?? null,
     [selectedSnack]
   );
-
+  //'snacksPrice' is declared but its value is never read.
   const snacksPrice = selected ? selected.prebookPrice : 0;
 
   const imageSrc = snackImageUrl || "/images/Commercials/popga.jpg";

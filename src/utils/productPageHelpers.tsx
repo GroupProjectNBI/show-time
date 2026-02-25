@@ -1,3 +1,5 @@
+//är detta något vi använder, med tanke på vad filen heter
+
 import type Product from '../interfaces/Product';
 
 export interface SortOption {

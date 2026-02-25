@@ -5,7 +5,7 @@ import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
-import PasswordDisplay from "../parts/PasswordDisplay";
+import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
 import AccountActions from "../parts/AccountActions";
 
 export default function MyPage() {
@@ -14,7 +14,7 @@ export default function MyPage() {
   const bookings: any[] = [];
 
   const avatarList = [
-    { id: 1, url: "/avatars/1.png" },
+    { id: 1, url: "/avatars/1.png" }, //connecta från databasen
     { id: 2, url: "/avatars/2.png" },
     { id: 3, url: "/avatars/3.png" },
     { id: 4, url: "/avatars/4.png" },
@@ -64,7 +64,7 @@ export default function MyPage() {
 
       </div>
 
-      {/* ---------------- BOOKINGS ---------------- */}
+      {/* ---------------- BOOKINGS ----------------göra denna dynamisk */}
       <h2 className="text-2xl font-semibold mt-16 mb-4">Kommande bokningar</h2>
 
       {bookings.length === 0 && (

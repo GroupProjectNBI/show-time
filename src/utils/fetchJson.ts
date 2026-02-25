@@ -1,4 +1,4 @@
-/*
+/*  Mycket ut kommenterat, ska det vara så här eller ska detta raderas?
    fetchJson(url, [options])
 
    if you're making a delete (/api/animals/1), options: {method: 'DELETE'}

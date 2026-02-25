@@ -15,3 +15,6 @@ export default function NotFoundPage() {
     <p>Please <Link to="/">visit the start page</Link> instead.</p>
   </>;
 }
+
+
+// Uppdatera till en snyggare version

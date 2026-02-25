@@ -1,3 +1,6 @@
+// Ska vi bygga ut mer logik i denna? 
+
+// Är detta den mest optimala?
 WorkWithUs.route = {
   path: '/jobba-hos-oss',
   index: -1 // ska inte synas i headern

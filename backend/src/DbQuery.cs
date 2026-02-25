@@ -6,7 +6,7 @@ public static class DbQuery
     private static string connectionString;
 
     // JSON columns for _CONTAINS_ validation
-    public static Arr JsonColumns = Arr(new[] { "categories" });
+    public static Arr JsonColumns = Arr(new[] { "categories" }); //CATEGORIES? 
 
     public static bool IsJsonColumn(string column) => JsonColumns.Includes(column);
 
@@ -39,7 +39,7 @@ public static class DbQuery
 
         db.Close();
     }
-
+    // IS THIS QUERIES STILL IN USE
     private static void CreateTablesIfNotExist(MySqlConnection db)
     {
         var createTablesSql = @"
@@ -101,7 +101,7 @@ public static class DbQuery
         var command = db.CreateCommand();
 
         // Seed ACL rules
-        command.CommandText = "SELECT COUNT(*) FROM acl";
+        command.CommandText = "SELECT COUNT(*) FROM acl"; // IS THIS QUERIES STILL IN USE
         if (Convert.ToInt32(command.ExecuteScalar()) == 0)
         {
             var aclData = @"
@@ -120,7 +120,7 @@ public static class DbQuery
         }
 
         // Seed users
-        command.CommandText = "SELECT COUNT(*) FROM users";
+        command.CommandText = "SELECT COUNT(*) FROM users"; // IS THIS QUERIES STILL IN USE
         if (Convert.ToInt32(command.ExecuteScalar()) == 0)
         {
             var usersData = @"
@@ -134,7 +134,7 @@ public static class DbQuery
         }
 
         // Seed products
-        command.CommandText = "SELECT COUNT(*) FROM products";
+        command.CommandText = "SELECT COUNT(*) FROM products"; // IS THIS QUERIES STILL IN USE
         if (Convert.ToInt32(command.ExecuteScalar()) == 0)
         {
             var productsData = new List<string>

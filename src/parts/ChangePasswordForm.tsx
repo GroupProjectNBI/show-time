@@ -1,3 +1,4 @@
+//Ska denna kopplas till databas
 import { useState } from "react";
 
 type Props = {

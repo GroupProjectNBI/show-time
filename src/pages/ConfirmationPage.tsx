@@ -148,7 +148,7 @@ function ConfirmationPage() {
     </div>
   );
 }
-
+// Är detta det mest optimala sättet? 
 ConfirmationPage.route = {
   path: "/confirmation",
   menuLabel: "Confirmation",

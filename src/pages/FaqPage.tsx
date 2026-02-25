@@ -1,3 +1,4 @@
+// ör detta det mest optimala sättet? 
 import { useState } from "react";
 FAQPage.route = {
   path: "/faq",

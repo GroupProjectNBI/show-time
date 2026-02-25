@@ -1,3 +1,5 @@
+//Mycket kommentarer för lite kod
+
 import { Link } from "react-router-dom"; // För att kunna navigera till filmsidan utan att ladda om hela sidan
 import Carousel from "react-multi-carousel"; // Själva karusell-komponenten
 import "react-multi-carousel/lib/styles.css"; // Standard-CSS för att karusellen ska fungera (viktig!)

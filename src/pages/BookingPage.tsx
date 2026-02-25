@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-// useNavigate;
+// useNavigate; ska denna vara kavr? 
 import { formatScreeningDate } from "../utils/formatTime";
 import MovieCard from "../parts/MovieCard";
 
@@ -20,7 +20,7 @@ export default function BookingPage() {
     const [screening, setScreening] = useState<Screening | null>(null);
     const [movie, setMovie] = useState<Movie | null>(null);
 
-    // const navigate = useNavigate(); // NYTT: för att navigera till confirmation
+    // const navigate = useNavigate(); // NYTT: för att navigera till confirmation, (vart finns denna? )
 
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
@@ -148,7 +148,7 @@ export default function BookingPage() {
         const finalBookingRows = selectedSeats.map((seat, index) => {
             return {
                 seatId: seat,
-                ticketType: ticketTypePool[index] // Hämta motsvarande typ från poolen
+                ticketType: ticketTypePool[index] // Hämta motsvarande typ från poolen, (är detta fixat?)
             };
         });
         // 2. Mappning: Översätt text till ID (TicketTypeId)
@@ -182,7 +182,7 @@ export default function BookingPage() {
             const bookingId = resultBookingData.insertId;
 
             // 3. Skapa biljetter - Använd for...of för att säkerställa att de körs i ordning
-            // och att vi väntar in alla innan vi går vidare.
+            // och att vi väntar in alla innan vi går vidare. (är detta kontrollerat?)
             for (const { seatId, ticketType } of finalBookingRows) {
                 const ticketResult = await fetchJson("/api/Ticket", {
                     method: "POST",

@@ -9,17 +9,17 @@ export default function EmailField({ initialValue, onSave }: EmailFieldProps) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(initialValue);
   const [draft, setDraft] = useState(initialValue);
-
+  //'startEditing' is declared but its value is never read.
   const startEditing = () => {
     setDraft(value);
     setEditing(true);
   };
-
+  //'cancelEditing' is declared but its value is never read.
   const cancelEditing = () => {
     setDraft(value);
     setEditing(false);
   };
-
+  //'confirmEditing' is declared but its value is never read.
   const confirmEditing = () => {
     setValue(draft);
     onSave(draft);
