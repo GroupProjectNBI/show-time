@@ -1,15 +1,20 @@
 export default function generate() {
-    let confNum = '';
-    while (confNum.length < 6) {
-        confNum += randomCharacterFromString(
-            confNum.length < 3 ?
-                'ABCDEFGHIJKLMNOPQRSTUVWXYZ' :
-                '0123456789'
-        )
-    }
-    return confNum;
-}
+    let letters = '';
+    let numbers = '';
 
-function randomCharacterFromString(str: string) {
-    return str[Math.floor(Math.random() * str.length)];
+    const letterChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numberChars = '0123456789';
+
+    // Slumpa 3 bokstäver
+    while (letters.length < 3) {
+        letters += letterChars[Math.floor(Math.random() * letterChars.length)];
+    }
+
+    // Slumpa 3 siffror
+    while (numbers.length < 3) {
+        numbers += numberChars[Math.floor(Math.random() * numberChars.length)];
+    }
+
+    // Returnera med bindestreck
+    return `${letters}-${numbers}`;
 }

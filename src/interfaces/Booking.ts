@@ -17,7 +17,6 @@ export interface BookingContextType {
 
     // Snacks
     selectedSnack: "large" | "medium" | "small" | null;
-
     // Kontakt
     email: string;
 
@@ -58,4 +57,21 @@ export interface BookingContextType {
 
     // Email
     setEmail: (value: string) => void;
+}
+
+
+// Datatyper som matchar databasen
+export interface BookingData {
+    id: number;
+    bookingRef: string;
+    email: string;
+    totalAmount: number;
+    snack: string; // Här kommer "large", "medium" eller "small" från DB
+}
+
+export interface TicketData {
+    id: number;
+    seatId: number;
+    ticketType: number;
+    price: number;
 }
