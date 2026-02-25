@@ -71,14 +71,9 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                         to={path}
                         aria-current={active ? "page" : undefined}
                         className={[
-                          // hover with a ''pill'' look
                           "rounded-full px-4 py-1.5 text-base font-semibold transition duration-200",
                           "hover:bg-white/5",
-
-                          // colors: active full accent, others dim
                           active ? "text-accent" : "text-accent/60 hover:text-accent/90",
-
-                          // active indicator: ONLY shadow under (no bg, no pill highlight)
                           active ? "bg-transparent shadow-none drop-shadow-[0_12px_16px_rgba(0,0,0,0.55)]" : "",
                         ].join(" ")}
                         onClick={() => setExpanded(false)}
@@ -87,28 +82,63 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                       </Link>
                     );
                   })}
+
+                  {/* --- NY PLACERING: Bli medlem / Min sida --- */}
+                  {!user && (
+                    <button
+                      onClick={openMembership}
+                      className="rounded-full px-4 py-1.5 text-base font-semibold text-accent/60 hover:text-accent/90 hover:bg-white/5 transition"
+                    >
+                      Bli medlem
+                    </button>
+                  )}
+
+                  {user && (
+                    <Link
+                      to="/min-sida"
+                      className="rounded-full px-4 py-1.5 text-base font-semibold text-accent/60 hover:text-accent/90 hover:bg-white/5 transition"
+                    >
+                      Min sida
+                    </Link>
+                  )}
                 </nav>
+
               </div>
 
-              {/* RIGHT: login pinned right */}
-              {
-                user ? <div className="ml-auto hidden md:block">
-                  <Link to="#" onClick={() => logout()} className="shrink-0"><p> <img src={user.avatar} className="w-10 h-10" alt="" /> Logout: {user.userName}</p></Link>
+              {/* RIGHT: login/logout only */}
+              <div className="ml-auto hidden md:flex items-center gap-4">
 
-                </div> : <div className="ml-auto hidden md:block">
-                  <button onClick={openLogin} className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary" >
+                {/* INLOGGAD */}
+                {user && (
+                  <>
+                    <button
+                      onClick={logout}
+                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
+                    >
+                      Logga ut
+                    </button>
+
+                    <img
+                      src={user.avatar}
+                      className="w-10 h-10 rounded-full border border-white/20"
+                      alt="avatar"
+                    />
+                  </>
+                )}
+
+                {/* UTLOGGAD */}
+                {!user && (
+                  <button
+                    onClick={openLogin}
+                    className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
+                  >
                     Logga in
                   </button>
-                  <button
-                    onClick={openMembership}
-                    className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary ml-4"
-                  >
-                    Bli medlem
-                  </button>
+                )}
 
-                </div>
+              </div>
 
-              }
+
 
 
               {/* MOBILE TOGGLE pinned right */}
@@ -131,7 +161,9 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
           {/* MOBILE MENU: separate dropdown panel */}
           <div id="mobile-nav" className={expanded ? "block md:hidden" : "hidden"}>
             <div className="mt-3 rounded-2xl bg-primary shadow-[0_18px_40px_rgba(0,0,0,0.55)] ring-1 ring-white/10">
-              <nav className="space-y-1 p-3" aria-label="Huvudmeny mobil">
+              <nav className="space-y-1 p-3 text-center" aria-label="Huvudmeny mobil">
+
+                {/* MENY-LÄNKAR (centrerade) */}
                 {menuRoutes.map(({ menuLabel, path }, i) => {
                   const active = isActive(path);
 
@@ -142,15 +174,10 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                       onClick={closeMenu}
                       className={[
                         "block w-full rounded-xl px-4 py-3 text-base font-semibold transition",
-
-                        // hover can have a soft background
                         "hover:bg-white/10",
-
-                        // dim others, keep active full accent
                         active ? "text-accent" : "text-accent/70 hover:text-accent",
-
-                        // active: shadow under
                         active ? "bg-transparent shadow-none drop-shadow-[0_12px_16px_rgba(0,0,0,0.55)]" : "",
+                        "text-center"
                       ].join(" ")}
                     >
                       {menuLabel}
@@ -158,36 +185,49 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                   );
                 })}
 
-
-                {!user ? (
+                {/* --- INTE INLOGGAD --- */}
+                {!user && (
                   <>
                     <button
-                      onClick={() => { openLogin(); closeMenu(); }}
-                      className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
-                    >
-                      Logga in
-                    </button>
-
-                    <button
                       onClick={() => { openMembership(); closeMenu(); }}
-                      className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
                     >
                       Bli medlem
                     </button>
+
+                    <button
+                      onClick={() => { openLogin(); closeMenu(); }}
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
+                    >
+                      Logga in
+                    </button>
                   </>
-                ) : (
-                  <button
-                    onClick={() => { logout(); closeMenu(); }}
-                    className="block w-full rounded-xl px-4 py-3 text-base font-semibold text-accent/70 transition hover:bg-white/10"
-                  >
-                    Logout: {user.userName}
-                  </button>
                 )}
 
+                {/* --- INLOGGAD --- */}
+                {user && (
+                  <>
+                    <Link
+                      to="/mypage"
+                      onClick={closeMenu}
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
+                    >
+                      Min sida
+                    </Link>
+
+                    <button
+                      onClick={() => { logout(); closeMenu(); }}
+                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
+                    >
+                      Logga ut
+                    </button>
+                  </>
+                )}
 
               </nav>
             </div>
           </div>
+
         </div>
       </div >
     </header >
