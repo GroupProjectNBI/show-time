@@ -166,7 +166,7 @@ export default function BookingPage() {
                 screeningId: screening.id,
                 email: cleanedEmail, //normaliserad email
                 snack: selectedSnack,
-                bookingRef: null,
+                bookingRef: code,
                 totalAmount: totalAmount,
                 status: 1,
             };
