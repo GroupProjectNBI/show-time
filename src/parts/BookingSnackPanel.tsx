@@ -47,7 +47,7 @@ export default function BookingSnackPanel({
   );
 
   const snacksPrice = selected ? selected.prebookPrice : 0;
-
+  console.log(snacksPrice, "den bygger inte pga att snacksPrice inte används någonstans. Har vi tagit bort det eller ?? ");
   const imageSrc = snackImageUrl || "/images/Commercials/popga.jpg";
 
   return (
