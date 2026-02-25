@@ -145,7 +145,7 @@ export default function ScreeningsPage() {
         {/* KONTROLLPANEL */}
         <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:gap-4">
 
-          <div className="relative">
+          <div className="relative z-20">
             <DateDropdown
               valueISO={selectedDateISO}
               onChange={setSelectedDateISO}
