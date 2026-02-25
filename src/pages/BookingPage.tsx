@@ -31,11 +31,10 @@ export default function BookingPage() {
         toggleSeat,
         setOccupied,
         tickets,
-        handleCode,      // Från HEAD
-        ticketCount,     // Från dev
-        selectedSnack,   // Från dev
+        ticketCount,
+        selectedSnack,
         email,
-        totalAmount,     // Från dev
+        totalAmount,
         clearBooking,
     } = useBooking();
 
@@ -151,7 +150,6 @@ export default function BookingPage() {
 
         try {
             const code = generate();
-            handleCode(code);
 
             // 2. Skapa bokningen
             // Konfliktlöst: Vi använder koden från HEAD men snacks och totalAmount från dev
