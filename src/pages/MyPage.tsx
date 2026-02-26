@@ -13,12 +13,7 @@ export default function MyPage() {
 
   const bookings: any[] = [];
 
-  const avatarList = [
-    { id: 1, url: "/avatars/1.png" }, //connecta från databasen
-    { id: 2, url: "/avatars/2.png" },
-    { id: 3, url: "/avatars/3.png" },
-    { id: 4, url: "/avatars/4.png" },
-  ];
+
 
   return (
     <div className="max-w-5xl mx-auto mt-32 px-4 pb-20 text-accent">
