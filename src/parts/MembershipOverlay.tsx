@@ -92,11 +92,11 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
         <h2 className="text-accent text-xl font-bold mb-4 text-center uppercase tracking-widest">Bli medlem</h2>
 
         {/* HÄR ANVÄNDER VI DEN NYA KOMPONENTEN */}
-        <AvatarSelector
+        {/* <AvatarSelector
           avatars={avatars}
           selectedId={formData.avatarUrl}
           onSelect={(id) => setFormData(prev => ({ ...prev, avatarUrl: id }))}
-        />
+        /> */}
 
         {error && (
           <p className="text-red-200 bg-red-500/20 border border-red-500/50 p-2 rounded-lg text-xs text-center mb-4 italic">
