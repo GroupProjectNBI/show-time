@@ -34,11 +34,13 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
     const [selectedSnack, setSelectedSnack] =
         useState<"large" | "medium" | "small" | null>(null);
 
-
     const [email, setEmail] = useState<string>("");
 
+
+    // NYTT: antal biljetter = max antal stolar som får väljas
+
     /* "derived values" data som räknas ut från befintliga state/prop värden istället för att lagras separat
-     i egen useState-variabel. För att hålla koden "DRY" så vi håller oss till Single Source of Truth */
+      i egen useState-variabel. För att hålla koden "DRY" så vi håller oss till Single Source of Truth */
 
     //Antal biljetter
     const ticketCount = tickets.ordinarie + tickets.pensionar + tickets.barn;
@@ -119,6 +121,7 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
         toggleSeat,
         setOccupied,
         clearBooking,
+
         setTickets,
         setSelectedSnack,
         setEmail,
