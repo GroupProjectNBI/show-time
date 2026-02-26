@@ -45,13 +45,13 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
         console.error("Kunde inte hänta avatarer", err);
       }
     }
-    getAvatars()
-  }, [])
+    getAvatars();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,12 +91,13 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
 
         <h2 className="text-accent text-xl font-bold mb-4 text-center uppercase tracking-widest">Bli medlem</h2>
 
-        {/* HÄR ANVÄNDER VI DEN NYA KOMPONENTEN */}
-        {/* <AvatarSelector
+        {/* HÄR ANVÄNDER VI DEN NYA KOMPONENTEN----- Type '{ avatars: Avatar[]; selectedId: number; onSelect: (id: any) => void; }' is not assignable to type 'IntrinsicAttributes & AvatarSectionProps'.
+  Property 'selectedId' does not exist on type 'IntrinsicAttributes & AvatarSectionProps'.--- Parameter 'id' implicitly has an 'any' type.*/}
+        <AvatarSelector
           avatars={avatars}
           selectedId={formData.avatarUrl}
           onSelect={(id) => setFormData(prev => ({ ...prev, avatarUrl: id }))}
-        /> */}
+        />
 
         {error && (
           <p className="text-red-200 bg-red-500/20 border border-red-500/50 p-2 rounded-lg text-xs text-center mb-4 italic">

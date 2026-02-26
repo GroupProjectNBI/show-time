@@ -6,32 +6,46 @@ type Props = {
   movieTitle: string;
   seatsLabelLines: string[];
   snackImageUrl?: string;
-  onBook?: () => void; // ÄNDRAD: tar inte längre payload
+  onBook?: () => void;
 };
 
 const snackOptions = [
   {
     key: "large" as const,
     title: "Stora menyn",
-    desc: "Tre stora popcorn, tre utvalda snacks och tre stora drycker",
-    prebookPrice: 189,
-    onSitePrice: 250,
+    base: { popcorn: 1, snacks: 1, drinks: 1 },
+    pricePerPerson: 63,
+    onSitePricePerPerson: 83.33,
   },
   {
     key: "medium" as const,
     title: "Mellan menyn",
-    desc: "Tre mellan popcorn, två utvalda snacks och tre medium drycker",
-    prebookPrice: 149,
-    onSitePrice: 210,
+    base: { popcorn: 1, snacks: 1, drinks: 1 },
+    pricePerPerson: 49.666,
+    onSitePricePerPerson: 70,
   },
   {
     key: "small" as const,
     title: "Lilla menyn",
-    desc: "Tre små popcorn och tre medium drycker",
-    prebookPrice: 129,
-    onSitePrice: 170,
+    base: { popcorn: 1, snacks: 0, drinks: 1 },
+    pricePerPerson: 43,
+    onSitePricePerPerson: 59.66,
   },
 ];
+
+function getDynamicDesc(opt: typeof snackOptions[number], ticketCount: number) {
+  const p = opt.base.popcorn * ticketCount;
+  const s = opt.base.snacks * ticketCount;
+  const d = opt.base.drinks * ticketCount;
+
+  const parts = [];
+  if (p > 0) parts.push(`${p} popcorn`);
+  if (s > 0) parts.push(`${s} snacks`);
+  if (d > 0) parts.push(`${d} dryck${d > 1 ? "er" : ""}`);
+
+  return parts.join(", ");
+}
+
 
 export default function BookingSnackPanel({
   movieTitle,
@@ -49,9 +63,9 @@ export default function BookingSnackPanel({
     [selectedSnack]
   );
 
-  const snacksPrice = selected ? selected.prebookPrice : 0;
-  console.log(snacksPrice, "den bygger inte pga att snacksPrice inte används någonstans. Har vi tagit bort det eller ?? ");
-  const imageSrc = snackImageUrl || "/images/Commercials/popga.jpg";
+  const snacksPrice = selected ? selected.pricePerPerson * ticketCount : 0;
+
+  const imageSrc = snackImageUrl || "images/Commercials/popga.jpg";
 
   return (
     <div className="w-full">
@@ -145,17 +159,21 @@ export default function BookingSnackPanel({
                             <div className="text-[14px] font-semibold text-accent leading-tight">
                               {opt.title}
                             </div>
+
+                            {/* ⭐ Dynamisk beskrivning */}
                             <div className="text-[12px] text-accent/70 leading-snug">
-                              {opt.desc}
+                              {getDynamicDesc(opt, ticketCount)}
                             </div>
                           </div>
 
                           <div className="sm:text-right">
+                            {/* ⭐ Dynamiskt pris */}
                             <div className="text-[13px] font-semibold text-accent tabular-nums">
-                              {opt.prebookPrice.toFixed(0)} kr
+                              {(opt.pricePerPerson * ticketCount).toFixed(0)} kr
                             </div>
+
                             <div className="text-[11px] text-accent/60 tabular-nums">
-                              På plats: {opt.onSitePrice} kr
+                              På plats: {(opt.onSitePricePerPerson * ticketCount).toFixed(0)} kr
                             </div>
                           </div>
                         </div>
