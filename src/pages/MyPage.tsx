@@ -2,7 +2,7 @@ import { useAuth } from "../context/AuthContext";
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 
-import AvatarSection from "../parts/AvatarSection";
+//import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
 //import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
@@ -52,15 +52,7 @@ export default function MyPage() {
         </div>
 
         {/* -------- RIGHT COLUMN -------- */}
-        <div className="flex justify-center md:justify-end">
-          <AvatarSection
-            currentAvatarId={user?.avatarUrl ?? 1}
-            avatars={avatarList}
-            onChange={(newId) => {
-              console.log("Byt avatar till:", newId);
-            }}
-          />
-        </div>
+
 
       </div>
 
