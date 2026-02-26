@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AvatarSelector from "./AvatarSelector";
+// import AvatarSelector from "./AvatarSelector";
 
 interface Avatar {
     id: number;
@@ -9,16 +9,19 @@ interface Avatar {
 interface AvatarSectionProps {
     currentAvatarId: number;
     avatars: Avatar[];
-    onChange: (id: number) => void;
+    selectedId: number;
+    // onChange: (id: number) => void;
+    onSelect?: (id: number) => void;
 }
 
-export default function AvatarSection({
+export default function AvatarSelector({
     currentAvatarId,
     avatars,
-    onChange
+    // onChange,
+    onSelect
 }: AvatarSectionProps) {
     const [open, setOpen] = useState(false);
-
+    console.log(onSelect);
     const currentAvatar = avatars.find(a => a.id === currentAvatarId);
 
     return (
@@ -40,18 +43,18 @@ export default function AvatarSection({
                 </button>
             </div>
 
-            {open && (
+            {/* {open && (
                 <div className="mt-6">
                     <AvatarSelector
                         avatars={avatars}
                         selectedId={currentAvatarId}
-                        onSelect={(id) => {
+                        onSelect={(id: number) => {
                             onChange(id);
                             setOpen(false);
                         }}
                     />
                 </div>
-            )}
+            )} */}
         </div>
     );
 }

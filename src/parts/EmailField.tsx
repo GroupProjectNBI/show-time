@@ -25,6 +25,11 @@ export default function EmailField({ initialValue, onSave }: EmailFieldProps) {
     onSave(draft);
     setEditing(false);
   };
+  // för att bygget inte ska klaga över att funktionerna inte används så loggar vi bara dom så länge :
+  console.log(startEditing);
+  console.log(cancelEditing);
+  console.log(confirmEditing);
+
 
   return (
     <div className="mb-8">

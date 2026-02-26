@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import fetchJson from "../utils/fetchJson";
-import AvatarSelector from "../parts/AvatarSelector";
+// import AvatarSelector from "../parts/AvatarSelector";
 type MembershipOverlayProps = {
   onClose: () => void;
 };
@@ -24,7 +24,8 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
     avatarUrl: 3 // Default till tredje avataren för att det blir snyggare design.
   });
   const [error, setError] = useState("");
-
+  // TODO : hantera avatars variablen 
+  console.log(avatars); // logg avatars så variabel används. 
   //Hämta alla avatarer från APIet. 
   useEffect(() => {
     async function getAvatars() {

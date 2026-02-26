@@ -5,7 +5,7 @@ import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
-import PasswordDisplay from "../parts/PasswordDisplay";
+// import PasswordDisplay from "../parts/PasswordDisplay"; //  <-- det används ingenstans så jag kommenterar bort denna så länge
 import AccountActions from "../parts/AccountActions";
 
 export default function MyPage() {
@@ -56,6 +56,7 @@ export default function MyPage() {
           <AvatarSection
             currentAvatarId={user?.avatarUrl ?? 1}
             avatars={avatarList}
+            selectedId={user?.avatarUrl ?? 1}  // fallback till user avatarUrl id 1 
             onChange={(newId) => {
               console.log("Byt avatar till:", newId);
             }}
@@ -72,6 +73,7 @@ export default function MyPage() {
       )}
 
       <UpcomingBookingCard
+        id={1}
         title="Dune: Messiah"
         dateLabel="Lör 14 mars 2026"
         timeLabel="19:30"

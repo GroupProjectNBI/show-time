@@ -1,6 +1,7 @@
 import { Calendar, Clock, MapPin, Ticket, Armchair, QrCode, X } from "lucide-react";
 
 type UpcomingBookingCardProps = {
+  id: number;
   title: string;
   dateLabel: string;
   timeLabel: string;
@@ -11,13 +12,14 @@ type UpcomingBookingCardProps = {
 
   // Actions för senare kanske 
   onViewTicket?: () => void; // Öppna QR-kod 
-  onCancel?: () => void; // Anropa cancelbooking(id()
+  onCancel?: (id: number) => void; // Anropa cancelbooking(id()
 
 
   cancelDisabled?: boolean; // Låsa avbokning nära start
 };
 
 export default function UpcomingBookingCard({
+  id,
   title,
   dateLabel,
   timeLabel,
@@ -113,7 +115,7 @@ export default function UpcomingBookingCard({
               {onCancel && (
                 <button
                   type="button"
-                  onClick={onCancel}
+                  onClick={() => onCancel(id)}
                   disabled={cancelDisabled}
                   className="
                   inline-flex items-center justify-center gap-2

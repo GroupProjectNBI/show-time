@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AvatarSelector from "./AvatarSelector";
+// import AvatarSelectorChild from "./AvatarSelector";
 
 interface Avatar {
   id: number;
@@ -9,21 +9,23 @@ interface Avatar {
 interface AvatarSectionProps {
   currentAvatarId: number;
   avatars: Avatar[];
+  selectedId: number;
   onChange: (id: number) => void;
 }
 
 export default function AvatarSection({
   currentAvatarId,
   avatars,
-  onChange
+  onChange,
+  selectedId
 }: AvatarSectionProps) {
   const [open, setOpen] = useState(false);
   const [previewId, setPreviewId] = useState<number>(currentAvatarId);
   const [zoom, setZoom] = useState(false);
-
+  console.log("Initial selectedId from props:", selectedId);
   const currentAvatar = avatars.find(a => a.id === currentAvatarId);
-  const previewAvatar = avatars.find(a => a.id === previewId);
-
+  // const previewAvatar = avatars.find(a => a.id === previewId);  // <-- vi använder inte denna funktionen
+  setPreviewId(1);
   return (
     <div className="mb-12">
       <h2 className="text-2xl font-semibold mb-4">Profilbild</h2>
@@ -61,11 +63,11 @@ export default function AvatarSection({
       {/* --- UTFÄLLBAR AVATAR-PICKER --- */}
       {open && (
         <div className="mt-6 p-4 rounded-xl bg-white/5 border border-white/10">
-          <AvatarSelector
+          {/* <AvatarSelectorChild
             avatars={avatars}
             selectedId={previewId}
-            onSelect={(id) => setPreviewId(id)}
-          />
+            onSelect={(id: number) => setPreviewId(id)}
+          /> */}
 
           {/* BEKRÄFTA-KNAPP */}
           <div className="flex justify-end mt-4">
