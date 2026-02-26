@@ -4,10 +4,7 @@ import { createElement } from 'react';
 // page components
 import AboutPage from './pages/AboutPage.tsx';
 import NotFoundPage from './pages/NotFoundPage.tsx';
-import OurVisionPage from './pages/OurVisionPage.tsx';
-import ProductDetailsPage from './pages/ProductDetailsPage.tsx';
-import AnimalPage from './pages/Animal.tsx';
-import ProductsPage from './pages/ProductsPage.tsx';
+
 import ScreeningsPage from './pages/ScreeningsPage.tsx';
 import BookingPage from './pages/BookingPage.tsx';
 import ConfirmationPage from './pages/ConfirmationPage.tsx';
@@ -25,12 +22,10 @@ export default [
   AboutPage,
   VisitInfoLink,
   NotFoundPage,
-  OurVisionPage,
-  ProductDetailsPage,
-  ProductsPage,
+
   ScreeningsPage,
   BookingPage,
-  AnimalPage,
+
   ConfirmationPage,
   WorkWithUs,
   StartPage,

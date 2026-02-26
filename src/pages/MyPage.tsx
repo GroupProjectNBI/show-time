@@ -2,10 +2,10 @@ import { useAuth } from "../context/AuthContext";
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 
-import AvatarSection from "../parts/AvatarSection";
+//import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
-
+//import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
 import AccountActions from "../parts/AccountActions";
 
 export default function MyPage() {
@@ -13,12 +13,7 @@ export default function MyPage() {
 
   const bookings: any[] = [];
 
-  const avatarList = [
-    { id: 1, url: "/avatars/1.png" },
-    { id: 2, url: "/avatars/2.png" },
-    { id: 3, url: "/avatars/3.png" },
-    { id: 4, url: "/avatars/4.png" },
-  ];
+
 
   return (
     <div className="max-w-5xl mx-auto mt-32 px-4 pb-20 text-accent">
@@ -52,19 +47,11 @@ export default function MyPage() {
         </div>
 
         {/* -------- RIGHT COLUMN -------- */}
-        <div className="flex justify-center md:justify-end">
-          <AvatarSection
-            currentAvatarId={user?.avatarUrl ?? 1}
-            avatars={avatarList}
-            onChange={(newId) => {
-              console.log("Byt avatar till:", newId);
-            }}
-          />
-        </div>
+
 
       </div>
 
-      {/* ---------------- BOOKINGS ---------------- */}
+      {/* ---------------- BOOKINGS ----------------göra denna dynamisk */}
       <h2 className="text-2xl font-semibold mt-16 mb-4">Kommande bokningar</h2>
 
       {bookings.length === 0 && (
@@ -99,4 +86,3 @@ MyPage.route = {
     </ProtectedRoute>
   )
 };
-
