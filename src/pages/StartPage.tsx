@@ -20,7 +20,7 @@ function StartPage() {
   useEffect(() => {
     const loadAllData = async () => {
       try {
-        // 1. Hämta data till karusellerna (din gamla fetch)
+        // 1. Hämta data till karusellerna (gamla fetch)
         const popular = await fetchJson("/api/v_getPopular");
         setPopularData(popular);
 

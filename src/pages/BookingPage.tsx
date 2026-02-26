@@ -14,6 +14,8 @@ import { useBooking } from "../context/BookingContext";
 import TicketSelector from "../parts/TicketSelector";
 import BookingSnackPanel from "../parts/BookingSnackPanel";
 
+import { isValidEmail, normalizeEmail } from "../utils/email"; //Nytt för att kunna använda validering
+
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
@@ -24,7 +26,7 @@ export default function BookingPage() {
     // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
     const { id } = useParams<{ id: string; }>();
 
-    // HÄR VAR KONFLIKTEN: Nu hämtar vi allt vi behöver från context
+    //validering innan navigation
     const {
         selectedSeats,
         occupiedSeats,
@@ -118,9 +120,16 @@ export default function BookingPage() {
 
     // Validering + POST till backend när man trycker BOKA
     const handleBook = async () => {
-        // 1. Valideringar 
-        if (!email.trim() || ticketCount === 0 || selectedSeats.length !== ticketCount) {
-            alert("Kontrollera email och antal valda platser.");
+        // 1. Validering av biljetter och stolar
+        if (ticketCount === 0 || selectedSeats.length !== ticketCount) {
+            alert("Kontrollera antal biljetter och valda platser.");
+            return;
+        }
+        //2. Email validering via utils email.ts
+        const cleanedEmail = normalizeEmail(email);
+
+        if (!isValidEmail(cleanedEmail)) {
+            alert("Skriv in en giltig emailadress.");
             return;
         }
 
@@ -155,10 +164,10 @@ export default function BookingPage() {
             // Konfliktlöst: Vi använder koden från HEAD men snacks och totalAmount från dev
             const bookingBody = {
                 screeningId: screening.id,
-                email: email.trim().toLowerCase(),
-                snack: selectedSnack, // Från dev
-                bookingRef: code,     // Från HEAD
-                totalAmount: totalAmount, // Från dev
+                email: cleanedEmail, //normaliserad email
+                snack: selectedSnack,
+                bookingRef: code,
+                totalAmount: totalAmount,
                 status: 1,
             };
 

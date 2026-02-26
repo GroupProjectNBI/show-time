@@ -34,6 +34,10 @@ public static class RestApi
             var body = JSON.Parse(bodyJson.ToString());
             body.Delete("id");
             var parsed = ReqBodyParse(table, body);
+            if (parsed.HasKey("error"))
+            {
+                return RestResult.Parse(context, parsed);
+            }
             var columns = parsed.insertColumns;
             var values = parsed.insertValues;
             var sql = $"INSERT INTO {table}({columns}) VALUES({values})";
