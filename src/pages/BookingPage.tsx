@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Lade till useNavigate här
+import { useParams, useNavigate } from "react-router-dom";
 import { formatScreeningDate } from "../utils/formatTime";
 import MovieCard from "../parts/MovieCard";
 import generate from "../utils/bookingNumberGeneratir";
@@ -8,25 +8,26 @@ import type { Theater } from "../interfaces/Seats";
 import type { Screening } from "../interfaces/Screenings";
 import type Movie from "../interfaces/Movie";
 import Chairs from "../parts/Chairs";
-
 import { useBooking } from "../context/BookingContext";
-
 import TicketSelector from "../parts/TicketSelector";
 import BookingSnackPanel from "../parts/BookingSnackPanel";
+import { isValidEmail, normalizeEmail } from "../utils/email";
 
-import { isValidEmail, normalizeEmail } from "../utils/email"; //Nytt för att kunna använda validering
+// --- NY IMPORT FÖR SIGNALR ---
+import * as signalR from '@microsoft/signalr';
 
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
     const [movie, setMovie] = useState<Movie | null>(null);
 
-    const navigate = useNavigate(); // Används för navigering efter bokning
+    // --- NYA STATES FÖR SIGNALR ---
+    const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+    const [realtimeLockedSeats, setRealtimeLockedSeats] = useState<number[]>([]);
 
-    // Hämta id från URL:en (t.ex. /booking/3 -> id blir "3")
+    const navigate = useNavigate();
     const { id } = useParams<{ id: string; }>();
 
-    //validering innan navigation
     const {
         selectedSeats,
         occupiedSeats,
@@ -40,6 +41,7 @@ export default function BookingPage() {
         clearBooking,
     } = useBooking();
 
+    // 1. DIN BEFINTLIGA USEEFFECT (Laddar sidans data)
     useEffect(() => {
         if (!id) return;
 
@@ -50,12 +52,10 @@ export default function BookingPage() {
                 setScreening(currentScreening);
 
                 if (currentScreening) {
-                    // Hämta layout
                     const theaterId = currentScreening.theaterName === "Stora" ? 1 : 2;
                     const layoutData = await fetchJson(`/api/Theater?where=id=${theaterId}`);
                     setSeatArray(layoutData);
 
-                    // Hämta Film-info (Movie) baserat på movieId från visningen
                     const movieResult = await fetchJson(
                         `/api/v_getMovieDetailsView?where=movieId=${currentScreening.movieId}`
                     );
@@ -64,7 +64,6 @@ export default function BookingPage() {
                         setMovie(movieResult[0]);
                     }
 
-                    // Hämta upptagna stolar för denna visning
                     const occupiedResult = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`);
                     const occupiedIds = occupiedResult.map((occ: any) => occ.seatId);
 
@@ -76,18 +75,98 @@ export default function BookingPage() {
         };
 
         loadPageData();
-    }, [id, setOccupied]);
+    }, [id]);
+
+    // 2. NY USEEFFECT FÖR ATT SÄTTA UPP SIGNALR
+    useEffect(() => {
+        if (!id) return;
+        const numericId = parseInt(id, 10);
+
+        const newConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/api/seathub")
+            .withAutomaticReconnect()
+            .build();
+
+        newConnection.on("SeatLocked", (seatId: number) => {
+            console.log(`[SignalR] Någon annan låste stol ${seatId}`);
+            setRealtimeLockedSeats(prev => [...prev, seatId]);
+        });
+
+        newConnection.on("SeatUnlocked", (seatId: number) => {
+            console.log(`[SignalR] Någon annan släppte stol ${seatId}`);
+            setRealtimeLockedSeats(prev => prev.filter(s => s !== seatId));
+        });
+
+        newConnection.on("SeatsBooked", (seatIds: number[]) => {
+            console.log(`[SignalR] Någon köpte precis dessa stolar:`, seatIds);
+            setOccupied((prev: number[]) => [...prev, ...seatIds]);
+            setRealtimeLockedSeats(prev => prev.filter(seatId => !seatIds.includes(seatId)));
+        });
+
+        async function startConnection() {
+            try {
+                await newConnection.start();
+                console.log("[SignalR] Uppkopplad!");
+
+                await newConnection.invoke("JoinScreening", numericId);
+                setConnection(newConnection);
+            } catch (err: any) {
+                // Vi fångar specifikt upp Reacts dubbel-rendering och ignorerar felet!
+                if (err.name === 'AbortError' || (err.message && err.message.includes('stopped during negotiation'))) {
+                    console.log("[SignalR] Första försöket avbröts av React Strict Mode (Detta är helt normalt!)");
+                } else {
+                    console.error("[SignalR] Något gick faktiskt fel:", err);
+                }
+            }
+        }
+
+        startConnection();
+
+        return () => {
+            // Stäng bara ner anslutningen om den faktiskt är igång eller håller på att koppla upp
+            if (newConnection.state !== signalR.HubConnectionState.Disconnected) {
+                newConnection.stop();
+            }
+        };
+    }, [id]); // Bara 'id' här!
+
+    // 3. NY FUNKTION SOM ERSÄTTER DIN VANLIGA ONTOGGLE
+    const handleRealtimeToggleSeat = async (seatId: number) => {
+        // Om stolen redan är låst av NÅGON ANNAN i realtid, avbryt!
+        if (realtimeLockedSeats.includes(seatId)) {
+            alert("Denna stol är precis vald av någon annan!");
+            return;
+        }
+
+        // Kollar om jag själv har valt stolen tidigare (isåfall vill jag låsa upp den nu)
+        const isCurrentlySelectedByMe = selectedSeats.includes(seatId);
+
+        if (connection && id) {
+            try {
+                const numericId = parseInt(id, 10);
+                if (isCurrentlySelectedByMe) {
+                    await connection.invoke("UnlockSeat", numericId, seatId);
+                } else {
+                    await connection.invoke("LockSeat", numericId, seatId);
+                }
+            } catch (err) {
+                console.error("[SignalR] Fel vid låsning av stol:", err);
+                return; // Avbryt lokala toggle om servern kraschar
+            }
+        }
+
+        // Kör er befintliga logik från BookingContext!
+        toggleSeat(seatId);
+    };
+
 
     if (!seatArray || !screening || !movie) {
         return <div className="text-white text-center p-10">Laddar...</div>;
     }
-    // 1. Räkna ut offset baserat på salong
-    const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
 
-    // 2. Plocka ut den aktuella salongens layout (bör bara finnas en i arrayen)
+    const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
     const currentTheater = seatArray[0];
 
-    // 3. Skapa label-strängarna med Rad och Stol
     const selectedSeatsData = selectedSeats
         .slice()
         .sort((a, b) => a - b)
@@ -110,22 +189,19 @@ export default function BookingPage() {
             }
 
             return {
-                id: seatId, // Detta ID använder vi för POST
-                label: `Rad ${rowNumber}, Stol ${seatNumberInRow}` // Detta visar vi i UI
+                id: seatId,
+                label: `Rad ${rowNumber}, Stol ${seatNumberInRow}`
             };
         });
 
-    // För att inte krascha dina nuvarande komponenter skapar vi en ren text-array till UI:t
     const seatsLabelLines = selectedSeatsData.map(s => s.label);
 
-    // Validering + POST till backend när man trycker BOKA
     const handleBook = async () => {
-        // 1. Validering av biljetter och stolar
         if (ticketCount === 0 || selectedSeats.length !== ticketCount) {
             alert("Kontrollera antal biljetter och valda platser.");
             return;
         }
-        //2. Email validering via utils email.ts
+
         const cleanedEmail = normalizeEmail(email);
 
         if (!isValidEmail(cleanedEmail)) {
@@ -134,23 +210,19 @@ export default function BookingPage() {
         }
 
         const ticketTypePool: string[] = [];
-        // Denna kommer att göra om tickets till en flat array, Tex: ['pensionar', 'barn']
         Object.entries(tickets).forEach(([type, count]) => {
-            // Lägg till typen i listan lika många gånger som count säger
             for (let i = 0; i < count; i++) {
                 ticketTypePool.push(type);
             }
         });
 
-        // 2. Mappa ihop stolarna med biljettyperna
         const finalBookingRows = selectedSeats.map((seat, index) => {
             return {
                 seatId: seat,
-                ticketType: ticketTypePool[index] // Hämta motsvarande typ från poolen
+                ticketType: ticketTypePool[index]
             };
         });
 
-        // 2. Mappning: Översätt text till ID (TicketTypeId)
         const ticketTypeMap: Record<string, number> = {
             ordinarie: 1,
             pensionar: 2,
@@ -160,11 +232,9 @@ export default function BookingPage() {
         try {
             const code = generate();
 
-            // 2. Skapa bokningen
-            // Konfliktlöst: Vi använder koden från HEAD men snacks och totalAmount från dev
             const bookingBody = {
                 screeningId: screening.id,
-                email: cleanedEmail, //normaliserad email
+                email: cleanedEmail,
                 snack: selectedSnack,
                 bookingRef: code,
                 totalAmount: totalAmount,
@@ -183,7 +253,6 @@ export default function BookingPage() {
 
             const bookingId = resultBookingData.insertId;
 
-            // 3. Skapa biljetter - Använd for...of för att säkerställa att de körs i ordning
             for (const { seatId, ticketType } of finalBookingRows) {
                 const ticketResult = await fetchJson("/api/Ticket", {
                     method: "POST",
@@ -203,7 +272,12 @@ export default function BookingPage() {
                 }
             }
 
-            // 4. Avsluta
+            // --- NYTT: ROPA PÅ SERVER ATT KÖPET ÄR KLART ---
+            if (connection && id) {
+                const numericId = parseInt(id, 10);
+                await connection.invoke("ConfirmBooking", numericId, selectedSeats);
+            }
+
             clearBooking();
             navigate(`/confirmation/${code}`);
 
@@ -215,9 +289,6 @@ export default function BookingPage() {
 
     return (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center relative">
-            {/*======================
-            MOVIECARD
-          ========================= */}
             <div className="w-full flex justify-center mb-8">
                 <MovieCard
                     title={screening.movieTitle}
@@ -229,44 +300,35 @@ export default function BookingPage() {
                 />
             </div>
 
-            {/* =========================
-            TICKET SELECTOR 
-          ========================= */}
             <div className="w-full max-w-4xl mb-10">
                 <TicketSelector />
             </div>
 
-            {/* =========================
-            STOLSVAL 
-          ========================= */}
             <h1 className="text-white text-2xl mb-2">Biograf Layout</h1>
-
-            {/* Duken / Scenen */}
             <div className="w-full max-w-md h-1 bg-white/20 shadow-[0_-10px_20px_rgba(255,255,255,0.1)] mb-12 rounded-full" />
 
             <div className="flex flex-col gap-1 w-full max-w-4xl">
                 {seatArray.map((theater) => (
                     <section key={theater.id} className="w-full">
                         {theater.seatsPerRow.map((count, rowIndex) => {
-                            // 1. Räkna ut hur många stolar som finns på tidigare rader (alltid start på 0)
                             const seatsBeforeThisRow = theater.seatsPerRow
                                 .slice(0, rowIndex)
                                 .reduce((acc, curr) => acc + curr, 0);
 
-                            // 2. ID-offset för databasen (81 om det är Lilla Salongen)
                             const dbOffset = screening.theaterName === "Lilla" ? 81 : 0;
 
                             return (
                                 <div key={`${theater.id}-row-${rowIndex}`} className="w-full">
                                     <Chairs
                                         numberOfSeats={count}
-                                        // Här skickar vi ID-basen för logiken (t.ex. 81 + tidigare stolar)
                                         previousSeatsCount={seatsBeforeThisRow + dbOffset}
-                                        // HÄR ÄR NYCKELN: Vi skickar en ren offset för siffrorna (alltid start på 0)
                                         visualOffset={seatsBeforeThisRow}
                                         selectedSeats={selectedSeats}
                                         occupiedSeats={occupiedSeats}
-                                        onToggle={toggleSeat}
+
+                                        // --- NYTT: SKICKA IN SIGNALR-STOLAR OCH NY FUNKTION ---
+                                        realtimeLockedSeats={realtimeLockedSeats}
+                                        onToggle={handleRealtimeToggleSeat}
                                     />
                                 </div>
                             );
@@ -275,15 +337,11 @@ export default function BookingPage() {
                 ))}
             </div>
 
-            {/* =========================
-            BOOKING SNACK PANEL 
-          ========================= */}
             <div className="w-full flex items-end mt-10">
                 <div className="mx-auto w-full max-w-[1200px] px-6 pb-10">
                     <BookingSnackPanel
-                        movieTitle={screening.movieTitle} // NYTT: använder rätt titel från screening
+                        movieTitle={screening.movieTitle}
                         seatsLabelLines={seatsLabelLines}
-                        // NYTT: BOKA-knappen kör samma handleBook som gör POST till backend
                         onBook={handleBook}
                     />
                 </div>

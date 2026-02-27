@@ -39,9 +39,20 @@ public static class Server
     {
         App.Use(async (context, next) =>
         {
+            // --- NYTT: SLÄPP FÖRBI SIGNALR HELT ---
+            // Om trafiken går till stols-hubben, skippa vår vanliga loggning!
+            if (context.Request.Path.StartsWithSegments("/api/seathub"))
+            {
+                await next(context);
+                return; // Hoppa ur funktionen här så DebugLog aldrig körs!
+            }
+            // --------------------------------------
+
+            // Er befintliga kod fortsätter här nedanför...
             context.Response.Headers.Append("Server", (string)Globals.serverName);
             DebugLog.Register(context);
             Session.Touch(context);
+
             if (!Acl.Allow(context))
             {
                 // Acl says the route is not allowed
@@ -51,6 +62,7 @@ public static class Server
                 await context.Response.WriteAsJsonAsync(error);
             }
             else { await next(context); }
+
             // Add some extra info for debugging
             var res = context.Response;
             var contentLength = res.ContentLength;
@@ -59,8 +71,7 @@ public static class Server
             {
                 statusCode = res.StatusCode,
                 contentType = res.ContentType,
-                contentLengthKB =
-                    Math.Round((double)contentLength / 10.24) / 100,
+                contentLengthKB = Math.Round((double)contentLength / 10.24) / 100,
                 RESPONSE_DONE = Now
             });
             if (info.contentLengthKB == null || info.contentLengthKB == 0)

@@ -5,7 +5,8 @@
 import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
-import proxy from 'express-http-proxy';
+// Det gamla paketet är borta, här är det nya:
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import { isFreePort } from 'find-free-ports';
 import chokidar from 'chokidar';
 
@@ -41,14 +42,17 @@ export default function startBackend(app) {
       { cwd: import.meta.dirname, stdio: 'inherit', shell: true }
     );
 
-    // Proxy traffic to the backend if the request starts with /api
-    initialStart && app.use('/api', (req, res, next) => {
-      proxy(`localhost:${startPort}`, {
-        proxyReqPathResolver(req) {
-          return '/api' + req.url;
-        }
-      })(req, res, next);
-    });
+    // ==========================================
+    // NYA PROXYN: Släpper igenom HTTP och WebSockets (V3 Syntax)
+    // ==========================================
+    initialStart && app.use(createProxyMiddleware({
+      pathFilter: '/api', // <-- Detta ersätter det gamla klipp-och-klistrandet!
+      target: `http://localhost:${startPort}`,
+      changeOrigin: true,
+      ws: true, // Tillåter SignalR WebSockets!
+      logLevel: 'warn'
+    }));
+    // ==========================================
 
     // Kill the backend process on exit
     process.on('exit', () => backendProcess.kill());
