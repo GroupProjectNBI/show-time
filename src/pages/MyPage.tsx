@@ -5,7 +5,7 @@ import fetchJson from "../utils/fetchJson";
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 
-//import AvatarSection from "../parts/AvatarSection";
+import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
 //import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
