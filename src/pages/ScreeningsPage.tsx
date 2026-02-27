@@ -25,6 +25,7 @@ export default function ScreeningsPage() {
     movie: "",
     category: "",
     theater: "",
+    ageLimit: "" as "" | "11" | "15" | "18",
   });
   const [sortOrder, setSortOrder] = useState("dateAsc");
 
@@ -95,7 +96,13 @@ export default function ScreeningsPage() {
       result = result.filter(s => s.theaterName === filters.theater);
     }
 
-    // 5. Sortering
+    // 5. Åldersfilter (max)
+    if (filters.ageLimit) {
+      const maxAge = Number(filters.ageLimit);
+      result = result.filter(s => Number(s.ageLimit) <= maxAge);
+    }
+
+    // 6. Sortering
     result.sort((a, b) => {
       switch (sortOrder) {
         case "dateAsc": return new Date(a.startTime).getTime() - new Date(b.startTime).getTime();
@@ -122,7 +129,7 @@ export default function ScreeningsPage() {
   };
 
   const clearFilters = () => {
-    setFilters({ movie: "", category: "", theater: "" });
+    setFilters({ movie: "", category: "", theater: "", ageLimit: "" });
     setSortOrder("dateAsc");
     setSelectedDateISO(formatDate(new Date())); // Återställ till Idag
   };
@@ -181,7 +188,7 @@ export default function ScreeningsPage() {
         {showFilters && (
           <div className="mb-8 bg-[#232323] border border-white/10 rounded-2xl p-6 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-300">
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
 
               {/* FILM */}
               <div>
@@ -207,6 +214,23 @@ export default function ScreeningsPage() {
                 <select name="theater" value={filters.theater} onChange={handleFilterChange} className={inputClass}>
                   <option value="">Alla salonger</option>
                   {uniqueTheaters.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-[10px] text-[#c0a060] uppercase tracking-[0.2em] mb-2 block font-bold">
+                  Åldersgräns (max)
+                </label>
+                <select
+                  name="ageLimit"
+                  value={filters.ageLimit}
+                  onChange={handleFilterChange}
+                  className={inputClass}
+                >
+                  <option value="">Alla</option>
+                  <option value="11">11+</option>
+                  <option value="15">15+</option>
+                  <option value="18">18+</option>
                 </select>
               </div>
 

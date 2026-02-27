@@ -19,6 +19,7 @@ interface AuthContextType {
     logout: () => Promise<void>;
     create: (credentials: any) => Promise<boolean>;
     checkLogin: () => Promise<void>;
+    updateAvatar: (avatarId: number) => Promise<boolean>;
     changePassword: (newPassword: string) => void;
 }
 
@@ -28,13 +29,32 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode; }) {
     const [user, setUser] = useState<User | null>(null);
 
+    // hydrateAvatar "fyller på" användaren med rätt avatar-bild.
+    // Användaren har bara ett avatarId sparat i databasen.
+    // En extra API-förfrågan görs för att hämta själva bildens URL.
+    // Sedan läggs den in på user-objektet så UI kan visa bilden direkt.
+
+    async function hydrateAvatar(u: User): Promise<User> {
+        if (!u?.avatarUrl) return u;
+        try {
+            const avatarData = await fetchJson(`/api/Avatar?where=id=${u.avatarUrl}`);
+            if (avatarData && avatarData[0]) {
+                return { ...u, avatar: avatarData[0].url };
+            }
+        } catch (err) {
+            console.error("Kunde inte hämta avatar:", err);
+        }
+        return u;
+    }
+
     // 3. CheckLogin implementation
     async function checkLogin() {
         try {
             const response = await fetchJson("/api/login");
             if (response && response.email) {
                 if (response.email) {
-                    setUser(response);
+                    const hydrated = await hydrateAvatar(response);
+                    setUser(hydrated);
 
                 } else {
                     setUser(null);
@@ -60,17 +80,8 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
 
             if (result && result.email) {
                 // Fetch avatar om user object och email i det objektet finns
-                if (result.avatarUrl) {
-                    try {
-                        const avatarData = await fetchJson(`/api/Avatar?where=id=${result.avatarUrl}`);
-                        if (avatarData && avatarData[0]) {
-                            result.avatar = avatarData[0].url;
-                        }
-                    } catch (err) {
-                        console.error("Kunde inte hämta avatar:", err);
-                    }
-                }
-                setUser(result);
+                const hydrated = await hydrateAvatar(result);
+                setUser(hydrated);
                 return true; // Returnerar boolean true
             } else {
                 setUser(null);
@@ -106,6 +117,31 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         setUser(null);
     }
 
+    // updateAvatar används när användaren byter profilbild.
+    // 1. Nytt avatarId till backend så det sparas i databasen.
+    // 2. När backend är klar uppdaterars det i user Context.
+    // 3. När user ändras renderas hela appen om automatiskt, profilbilden byts direkt utan refresh.
+    async function updateAvatar(avatarId: number): Promise<boolean> {
+        if (!user) return false;
+        try {
+            // 1) Spara i DB
+            await fetchJson(`/api/User/${user.id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ avatarUrl: avatarId }),
+            });
+
+            // 2) Uppdatera i appens "minne" så UI byter direkt
+            const updatedUser: User = { ...user, avatarUrl: avatarId };
+            const hydrated = await hydrateAvatar(updatedUser);
+            setUser(hydrated);
+            return true;
+        } catch (error) {
+            console.error("Update avatar failed:", error);
+            return false;
+        }
+    }
+
     // 6. useEffect flyttad till roten av komponenten!
     useEffect(() => {
         checkLogin();
@@ -126,6 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         logout,
         create,
         checkLogin,
+        updateAvatar,
         changePassword
     };
 
