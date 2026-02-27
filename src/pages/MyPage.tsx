@@ -1,44 +1,66 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import fetchJson from "../utils/fetchJson";
+
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 import { formatScreeningDate } from "../utils/formatTime";
 import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
-// import PasswordDisplay from "../parts/PasswordDisplay";
 import AccountActions from "../parts/AccountActions";
+import ProtectedRoute from "../parts/ProtectedRoute";
 
-const avatarList = [
-  { id: 1, url: "/avatars/1.png" },
-  { id: 2, url: "/avatars/2.png" },
-  { id: 3, url: "/avatars/3.png" },
-  { id: 4, url: "/avatars/4.png" },
-];
+// Typ för avatarer (från dev-branchen)
+interface AvatarItem {
+  id: number;
+  url: string;
+}
+
 export default function MyPage() {
-  const { user, changePassword, logout } = useAuth();
-  // State för bokningarna och laddning
+  const { user, changePassword, logout, updateAvatar } = useAuth();
+
+  // --- STATES ---
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  // --- HÄMTA DATA ---
+  const [avatarList, setAvatarList] = useState<AvatarItem[]>([]);
+
+  // 1. --- HÄMTA AVATARER ---
+  useEffect(() => {
+    async function loadAvatars() {
+      try {
+        const res = await fetchJson("/api/Avatar");
+        if (Array.isArray(res)) {
+          const mapped: AvatarItem[] = res
+            .filter((a) => a && typeof a.id === "number" && typeof a.url === "string")
+            .map((a) => ({ id: a.id, url: a.url }));
+
+          setAvatarList(mapped);
+        } else {
+          setAvatarList([]);
+        }
+      } catch (err) {
+        console.error("Kunde inte hämta avatars:", err);
+        setAvatarList([]);
+      }
+    }
+    loadAvatars();
+  }, []);
+
+  // 2. --- HÄMTA BOKNINGAR ---
   useEffect(() => {
     async function fetchUserBookings() {
-      // Om användaren inte är inloggad eller saknar email, avbryt.
       if (!user?.email) return;
 
       try {
         setLoading(true);
-        // 1. Hämta alla bokningar för denna användare (via email)
-        let alfa = "ceciliacavallin@hotmail.se";
-        const userBookings = await fetchJson(`/api/Booking?where=email=${alfa}`);
+        const userBookings = await fetchJson(`/api/Booking?where=email=${user.email}`);
 
         if (!userBookings || userBookings.length === 0) {
           setBookings([]);
           return;
         }
 
-        // 2. Eftersom vi behöver filmtitel och platser, måste vi hämta detaljer för VARJE bokning
         const enrichedBookings = await Promise.all(
           userBookings.map(async (booking: any) => {
             const screeningId = booking.screeningId || booking.ScreeningId;
@@ -48,7 +70,6 @@ export default function MyPage() {
 
             const ticketsData = await fetchJson(`/api/Ticket?where=bookingId=${booking.id}`);
 
-            // Här är den korrekta returen för varje bokning i loopen
             return {
               ...booking,
               movieTitle: screening?.movieTitle || "Okänd film",
@@ -60,7 +81,6 @@ export default function MyPage() {
           })
         );
 
-        // Uppdatera statet med den kompletta datan
         setBookings(enrichedBookings);
       } catch (error) {
         console.error("Kunde inte hämta bokningar:", error);
@@ -70,19 +90,15 @@ export default function MyPage() {
     }
 
     fetchUserBookings();
-  }, [user]); // Körs igen om user ändras
+  }, [user]);
 
-  // const bookings: any[] = [];
-
-  // --- AVBOKA FUNKTION ---
+  // 3. --- AVBOKA FUNKTION ---
   const handleCancelBooking = async (id: number) => {
     try {
       console.log("Startar avbokning för bokning ID:", id);
 
-      // 1. Hämta alla biljetter som tillhör denna bokning
       const ticketsData = await fetchJson(`/api/Ticket?where=BookingId=${id}`);
 
-      // 2. Radera varje biljett EN OCH EN (Väntar på att varje radering blir klar)
       if (ticketsData && ticketsData.length > 0) {
         for (const ticket of ticketsData) {
           await fetchJson(`/api/Ticket/${ticket.id}`, {
@@ -92,23 +108,26 @@ export default function MyPage() {
         }
       }
 
-      // 3. När ALLA biljetter är borta, radera själva bokningen.
-      // Vi använder 'id' från funktionen, inte från ticketsData.
       await fetchJson(`/api/Booking/${id}`, {
         method: "DELETE"
       });
-      console.log("Raderade bokning:", id);
 
-      // 4. Uppdatera gränssnittet så att kortet försvinner direkt (Magi!)
+      console.log("Raderade bokning:", id);
       setBookings((prevBookings) => prevBookings.filter((b) => b.id !== id));
 
     } catch (error) {
       console.error("Fel vid avbokning:", error);
-      alert("Kunde inte avboka. Vänligen försök igen."); // Enkel felhantering för användaren
+      alert("Kunde inte avboka. Vänligen försök igen.");
     }
   };
 
-
+  // Säker avatarlista ifall databasen är långsam
+  const safeAvatarList: AvatarItem[] =
+    avatarList.length > 0
+      ? avatarList
+      : user?.avatar && typeof user.avatarUrl === "number"
+        ? [{ id: user.avatarUrl, url: user.avatar }]
+        : [];
 
   return (
     <div className="max-w-5xl mx-auto mt-32 px-4 pb-20 text-accent">
@@ -135,9 +154,12 @@ export default function MyPage() {
         <div className="flex justify-center md:justify-end">
           <AvatarSection
             currentAvatarId={user?.avatarUrl ?? 1}
-            avatars={avatarList} // Nu skickar vi in den stabila listan!
-            selectedId={user?.avatarUrl ?? 1}
-            onSelect={(newId) => console.log("Byt avatar till:", newId)}
+            avatars={safeAvatarList}
+            onChange={async (newId) => {
+              if (updateAvatar) {
+                await updateAvatar(newId);
+              }
+            }}
           />
         </div>
       </div>
@@ -154,12 +176,10 @@ export default function MyPage() {
           {bookings.map((booking) => (
             <UpcomingBookingCard
               key={booking.id}
-              id={booking.id} // Skickas med så avbokningen vet vilken som ska bort
+              id={booking.id}
               title={booking.movieTitle}
-              // formatScreeningDate returnerar hela datum/tid-strängen, så vi kan behöva dela upp den,
-              // eller bara lägga den i dateLabel om ni inte har en specifik format-funktion för tid
               dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
-              timeLabel={""} // Om du vill bryta ut tiden separat, annars lämna tom 
+              timeLabel={""}
               theaterLabel={booking.theaterName}
               ticketsLabel={`${booking.ticketCount} biljetter`}
               seatsLabel={booking.seats}
@@ -170,12 +190,10 @@ export default function MyPage() {
         </div>
       )}
 
-      <AccountActions onLogout={logout} />
+      <AccountActions onLogout={() => { void logout(); }} />
     </div>
   );
 }
-
-import ProtectedRoute from "../parts/ProtectedRoute";
 
 MyPage.route = {
   path: "/min-sida",
@@ -187,4 +205,3 @@ MyPage.route = {
     </ProtectedRoute>
   )
 };
-
