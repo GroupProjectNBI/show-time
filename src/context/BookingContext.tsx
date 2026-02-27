@@ -15,11 +15,12 @@ const TICKET_PRICES = {
     barn: 90,
 } as const;
 
-const SNACK_PRICES: Record<"large" | "medium" | "small", number> = {
-    large: 189,
-    medium: 149,
-    small: 129,
-};
+const SNACK_PRICE_PER_PERSON = {
+    large: 63,
+    medium: 49.666,
+    small: 43,
+} as const;
+
 
 export function BookingProvider({ children }: { children: ReactNode; }) {
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
@@ -52,8 +53,7 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
         tickets.barn * TICKET_PRICES.barn;
 
     // Snack-total
-    const snackTotal =
-        selectedSnack ? SNACK_PRICES[selectedSnack] : 0;
+    const snackTotal = selectedSnack ? SNACK_PRICE_PER_PERSON[selectedSnack] * ticketCount : 0;
 
     // TOTALT
     const totalAmount = ticketTotal + snackTotal;
