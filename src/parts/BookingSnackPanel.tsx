@@ -9,6 +9,7 @@ type Props = {
   onBook?: () => void;
 };
 
+// ⭐ Snack-priser per person (måste matcha BookingContext)
 const snackOptions = [
   {
     key: "large" as const,
@@ -33,6 +34,7 @@ const snackOptions = [
   },
 ];
 
+// ⭐ Dynamisk text baserat på antal biljetter
 function getDynamicDesc(opt: typeof snackOptions[number], ticketCount: number) {
   const p = opt.base.popcorn * ticketCount;
   const s = opt.base.snacks * ticketCount;
@@ -46,15 +48,20 @@ function getDynamicDesc(opt: typeof snackOptions[number], ticketCount: number) {
   return parts.join(", ");
 }
 
-
 export default function BookingSnackPanel({
   movieTitle,
   seatsLabelLines,
   snackImageUrl,
   onBook,
 }: Props) {
-  const { ticketCount, totalAmount, selectedSnack, setSelectedSnack, email, setEmail } =
-    useBooking();
+  const {
+    ticketCount,
+    totalAmount,
+    selectedSnack,
+    setSelectedSnack,
+    email,
+    setEmail,
+  } = useBooking();
 
   const emailIsValid = useMemo(() => isValidEmail(email), [email]);
 
@@ -63,15 +70,20 @@ export default function BookingSnackPanel({
     [selectedSnack]
   );
 
-  const snacksPrice = selected ? selected.pricePerPerson * ticketCount : 0;
+  // ⭐ Dynamiskt pris per person × antal biljetter
+  const snacksPrice = selected
+    ? selected.pricePerPerson * ticketCount
+    : 0;
 
-  const imageSrc = snackImageUrl || "images/Commercials/popga.jpg";
+  const imageSrc = snackImageUrl || "/images/Commercials/popga.jpg";
 
   return (
     <div className="w-full">
       <div className="relative w-full rounded-[26px] bg-surface px-4 py-5 text-accent shadow-[0_10px_30px_rgba(0,0,0,0.35)] sm:px-6 sm:py-6 lg:px-8 lg:py-7">
+
         {/* TOP – två kolumner */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[240px_1fr] lg:gap-8">
+
           {/* Vänster: titel + biljetter + säten */}
           <div>
             <div className="text-[16px] font-semibold text-accent">
@@ -108,7 +120,7 @@ export default function BookingSnackPanel({
               Förboka snackset och få det serverat till din stol.
             </div>
 
-            {/* Snackkort – kompakt + klicka i/ur */}
+            {/* Snackkort */}
             <div className="mt-3 space-y-2">
               {snackOptions.map((opt) => {
                 const checked = opt.key === selectedSnack;
@@ -186,7 +198,7 @@ export default function BookingSnackPanel({
           </div>
         </div>
 
-        {/* CHECKOUT UNDER */}
+        {/* CHECKOUT */}
         <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <div>
             <div className="mb-2 text-[12px] font-semibold text-accent/80">
@@ -222,6 +234,8 @@ export default function BookingSnackPanel({
               <span className="text-[14px] font-semibold text-accent">
                 Totalt:
               </span>
+
+              {/* ⭐ totalAmount kommer direkt från BookingContext */}
               <span className="tabular-nums text-[20px] font-bold text-accent">
                 {Math.round(totalAmount)} kr
               </span>
@@ -232,15 +246,15 @@ export default function BookingSnackPanel({
               disabled={!emailIsValid}
               onClick={() => onBook?.()}
               className={`
-              h-[48px] w-full rounded-full px-10
-              text-[14px] font-extrabold
-              transition-all duration-300
-              sm:w-auto
-              bg-primary text-accent
-              ${emailIsValid
+                h-[48px] w-full rounded-full px-10
+                text-[14px] font-extrabold
+                transition-all duration-300
+                sm:w-auto
+                bg-primary text-accent
+                ${emailIsValid
                   ? "hover:-translate-y-0.5 active:scale-95"
                   : "opacity-50 cursor-not-allowed"}
-            `}
+              `}
             >
               BOKA
             </button>
