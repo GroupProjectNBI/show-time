@@ -12,6 +12,7 @@ import { AuthProvider } from './context/AuthContext';
 import { useState } from "react";
 import MembershipOverlay from "./parts/MembershipOverlay";
 import LoginOverlay from "./parts/LoginOverlay";
+import CookiePopup from './parts/CookiePopup';
 export default function App() {
 
   // Denna hook fungerar eftersom App ligger inuti RouterProvider i main.tsx
@@ -53,9 +54,9 @@ export default function App() {
           />
 
           {/* Main tar upp allt ledigt utrymme och centrerar innehållet */}
-  <main className="flex-grow">
-    <Main />
-  </main>
+          <main className="flex-grow">
+            <Main />
+          </main>
           <div className={isAboutPage ? "footer-about" : ""}>
             <Footer openMembership={() => setShowMembership(true)} />
           </div>
