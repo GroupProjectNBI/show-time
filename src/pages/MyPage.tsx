@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+
 import { useAuth } from "../context/AuthContext";
-import fetchJson from "../utils/fetchJson";
+
 
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
