@@ -9,6 +9,7 @@ export interface Screening {
   availableSeats: number; // Lade till denna
   priceSek: number;
   movieId: number;
+  ageLimit: "11" | "15" | "18";
   duration: number;
   totalAmountOfSeats: number;
 }
