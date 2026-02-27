@@ -26,6 +26,7 @@ export default function MyPage() {
 
 
   const [bookings, setBookings] = useState<any[]>([]);
+  const [pastBookings, setPastBookings] = useState<any[]>([]);
 
   const [avatarList, setAvatarList] = useState<AvatarItem[]>([]);
 
@@ -77,17 +78,27 @@ export default function MyPage() {
         if (result && !result.error) {
           const now = new Date();
 
-          // Filtrera fram inloggad användares framtida bokningar
-          const myUpcoming = result
-            .filter((b: any) => b.email?.toLowerCase() === user.email.toLowerCase())
-            .filter((b: any) => new Date(b.startTime) >= now);
-
-          // Sortera listan
-          myUpcoming.sort((a: any, b: any) =>
-            new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+          const mine = result.filter(
+            (b: any) => b.email?.toLowerCase() === user.email.toLowerCase()
           );
+          // Filtrera fram inloggad användares framtida bokningar
+          const myUpcoming = mine
+            .filter((b: any) => new Date(b.startTime) >= now)
+            .sort((a: any, b: any) =>
+              new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+            );
+
+          // filtrera på användarens tidigare bokningar
+          const myPast = mine
+            .filter((b: any) => new Date(b.startTime) < now)
+            .sort(
+              (a: any, b: any) =>
+                new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+            );
+
 
           setBookings(myUpcoming);
+          setPastBookings(myPast);
         }
       } catch (error) {
         console.error("Kunde inte hämta bokningar:", error);
@@ -174,19 +185,38 @@ export default function MyPage() {
 
 
       {/* -------- HISTORISKA BOKNINGAR -------- */}
-      <h2 className="text-2xl font-semibold mt-0 mb-4">
-        Tidigare bokningar
-      </h2>
+      <h2 className="text-2xl font-semibold mt-0 mb-4">Tidigare bokningar</h2>
 
-      <PastBookingCard
-        title="Dune: Messiah"
-        dateLabel="Lör 14 mars 2026"
-        timeLabel="19:30"
-        theaterLabel="Stora salongen"
-        ticketsLabel="2 biljetter"
-        seatsLabel="A5, A6"
-        seenLabel="Sågs 14 mars 2026"
-      />
+      {pastBookings.length === 0 ? (
+        <p className="text-accent/60 mb-6">Du har inga tidigare bokningar</p>
+      ) : (
+        <div className="flex flex-col gap-4 mb-10">
+          {pastBookings.map((booking) => (
+            <PastBookingCard
+              key={booking.bookingId || booking.id}
+              title={booking.movieTitle}
+              dateLabel={new Date(booking.startTime).toLocaleDateString("sv-SE", {
+                weekday: "short",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              theaterLabel={booking.theaterName + " salongen"}
+              ticketsLabel={`${booking.ticketCount || 0} biljetter`}
+              seatsLabel={booking.seats || "Information saknas"}
+              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}`}
+            />
+          ))}
+        </div>
+      )}
 
       {/* -------- ACCOUNT ACTIONS -------- */}
       <div className="mt-12">
