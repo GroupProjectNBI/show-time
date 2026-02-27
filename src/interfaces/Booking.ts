@@ -42,7 +42,7 @@ export interface BookingContextType {
 
     // Stol-hantering
     toggleSeat: (seatId: number) => void;
-    setOccupied: (seatIds: number[]) => void;
+    setOccupied: React.Dispatch<React.SetStateAction<number[]>>;
     clearBooking: () => void;
 
     // Biljetter
