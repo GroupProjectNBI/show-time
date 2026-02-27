@@ -1,28 +1,69 @@
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import fetchJson from "../utils/fetchJson";
+
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 
 import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
-import PasswordDisplay from "../parts/PasswordDisplay";
+//import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
 import AccountActions from "../parts/AccountActions";
 import { useEffect, useState } from "react";
 import fetchJson from "../utils/fetchJson";
 
  //
 
+interface AvatarItem {
+  id: number;
+  url: string;
+}
+
 export default function MyPage() {
-  const { user, changePassword, logout } = useAuth();
+  const { user, changePassword, logout, updateAvatar } = useAuth();
+
 
   const [bookings, setBookings] = useState<any[]>([]);
 
-  const avatarList = [
-    { id: 1, url: "/avatars/1.png" },
-    { id: 2, url: "/avatars/2.png" },
-    { id: 3, url: "/avatars/3.png" },
-    { id: 4, url: "/avatars/4.png" },
-  ];
+  const [avatarList, setAvatarList] = useState<AvatarItem[]>([]);
+
+  // När MyPage laddas hämtas alla tillgängliga avatars från backend.
+  // Detta gör att vi slipper hårdkoda bilder i frontend.
+  // Både login och avatar-väljaren använder nu samma datakälla (databasen).
+  useEffect(() => {
+    async function loadAvatars() {
+      try {
+        const res = await fetchJson("/api/Avatar");
+
+        // Förväntar oss array: [{ id: number, url: string }, ...]
+        if (Array.isArray(res)) {
+          const mapped: AvatarItem[] = res
+            .filter((a) => a && typeof a.id === "number" && typeof a.url === "string")
+            .map((a) => ({ id: a.id, url: a.url }));
+
+          setAvatarList(mapped);
+        } else {
+          setAvatarList([]);
+        }
+      } catch (err) {
+        console.error("Kunde inte hämta avatars:", err);
+        setAvatarList([]);
+      }
+    }
+
+    loadAvatars();
+  }, []);
+
+  // Om avatar-listan inte hunnit laddas men användaren redan har en avatar från login,
+  // avatar läggs in den temporärt så UI inte visar trasig bild. 
+  // Gör sidan mer stabil vid första render.
+  const safeAvatarList: AvatarItem[] =
+    avatarList.length > 0
+      ? avatarList
+      : user?.avatar && typeof user.avatarUrl === "number"
+        ? [{ id: user.avatarUrl, url: user.avatar }]
+        : [];
   // LOGIK #310: Hämta bokningar baserat på e-post
 useEffect(() => {
     if (!user?.email) return;
@@ -57,12 +98,11 @@ useEffect(() => {
 
   return (
     <div className="max-w-5xl mx-auto mt-32 px-4 pb-20 text-accent">
-
       <h1 className="text-4xl font-bold mb-10 text-center">Min sida</h1>
+
 
       {/* ---------------- TWO COLUMN LAYOUT ---------------- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-
         {/* -------- LEFT COLUMN -------- */}
         <div>
           <UsernameField
@@ -79,8 +119,6 @@ useEffect(() => {
             }}
           />
 
-
-
           <div className="mt-6">
             <ChangePasswordForm onSubmit={changePassword} />
           </div>
@@ -90,13 +128,12 @@ useEffect(() => {
         <div className="flex justify-center md:justify-end">
           <AvatarSection
             currentAvatarId={user?.avatarUrl ?? 1}
-            avatars={avatarList}
-            onChange={(newId) => {
-              console.log("Byt avatar till:", newId);
+            avatars={safeAvatarList}
+            onChange={async (newId) => {
+              await updateAvatar(newId);
             }}
           />
         </div>
-
       </div>
 
 {/* ---------------- BOOKINGS SECTION #310 ---------------- */}
@@ -131,7 +168,7 @@ useEffect(() => {
         </div>
       )}
 
-      <AccountActions onLogout={logout} />
+      <AccountActions onLogout={() => { void logout(); }} />
     </div>
   );
 }
@@ -148,4 +185,3 @@ MyPage.route = {
     </ProtectedRoute>
   )
 };
-

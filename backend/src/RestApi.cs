@@ -91,6 +91,35 @@ public static class RestApi
             var update = parsed.update;
             var sql = $"UPDATE {table} SET {update} WHERE id = @id";
             var result = SQLQueryOne(sql, parsed.body, context);
+
+            // Session-sync när det är just User som ändras.
+            if (table == "User") 
+            {
+                // Servern tittar i sessionen och försöker hämta objektet "user".
+                var sessionUser = Session.Get(context, "user");
+
+                // Om någon är inloggad och uppdaterar sin egen user
+                // Id jämförs försöker uppdatera samma som den inloggade användarens id
+                // tex user 11 inte ska uppdatera till user 12, du får bara synka sessionen om du ändrade din egen profil 
+                if (sessionUser != null && (string)id == sessionUser.id.ToString())
+                {
+                    // Hämtar användaren igen från databasen 
+                   // Hämtar den senaste versionen av användaren.
+                        var freshUser = SQLQueryOne(
+                        "SELECT * FROM User WHERE id = @id",
+                        new { id = (int)sessionUser.id }
+                    );
+
+                    if (freshUser != null)
+                    {
+                        //För att lösenord inte ska läggas i session
+                        //Den plockar bort känslig data innan vi skickar/sparar user objekt
+                        if (freshUser.HasKey("password")) freshUser.Delete("password");
+                        Session.Set(context, "user", freshUser);
+                    }
+                }
+            }
+
             return RestResult.Parse(context, result);
         });
 
