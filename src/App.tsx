@@ -23,6 +23,8 @@ export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showMembership, setShowMembership] = useState(false);
 
+  const [showCookies, setShowCookies] = useState(true);
+
 
 
   // Scroll to top vid sidbyte
@@ -44,6 +46,13 @@ export default function App() {
             setShowLogin(false);
             setShowMembership(true);
           }} />)}
+
+        {showCookies && (
+          <CookiePopup
+            onAccept={() => setShowCookies(false)}
+            onDecline={() => setShowCookies(false)}
+          />
+        )}
 
 
 
