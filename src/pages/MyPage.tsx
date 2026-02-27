@@ -1,19 +1,20 @@
-
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import fetchJson from "../utils/fetchJson";
 
 
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
+import PastBookingCard from "../parts/PastBookingCard";
+
 
 import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
 //import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
 import AccountActions from "../parts/AccountActions";
-import { useEffect, useState } from "react";
-import fetchJson from "../utils/fetchJson";
 
- //
+import ProtectedRoute from "../parts/ProtectedRoute";
 
 interface AvatarItem {
   id: number;
@@ -65,7 +66,7 @@ export default function MyPage() {
         ? [{ id: user.avatarUrl, url: user.avatar }]
         : [];
   // LOGIK #310: Hämta bokningar baserat på e-post
-useEffect(() => {
+  useEffect(() => {
     if (!user?.email) return;
 
     const loadBookings = async () => {
@@ -82,7 +83,7 @@ useEffect(() => {
             .filter((b: any) => new Date(b.startTime) >= now);
 
           // Sortera listan
-          myUpcoming.sort((a: any, b: any) => 
+          myUpcoming.sort((a: any, b: any) =>
             new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
           );
 
@@ -136,7 +137,7 @@ useEffect(() => {
         </div>
       </div>
 
-{/* ---------------- BOOKINGS SECTION #310 ---------------- */}
+      {/* ---------------- BOOKINGS SECTION #310 ---------------- */}
       <h2 className="text-2xl font-semibold mt-16 mb-6">Kommande bokningar</h2>
 
       {/* Om inga bokningar finns */}
@@ -149,14 +150,14 @@ useEffect(() => {
             <UpcomingBookingCard
               key={booking.bookingId || booking.id}
               title={booking.movieTitle}
-              dateLabel={new Date(booking.startTime).toLocaleDateString('sv-SE', { 
-                weekday: 'short', 
-                day: 'numeric', 
-                month: 'long' 
+              dateLabel={new Date(booking.startTime).toLocaleDateString('sv-SE', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'long'
               })}
-              timeLabel={new Date(booking.startTime).toLocaleTimeString('sv-SE', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+              timeLabel={new Date(booking.startTime).toLocaleTimeString('sv-SE', {
+                hour: '2-digit',
+                minute: '2-digit',
               })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
@@ -168,12 +169,33 @@ useEffect(() => {
         </div>
       )}
 
-      <AccountActions onLogout={() => { void logout(); }} />
-    </div>
-  );
-}
+      {/* -------- DIVIDER MELLAN SEKTIONERNA -------- */}
+      <div className="my-10 h-px bg-white/10" />
 
-import ProtectedRoute from "../parts/ProtectedRoute";
+
+      {/* -------- HISTORISKA BOKNINGAR -------- */}
+      <h2 className="text-2xl font-semibold mt-0 mb-4">
+        Tidigare bokningar
+      </h2>
+
+      <PastBookingCard
+        title="Dune: Messiah"
+        dateLabel="Lör 14 mars 2026"
+        timeLabel="19:30"
+        theaterLabel="Stora salongen"
+        ticketsLabel="2 biljetter"
+        seatsLabel="A5, A6"
+        seenLabel="Sågs 14 mars 2026"
+      />
+
+      {/* -------- ACCOUNT ACTIONS -------- */}
+      <div className="mt-12">
+        <AccountActions onLogout={() => void logout()} />
+      </div>
+
+    </div>   //detta är sista wrapper-diven  
+  );
+} // här stängs funktionen  
 
 MyPage.route = {
   path: "/min-sida",
