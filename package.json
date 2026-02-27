@@ -16,6 +16,7 @@
     "test:run": "vitest run"
   },
   "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
     "bcryptjs": "^3.0.2",
     "better-express-store": "^1.0.5",
     "callsites": "^4.2.0",

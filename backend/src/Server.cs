@@ -1,10 +1,15 @@
 namespace WebApp;
 
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 public static class Server
 {
     public static void Start()
     {
         var builder = WebApplication.CreateBuilder();
+
+        builder.Services.AddSignalR();
+
         App = builder.Build();
         Middleware();
         DebugLog.Start();
@@ -15,11 +20,15 @@ public static class Server
         LoginRoutes.Start();
         RestApi.Start();
         Session.Start();
+
+        App.MapHub<SeatHub>("/api/seathub");
+
         // Start the server on port 3001
         var runUrl = "http://localhost:" + Globals.port;
         Log("Server running on:", runUrl);
         Log("With these settings:", Globals);
         App.Run(runUrl);
+
     }
 
     // Middleware that changes the server response header,
