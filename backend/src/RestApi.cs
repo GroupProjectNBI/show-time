@@ -27,6 +27,10 @@ public static class RestApi
 
         //     return RestResult.Parse(context, SQLQuery(sql, parameters, context));
         // });
+
+        // 1. Specifik route för att hämta bokningsvyn
+
+        
         App.MapPost("/api/{table}", (
             HttpContext context, string table, JsonElement bodyJson
         ) =>
@@ -52,6 +56,7 @@ public static class RestApi
             }
             return RestResult.Parse(context, result);
         });
+        
 
         App.MapGet("/api/{table}", (
             HttpContext context, string table
