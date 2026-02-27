@@ -4,12 +4,16 @@ import fetchJson from "../utils/fetchJson";
 
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
+import PastBookingCard from "../parts/PastBookingCard";
+
 
 import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
 //import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
 import AccountActions from "../parts/AccountActions";
+
+import ProtectedRoute from "../parts/ProtectedRoute";
 
 interface AvatarItem {
   id: number;
@@ -118,13 +122,33 @@ export default function MyPage() {
         onCancel={() => console.log("Avboka bokning")}
         cancelDisabled={false}
       />
+      
+      {/* -------- DIVIDER MELLAN SEKTIONERNA -------- */}
+      <div className="my-10 h-px bg-white/10" /> 
+
+
+      {/* -------- HISTORISKA BOKNINGAR -------- */}
+      <h2 className="text-2xl font-semibold mt-0 mb-4">
+        Tidigare bokningar
+      </h2>
+
+      <PastBookingCard
+        title="Dune: Messiah"
+        dateLabel="Lör 14 mars 2026"
+        timeLabel="19:30"
+        theaterLabel="Stora salongen"
+        ticketsLabel="2 biljetter"
+        seatsLabel="A5, A6"
+        seenLabel="Sågs 14 mars 2026"
+      />
+   
 
       <AccountActions onLogout={() => { void logout(); }} />
     </div>
   );
 }
 
-import ProtectedRoute from "../parts/ProtectedRoute";
+
 
 MyPage.route = {
   path: "/min-sida",
