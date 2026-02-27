@@ -91,8 +91,7 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
 
         <h2 className="text-accent text-xl font-bold mb-4 text-center uppercase tracking-widest">Bli medlem</h2>
 
-        {/* HÄR ANVÄNDER VI DEN NYA KOMPONENTEN----- Type '{ avatars: Avatar[]; selectedId: number; onSelect: (id: any) => void; }' is not assignable to type 'IntrinsicAttributes & AvatarSectionProps'.
-  Property 'selectedId' does not exist on type 'IntrinsicAttributes & AvatarSectionProps'.--- Parameter 'id' implicitly has an 'any' type.*/}
+        {/* HÄR ANVÄNDER VI DEN NYA KOMPONENTEN */}
         <AvatarSelector
           avatars={avatars}
           selectedId={formData.avatarUrl}

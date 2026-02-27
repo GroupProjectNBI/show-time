@@ -4,7 +4,6 @@ import { createElement } from 'react';
 // page components
 import AboutPage from './pages/AboutPage.tsx';
 import NotFoundPage from './pages/NotFoundPage.tsx';
-
 import ScreeningsPage from './pages/ScreeningsPage.tsx';
 import BookingPage from './pages/BookingPage.tsx';
 import ConfirmationPage from './pages/ConfirmationPage.tsx';
@@ -22,10 +21,8 @@ export default [
   AboutPage,
   VisitInfoLink,
   NotFoundPage,
-
   ScreeningsPage,
   BookingPage,
-
   ConfirmationPage,
   WorkWithUs,
   StartPage,
