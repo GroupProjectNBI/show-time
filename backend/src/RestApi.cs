@@ -94,7 +94,8 @@ public static class RestApi
         ) =>
             RestResult.Parse(context, SQLQueryOne(
                 $"DELETE FROM {table} WHERE id = @id",
-                ReqBodyParse(table, Obj(new { id })).body,
+                new { id = id },
+                //ReqBodyParse(table, Obj(new { id })).body,
                 context
             ))
         );
