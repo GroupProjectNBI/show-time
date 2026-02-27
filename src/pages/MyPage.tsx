@@ -8,7 +8,7 @@ import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
-import PasswordDisplay from "../parts/PasswordDisplay";
+//import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
 import AccountActions from "../parts/AccountActions";
 
 interface AvatarItem {
@@ -18,7 +18,7 @@ interface AvatarItem {
 
 export default function MyPage() {
   const { user, changePassword, logout, updateAvatar } = useAuth();
-  
+
 
   const bookings: any[] = [];
 
@@ -64,7 +64,7 @@ export default function MyPage() {
   return (
     <div className="max-w-5xl mx-auto mt-32 px-4 pb-20 text-accent">
       <h1 className="text-4xl font-bold mb-10 text-center">Min sida</h1>
-      
+
 
       {/* ---------------- TWO COLUMN LAYOUT ---------------- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -101,7 +101,7 @@ export default function MyPage() {
         </div>
       </div>
 
-      {/* ---------------- BOOKINGS ---------------- */}
+      {/* ---------------- BOOKINGS ----------------göra denna dynamisk */}
       <h2 className="text-2xl font-semibold mt-16 mb-4">Kommande bokningar</h2>
 
       {bookings.length === 0 && (
@@ -136,4 +136,3 @@ MyPage.route = {
     </ProtectedRoute>
   )
 };
-
