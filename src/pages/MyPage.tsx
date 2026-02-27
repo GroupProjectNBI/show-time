@@ -1,5 +1,6 @@
-
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import fetchJson from "../utils/fetchJson";
 
 
 import ChangePasswordForm from "../parts/ChangePasswordForm";
@@ -149,14 +150,14 @@ export default function MyPage() {
             <UpcomingBookingCard
               key={booking.bookingId || booking.id}
               title={booking.movieTitle}
-              dateLabel={new Date(booking.startTime).toLocaleDateString('sv-SE', { 
-                weekday: 'short', 
-                day: 'numeric', 
-                month: 'long' 
+              dateLabel={new Date(booking.startTime).toLocaleDateString('sv-SE', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'long'
               })}
-              timeLabel={new Date(booking.startTime).toLocaleTimeString('sv-SE', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+              timeLabel={new Date(booking.startTime).toLocaleTimeString('sv-SE', {
+                hour: '2-digit',
+                minute: '2-digit',
               })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
@@ -164,9 +165,12 @@ export default function MyPage() {
               onCancel={() => console.log("Avboka bokning:", booking.id)}
               cancelDisabled={false}
             />
-      
+          ))}
+        </div>
+      )}
+
       {/* -------- DIVIDER MELLAN SEKTIONERNA -------- */}
-      <div className="my-10 h-px bg-white/10" /> 
+      <div className="my-10 h-px bg-white/10" />
 
 
       {/* -------- HISTORISKA BOKNINGAR -------- */}
@@ -184,17 +188,14 @@ export default function MyPage() {
         seenLabel="Sågs 14 mars 2026"
       />
 
-      ))}
-    </div>
+      {/* -------- ACCOUNT ACTIONS -------- */}
+      <div className="mt-12">
+        <AccountActions onLogout={() => void logout()} />
+      </div>
+
+    </div>   //detta är sista wrapper-diven  
   );
-}
-
-<AccountActions onLogout={() => { void logout(); }} />
-    </div >
-  );
-}
-
-
+} // här stängs funktionen  
 
 MyPage.route = {
   path: "/min-sida",
