@@ -2,6 +2,8 @@ import { useEffect, useState, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import fetchJson from "../utils/fetchJson";
 import { formatScreeningDate } from "../utils/formatTime";
+import { useOverlay } from "../context/OverlayContext";
+import { useAuth } from "../context/AuthContext";
 
 // Datatyper
 interface BookingData {
@@ -27,8 +29,14 @@ interface ScreeningData {
   theaterName: string;
 }
 
+type ConfirmationPageProps = {
+  openMembership: () => void;
+};
+
 export default function ConfirmationPage() {
-  const { bookingRef } = useParams<{ bookingRef: string }>();
+  const { user } = useAuth();
+  const { openMembership } = useOverlay();
+  const { bookingRef } = useParams<{ bookingRef: string; }>();
 
   const [booking, setBooking] = useState<BookingData | null>(null);
   const [tickets, setTickets] = useState<TicketData[]>([]);
@@ -36,6 +44,8 @@ export default function ConfirmationPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -188,12 +198,14 @@ export default function ConfirmationPage() {
                 Till startsidan
               </Link>
 
-              <Link
-                to="/login"
-                className="h-[48px] inline-flex items-center justify-center rounded-full bg-primary px-10 text-sm font-bold uppercase tracking-wide text-accent hover:bg-[#a0001e] transition"
-              >
-                Bli medlem
-              </Link>
+              {!user && (
+                <button
+                  onClick={openMembership}
+                  className="h-[48px] inline-flex items-center justify-center rounded-full bg-primary px-10 text-sm font-bold uppercase tracking-wide text-accent hover:bg-[#a0001e] transition"
+                >
+                  Bli medlem
+                </button>
+              )}
             </div>
           </div>
 
