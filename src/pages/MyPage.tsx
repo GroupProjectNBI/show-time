@@ -21,7 +21,8 @@ export default function MyPage() {
   const { user, changePassword, logout, updateAvatar } = useAuth();
 
   // --- STATES ---
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<any[]>([]); // Kommande
+  const [pastBookings, setPastBookings] = useState<any[]>([]); // Historik
   const [loading, setLoading] = useState(true);
   const [avatarList, setAvatarList] = useState<AvatarItem[]>([]);
 
@@ -43,30 +44,39 @@ export default function MyPage() {
     loadAvatars();
   }, []);
 
-  // 2. --- HÄMTA BOKNINGAR (Kombinerad logik) ---
+  // 2. --- HÄMTA OCH FILTRERA BOKNINGAR ---
   useEffect(() => {
     if (!user?.email) return;
 
     const loadBookings = async () => {
       try {
         setLoading(true);
-        // Vi hämtar från vyn v_user_bookings som i dev-branchen
         const result = await fetchJson(`/api/v_user_bookings`);
 
         if (result && !result.error) {
           const now = new Date();
 
-          // Filtrera fram inloggad användares framtida bokningar
-          const myUpcoming = result
-            .filter((b: any) => b.email?.toLowerCase() === user.email.toLowerCase())
-            .filter((b: any) => new Date(b.startTime) >= now);
-
-          // Sortera listan efter tid
-          myUpcoming.sort((a: any, b: any) =>
-            new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+          // 1. Filtrera på användarens e-post
+          const mine = result.filter(
+            (b: any) => b.email?.toLowerCase() === user.email.toLowerCase()
           );
 
+          // 2. Filtrera fram kommande bokningar (startTime >= nu) och sortera ASC
+          const myUpcoming = mine
+            .filter((b: any) => new Date(b.startTime) >= now)
+            .sort((a: any, b: any) =>
+              new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+            );
+
+          // 3. Filtrera fram tidigare bokningar (startTime < nu) och sortera DESC
+          const myPast = mine
+            .filter((b: any) => new Date(b.startTime) < now)
+            .sort((a: any, b: any) =>
+              new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+            );
+
           setBookings(myUpcoming);
+          setPastBookings(myPast);
         }
       } catch (error) {
         console.error("Kunde inte hämta bokningar:", error);
@@ -78,13 +88,13 @@ export default function MyPage() {
     loadBookings();
   }, [user?.email]);
 
-  // 3. --- AVBOKA FUNKTION (Behålls från din HEAD) ---
+  // 3. --- AVBOKA FUNKTION ---
   const handleCancelBooking = async (id: number) => {
     const confirmCancel = window.confirm("Är du säker på att du vill avboka denna film?");
     if (!confirmCancel) return;
 
     try {
-      // Hämta biljetter för att radera dem först (Foreign Key constraints)
+      // Radera biljetter först pga Foreign Key constraints
       const ticketsData = await fetchJson(`/api/Ticket?where=BookingId=${id}`);
 
       if (ticketsData && ticketsData.length > 0) {
@@ -93,10 +103,10 @@ export default function MyPage() {
         }
       }
 
-      // Radera själva bokningen
+      // Radera bokningen
       await fetchJson(`/api/Booking/${id}`, { method: "DELETE" });
 
-      // Uppdatera UI
+      // Uppdatera UI: Ta bort från kommande bokningar
       setBookings((prev) => prev.filter((b) => (b.bookingId || b.id) !== id));
       alert("Bokningen är nu avbokad.");
     } catch (error) {
@@ -112,7 +122,7 @@ export default function MyPage() {
       <h1 className="text-4xl font-bold mb-10 text-center">Min sida</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* -------- VÄNSTER KOLUMN -------- */}
+        {/* -------- VÄNSTER KOLUMN (Profilinställningar) -------- */}
         <div>
           <UsernameField
             initialValue={user?.userName ?? ""}
@@ -127,7 +137,7 @@ export default function MyPage() {
           </div>
         </div>
 
-        {/* -------- HÖGER KOLUMN -------- */}
+        {/* -------- HÖGER KOLUMN (Avatar) -------- */}
         <div className="flex justify-center md:justify-end">
           <AvatarSection
             currentAvatarId={user?.avatarUrl ?? 1}
@@ -153,36 +163,59 @@ export default function MyPage() {
               key={booking.bookingId || booking.id}
               id={booking.bookingId || booking.id}
               title={booking.movieTitle}
-              // Använder din format-helper för datumet
               dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
-              timeLabel={new Date(booking.startTime).toLocaleTimeString('sv-SE', {
-                hour: '2-digit',
-                minute: '2-digit',
+              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
+                hour: "2-digit",
+                minute: "2-digit",
               })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
               seatsLabel={booking.seats || "Information saknas"}
-              onCancel={handleCancelBooking} // Kopplad till din funktion!
+              onCancel={handleCancelBooking}
               cancelDisabled={false}
             />
           ))}
         </div>
       )}
 
-      {/* -------- DIVIDER FRÅN DEV -------- */}
+      {/* -------- DIVIDER -------- */}
       <div className="my-10 h-px bg-white/10" />
 
-      {/* -------- HISTORISKA BOKNINGAR FRÅN DEV -------- */}
+      {/* ---------------- HISTORISKA BOKNINGAR ---------------- */}
       <h2 className="text-2xl font-semibold mt-0 mb-4">Tidigare bokningar</h2>
-      <PastBookingCard
-        title="Dune: Messiah"
-        dateLabel="Lör 14 mars 2026"
-        timeLabel="19:30"
-        theaterLabel="Stora salongen"
-        ticketsLabel="2 biljetter"
-        seatsLabel="A5, A6"
-        seenLabel="Sågs 14 mars 2026"
-      />
+
+      {loading ? (
+        <p className="text-accent/60">Laddar historik...</p>
+      ) : pastBookings.length === 0 ? (
+        <p className="text-accent/60 mb-6">Du har inga tidigare bokningar</p>
+      ) : (
+        <div className="flex flex-col gap-4 mb-10">
+          {pastBookings.map((booking) => (
+            <PastBookingCard
+              key={booking.bookingId || booking.id}
+              title={booking.movieTitle}
+              dateLabel={new Date(booking.startTime).toLocaleDateString("sv-SE", {
+                weekday: "short",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              theaterLabel={booking.theaterName + " salongen"}
+              ticketsLabel={`${booking.ticketCount || 0} biljetter`}
+              seatsLabel={booking.seats || "Information saknas"}
+              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}`}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="mt-12">
         <AccountActions onLogout={() => void logout()} />
