@@ -8,6 +8,7 @@ import Footer from './partials/Footer';
 // import { AuthProvider } from './context/AuthContext';
 import { BookingProvider } from './context/BookingContext';
 import { AuthProvider } from './context/AuthContext';
+import { OverlayProvider } from './context/OverlayContext';
 
 import { useState } from "react";
 import MembershipOverlay from "./parts/MembershipOverlay";
@@ -33,35 +34,41 @@ export default function App() {
     // 2. WRAPPA HELA INNEHÅLLET HÄR
     <AuthProvider>
       <BookingProvider>
-        {showMembership && (
-          <MembershipOverlay onClose={() => setShowMembership(false)} />
-        )}
+        <OverlayProvider
+          value={{
+            openMembership: () => setShowMembership(true),
+            openLogin: () => setShowLogin(true),
+          }}
+        >
+          {showMembership && (
+            <MembershipOverlay onClose={() => setShowMembership(false)} />
+          )}
 
 
-        {showLogin && (<LoginOverlay onClose={() => setShowLogin(false)}
-          openMembership={() => {
-            setShowLogin(false);
-            setShowMembership(true);
-          }} />)}
+          {showLogin && (<LoginOverlay onClose={() => setShowLogin(false)}
+            openMembership={() => {
+              setShowLogin(false);
+              setShowMembership(true);
+            }} />)}
 
 
 
-        <div className="min-h-screen flex flex-col">
+          <div className="min-h-screen flex flex-col">
 
-          <Header openMembership={() => setShowMembership(true)}
-            openLogin={() => setShowLogin(true)}
-          />
+            <Header openMembership={() => setShowMembership(true)}
+              openLogin={() => setShowLogin(true)}
+            />
 
-          {/* Main tar upp allt ledigt utrymme och centrerar innehållet */}
-  <main className="flex-grow">
-    <Main />
-  </main>
-          <div className={isAboutPage ? "footer-about" : ""}>
-            <Footer openMembership={() => setShowMembership(true)} />
+            {/* Main tar upp allt ledigt utrymme och centrerar innehållet */}
+            <main className="flex-grow">
+              <Main />
+            </main>
+            <div className={isAboutPage ? "footer-about" : ""}>
+              <Footer openMembership={() => setShowMembership(true)} />
+            </div>
+
           </div>
-
-        </div>
-
+        </OverlayProvider>
       </BookingProvider>
     </AuthProvider >
   );
