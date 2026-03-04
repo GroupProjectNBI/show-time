@@ -9,7 +9,7 @@ type Props = {
   onBook?: () => void;
 };
 
-// ⭐ Snack-priser per person (måste matcha BookingContext)
+//  Snack-priser per person (måste matcha BookingContext)
 const snackOptions = [
   {
     key: "large" as const,
@@ -34,7 +34,7 @@ const snackOptions = [
   },
 ];
 
-// ⭐ Dynamisk text baserat på antal biljetter
+// Dynamisk text baserat på antal biljetter
 function getDynamicDesc(opt: typeof snackOptions[number], ticketCount: number) {
   const p = opt.base.popcorn * ticketCount;
   const s = opt.base.snacks * ticketCount;
@@ -65,15 +65,10 @@ export default function BookingSnackPanel({
 
   const emailIsValid = useMemo(() => isValidEmail(email), [email]);
 
-  const selected = useMemo(
-    () => snackOptions.find((s) => s.key === selectedSnack) ?? null,
-    [selectedSnack]
-  );
 
-  // ⭐ Dynamiskt pris per person × antal biljetter
-  const snacksPrice = selected
-    ? selected.pricePerPerson * ticketCount
-    : 0;
+
+  //  Dynamiskt pris per person × antal biljetter
+
 
   const imageSrc = snackImageUrl || "/images/Commercials/popga.jpg";
 
