@@ -29,10 +29,6 @@ interface ScreeningData {
   theaterName: string;
 }
 
-type ConfirmationPageProps = {
-  openMembership: () => void;
-};
-
 export default function ConfirmationPage() {
   const { user } = useAuth();
   const { openMembership } = useOverlay();
