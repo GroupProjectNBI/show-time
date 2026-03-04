@@ -194,12 +194,13 @@ export default function MyPage() {
             <PastBookingCard
               key={booking.bookingId || booking.id}
               title={booking.movieTitle}
-              dateLabel={new Date(booking.startTime).toLocaleDateString("sv-SE", {
-                weekday: "short",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
+              // dateLabel={new Date(booking.startTime).toLocaleDateString("sv-SE", {
+              //   weekday: "short",
+              //   day: "numeric",
+              //   month: "long",
+              //   year: "numeric",
+              // })}
+              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
               timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
                 hour: "2-digit",
                 minute: "2-digit",
