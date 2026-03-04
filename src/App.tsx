@@ -13,6 +13,7 @@ import { OverlayProvider } from './context/OverlayContext';
 import { useState } from "react";
 import MembershipOverlay from "./parts/MembershipOverlay";
 import LoginOverlay from "./parts/LoginOverlay";
+import CookiePopup from './parts/CookiePopup';
 export default function App() {
 
   // Denna hook fungerar eftersom App ligger inuti RouterProvider i main.tsx
@@ -22,6 +23,8 @@ export default function App() {
 
   const [showLogin, setShowLogin] = useState(false);
   const [showMembership, setShowMembership] = useState(false);
+
+  const [showCookies, setShowCookies] = useState(true);
 
 
 
@@ -50,6 +53,13 @@ export default function App() {
               setShowLogin(false);
               setShowMembership(true);
             }} />)}
+
+          {showCookies && (
+            <CookiePopup
+              onAccept={() => setShowCookies(false)}
+              onDecline={() => setShowCookies(false)}
+            />
+          )}
 
 
 
