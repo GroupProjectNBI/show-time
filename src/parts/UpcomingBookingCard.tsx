@@ -4,6 +4,7 @@ type UpcomingBookingCardProps = {
   title: string;
   dateLabel: string;
   timeLabel: string;
+  id: number;
   theaterLabel: string;
   seatsLabel?: string;
   ticketsLabel?: string;
@@ -11,7 +12,7 @@ type UpcomingBookingCardProps = {
 
   // Actions för senare kanske 
   onViewTicket?: () => void; // Öppna QR-kod 
-  onCancel?: () => void; // Anropa cancelbooking(id()
+  onCancel?: (id: number) => void; // Anropa cancelbooking(id()
 
 
   cancelDisabled?: boolean; // Låsa avbokning nära start
@@ -19,6 +20,7 @@ type UpcomingBookingCardProps = {
 
 export default function UpcomingBookingCard({
   title,
+  id,
   dateLabel,
   timeLabel,
   theaterLabel,
@@ -113,7 +115,7 @@ export default function UpcomingBookingCard({
               {onCancel && (
                 <button
                   type="button"
-                  onClick={onCancel}
+                  onClick={() => onCancel(id)}
                   disabled={cancelDisabled}
                   className="
                   inline-flex items-center justify-center gap-2
