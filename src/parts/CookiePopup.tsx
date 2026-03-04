@@ -7,7 +7,7 @@ type CookiePopupProps = {
 
 export default function CookiePopup({ onAccept, onDecline }: CookiePopupProps) {
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-xs bg-black/60 p-4 animate-fadeIn">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-xs bg-black/80 p-4 animate-fadeIn">
       <div className="relative w-[90%] max-w-md bg-primary/90 rounded-3xl p-8 shadow-2xl border border-white/10">
 
         <h2 className="text-accent text-xl font-bold mb-4 text-center uppercase tracking-widest">
