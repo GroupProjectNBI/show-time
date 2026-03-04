@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import fetchJson from "../utils/fetchJson";
-
+import { formatScreeningDate } from "../utils/formatTime";
 
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
 import PastBookingCard from "../parts/PastBookingCard";
-
-
 import AvatarSection from "../parts/AvatarSection";
 import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
-//import PasswordDisplay from "../parts/PasswordDisplay"; // används denna? 
 import AccountActions from "../parts/AccountActions";
-
 import ProtectedRoute from "../parts/ProtectedRoute";
 
 interface AvatarItem {
@@ -24,178 +20,210 @@ interface AvatarItem {
 export default function MyPage() {
   const { user, changePassword, logout, updateAvatar } = useAuth();
 
-
-  const [bookings, setBookings] = useState<any[]>([]);
-
+  // --- STATES ---
+  const [bookings, setBookings] = useState<any[]>([]); // Kommande
+  const [pastBookings, setPastBookings] = useState<any[]>([]); // Historik
+  const [loading, setLoading] = useState(true);
   const [avatarList, setAvatarList] = useState<AvatarItem[]>([]);
 
-  // När MyPage laddas hämtas alla tillgängliga avatars från backend.
-  // Detta gör att vi slipper hårdkoda bilder i frontend.
-  // Både login och avatar-väljaren använder nu samma datakälla (databasen).
+  // 1. --- HÄMTA AVATARER ---
   useEffect(() => {
     async function loadAvatars() {
       try {
         const res = await fetchJson("/api/Avatar");
-
-        // Förväntar oss array: [{ id: number, url: string }, ...]
         if (Array.isArray(res)) {
           const mapped: AvatarItem[] = res
             .filter((a) => a && typeof a.id === "number" && typeof a.url === "string")
             .map((a) => ({ id: a.id, url: a.url }));
-
           setAvatarList(mapped);
-        } else {
-          setAvatarList([]);
         }
       } catch (err) {
         console.error("Kunde inte hämta avatars:", err);
-        setAvatarList([]);
       }
     }
-
     loadAvatars();
   }, []);
 
-  // Om avatar-listan inte hunnit laddas men användaren redan har en avatar från login,
-  // avatar läggs in den temporärt så UI inte visar trasig bild. 
-  // Gör sidan mer stabil vid första render.
-  const safeAvatarList: AvatarItem[] =
-    avatarList.length > 0
-      ? avatarList
-      : user?.avatar && typeof user.avatarUrl === "number"
-        ? [{ id: user.avatarUrl, url: user.avatar }]
-        : [];
-  // LOGIK #310: Hämta bokningar baserat på e-post
+  // 2. --- HÄMTA OCH FILTRERA BOKNINGAR ---
   useEffect(() => {
     if (!user?.email) return;
 
     const loadBookings = async () => {
       try {
-        // Vi hämtar datan från VIEW
+        setLoading(true);
         const result = await fetchJson(`/api/v_user_bookings`);
-        console.log("Hämtade bokningar:", result);
+
         if (result && !result.error) {
           const now = new Date();
 
-          // Filtrera fram inloggad användares framtida bokningar
-          const myUpcoming = result
-            .filter((b: any) => b.email?.toLowerCase() === user.email.toLowerCase())
-            .filter((b: any) => new Date(b.startTime) >= now);
-
-          // Sortera listan
-          myUpcoming.sort((a: any, b: any) =>
-            new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+          // 1. Filtrera på användarens e-post
+          const mine = result.filter(
+            (b: any) => b.email?.toLowerCase() === user.email.toLowerCase()
           );
 
+          // 2. Filtrera fram kommande bokningar (startTime >= nu) och sortera ASC
+          const myUpcoming = mine
+            .filter((b: any) => new Date(b.startTime) >= now)
+            .sort((a: any, b: any) =>
+              new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+            );
+
+          // 3. Filtrera fram tidigare bokningar (startTime < nu) och sortera DESC
+          const myPast = mine
+            .filter((b: any) => new Date(b.startTime) < now)
+            .sort((a: any, b: any) =>
+              new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+            );
+
           setBookings(myUpcoming);
+          setPastBookings(myPast);
         }
       } catch (error) {
         console.error("Kunde inte hämta bokningar:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadBookings();
   }, [user?.email]);
 
+  // 3. --- AVBOKA FUNKTION ---
+  const handleCancelBooking = async (id: number) => {
+    const confirmCancel = window.confirm("Är du säker på att du vill avboka denna film?");
+    if (!confirmCancel) return;
+
+    try {
+      // Radera biljetter först pga Foreign Key constraints
+      const ticketsData = await fetchJson(`/api/Ticket?where=BookingId=${id}`);
+
+      if (ticketsData && ticketsData.length > 0) {
+        for (const ticket of ticketsData) {
+          await fetchJson(`/api/Ticket/${ticket.id}`, { method: "DELETE" });
+        }
+      }
+
+      // Radera bokningen
+      await fetchJson(`/api/Booking/${id}`, { method: "DELETE" });
+
+      // Uppdatera UI: Ta bort från kommande bokningar
+      setBookings((prev) => prev.filter((b) => (b.bookingId || b.id) !== id));
+      alert("Bokningen är nu avbokad.");
+    } catch (error) {
+      console.error("Fel vid avbokning:", error);
+      alert("Kunde inte avboka. Vänligen försök igen.");
+    }
+  };
+
+  const safeAvatarList: AvatarItem[] = avatarList.length > 0 ? avatarList : [];
+
   return (
     <div className="max-w-5xl mx-auto mt-32 px-4 pb-20 text-accent">
       <h1 className="text-4xl font-bold mb-10 text-center">Min sida</h1>
 
-
-      {/* ---------------- TWO COLUMN LAYOUT ---------------- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* -------- LEFT COLUMN -------- */}
+        {/* -------- VÄNSTER KOLUMN (Profilinställningar) -------- */}
         <div>
           <UsernameField
             initialValue={user?.userName ?? ""}
-            onSave={(newName) => {
-              console.log("Spara nytt användarnamn:", newName);
-            }}
+            onSave={(newName) => console.log("Spara nytt namn:", newName)}
           />
-
           <EmailField
             initialValue={user?.email ?? ""}
-            onSave={(newEmail) => {
-              console.log("Spara ny email:", newEmail);
-            }}
+            onSave={(newEmail) => console.log("Spara ny email:", newEmail)}
           />
-
           <div className="mt-6">
             <ChangePasswordForm onSubmit={changePassword} />
           </div>
         </div>
 
-        {/* -------- RIGHT COLUMN -------- */}
+        {/* -------- HÖGER KOLUMN (Avatar) -------- */}
         <div className="flex justify-center md:justify-end">
           <AvatarSection
             currentAvatarId={user?.avatarUrl ?? 1}
             avatars={safeAvatarList}
             onChange={async (newId) => {
-              await updateAvatar(newId);
+              if (updateAvatar) await updateAvatar(newId);
             }}
           />
         </div>
       </div>
 
-      {/* ---------------- BOOKINGS SECTION #310 ---------------- */}
+      {/* ---------------- KOMMANDE BOKNINGAR ---------------- */}
       <h2 className="text-2xl font-semibold mt-16 mb-6">Kommande bokningar</h2>
 
-      {/* Om inga bokningar finns */}
-      {bookings.length === 0 ? (
+      {loading ? (
+        <p className="text-accent/60 mb-6">Laddar dina bokningar...</p>
+      ) : bookings.length === 0 ? (
         <p className="text-accent/60 mb-6">Du har inga kommande bokningar</p>
       ) : (
-        /* Lista med riktiga bokningar från databasen */
         <div className="flex flex-col gap-4 mb-10">
           {bookings.map((booking) => (
             <UpcomingBookingCard
               key={booking.bookingId || booking.id}
+              id={booking.bookingId || booking.id}
               title={booking.movieTitle}
-              dateLabel={new Date(booking.startTime).toLocaleDateString('sv-SE', {
-                weekday: 'short',
-                day: 'numeric',
-                month: 'long'
-              })}
-              timeLabel={new Date(booking.startTime).toLocaleTimeString('sv-SE', {
-                hour: '2-digit',
-                minute: '2-digit',
+              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
+              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
+                hour: "2-digit",
+                minute: "2-digit",
               })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
               seatsLabel={booking.seats || "Information saknas"}
-              onCancel={() => console.log("Avboka bokning:", booking.id)}
+              onCancel={handleCancelBooking}
               cancelDisabled={false}
             />
           ))}
         </div>
       )}
 
-      {/* -------- DIVIDER MELLAN SEKTIONERNA -------- */}
+      {/* -------- DIVIDER -------- */}
       <div className="my-10 h-px bg-white/10" />
 
+      {/* ---------------- HISTORISKA BOKNINGAR ---------------- */}
+      <h2 className="text-2xl font-semibold mt-0 mb-4">Tidigare bokningar</h2>
 
-      {/* -------- HISTORISKA BOKNINGAR -------- */}
-      <h2 className="text-2xl font-semibold mt-0 mb-4">
-        Tidigare bokningar
-      </h2>
+      {loading ? (
+        <p className="text-accent/60">Laddar historik...</p>
+      ) : pastBookings.length === 0 ? (
+        <p className="text-accent/60 mb-6">Du har inga tidigare bokningar</p>
+      ) : (
+        <div className="flex flex-col gap-4 mb-10">
+          {pastBookings.map((booking) => (
+            <PastBookingCard
+              key={booking.bookingId || booking.id}
+              title={booking.movieTitle}
+              // dateLabel={new Date(booking.startTime).toLocaleDateString("sv-SE", {
+              //   weekday: "short",
+              //   day: "numeric",
+              //   month: "long",
+              //   year: "numeric",
+              // })}
+              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
+              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              theaterLabel={booking.theaterName + " salongen"}
+              ticketsLabel={`${booking.ticketCount || 0} biljetter`}
+              seatsLabel={booking.seats || "Information saknas"}
+              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}`}
+            />
+          ))}
+        </div>
+      )}
 
-      <PastBookingCard
-        title="Dune: Messiah"
-        dateLabel="Lör 14 mars 2026"
-        timeLabel="19:30"
-        theaterLabel="Stora salongen"
-        ticketsLabel="2 biljetter"
-        seatsLabel="A5, A6"
-        seenLabel="Sågs 14 mars 2026"
-      />
-
-      {/* -------- ACCOUNT ACTIONS -------- */}
       <div className="mt-12">
         <AccountActions onLogout={() => void logout()} />
       </div>
-
-    </div>   //detta är sista wrapper-diven  
+    </div>
   );
-} // här stängs funktionen  
+}
 
 MyPage.route = {
   path: "/min-sida",
@@ -205,5 +233,5 @@ MyPage.route = {
     <ProtectedRoute>
       <MyPage />
     </ProtectedRoute>
-  )
+  ),
 };
