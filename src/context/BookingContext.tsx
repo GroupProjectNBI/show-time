@@ -1,13 +1,8 @@
 import type { ReactNode } from "react";
 import { createContext, useState, useContext, useMemo, useCallback, useEffect } from "react";
-// import generate from "../utils/bookingNumberGeneratir";
 import type { BookingContextType } from "../interfaces/Booking";
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
-
-/*==================================
-ENDA KÄLLAN FÖR PRISER ISTÄLLET FÖR UPPREPNING
-====================================*/
 
 const TICKET_PRICES = {
     ordinarie: 140,
@@ -21,68 +16,32 @@ const SNACK_PRICE_PER_PERSON = {
     small: 43,
 } as const;
 
-
-export function BookingProvider({ children }: { children: ReactNode; }) {
+export function BookingProvider({ children }: { children: ReactNode }) {
     const [selectedSeats, setSelectedSeats] = useState<number[]>([]);
     const [occupiedSeats, setOccupiedSeats] = useState<number[]>([]);
-
-    const [tickets, setTickets] = useState({
-        ordinarie: 0,
-        pensionar: 0,
-        barn: 0,
-    });
-
-    const [selectedSnack, setSelectedSnack] =
-        useState<"large" | "medium" | "small" | null>(null);
-
+    const [tickets, setTickets] = useState({ ordinarie: 0, pensionar: 0, barn: 0 });
+    const [selectedSnack, setSelectedSnack] = useState<"large" | "medium" | "small" | null>(null);
     const [email, setEmail] = useState<string>("");
 
-
-    // NYTT: antal biljetter = max antal stolar som får väljas
-
-    /* "derived values" data som räknas ut från befintliga state/prop värden istället för att lagras separat
-      i egen useState-variabel. För att hålla koden "DRY" så vi håller oss till Single Source of Truth */
-
-    //Antal biljetter
     const ticketCount = tickets.ordinarie + tickets.pensionar + tickets.barn;
-
-    //Biljett-total
     const ticketTotal =
         tickets.ordinarie * TICKET_PRICES.ordinarie +
         tickets.pensionar * TICKET_PRICES.pensionar +
         tickets.barn * TICKET_PRICES.barn;
 
-    // Snack-total
     const snackTotal = selectedSnack ? SNACK_PRICE_PER_PERSON[selectedSnack] * ticketCount : 0;
-
-    // TOTALT
     const totalAmount = ticketTotal + snackTotal;
-
-    /*==============================
-    LOGIK FÖR STOLAR
-    ================================*/
-    const maxSelectableSeats = tickets.ordinarie + tickets.pensionar + tickets.barn;
+    const maxSelectableSeats = ticketCount;
 
     const toggleSeat = useCallback((seatId: number) => {
         setSelectedSeats((prev) => {
-            if (prev.includes(seatId)) {
-                return prev.filter(id => id !== seatId);
-            }
-
-            // Om inga biljetter valda så välj inga stolar
-            if (maxSelectableSeats === 0) return prev;
-
-            // Om max uppnått (alla platser blivit valda) välj inga fler
-            if (prev.length >= maxSelectableSeats) return prev;
-
-            //annars lägg till
+            if (prev.includes(seatId)) return prev.filter(id => id !== seatId);
+            if (maxSelectableSeats === 0 || prev.length >= maxSelectableSeats) return prev;
             return [...prev, seatId];
         });
     }, [maxSelectableSeats]);
 
-    //NYTT: lagt till en useEffect om antal biljetter minskar när man valt stolar
-    // 3 biljetter = 3 stolar, minskar man till 2 försvinnedr den tredje automatiskt
-    // 0 biljetter = stolarna nollställs
+    // Rensar stolar om man minskar antalet biljetter i dropdownen
     useEffect(() => {
         setSelectedSeats((prev) => {
             if (maxSelectableSeats === 0) return [];
@@ -91,9 +50,8 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
         });
     }, [maxSelectableSeats]);
 
-    const setOccupied = useCallback((seatIds: number[]) => {
-        setOccupiedSeats(seatIds);
-    }, []);
+    // VIKTIGT: Exportera settern direkt för att stödja funktionella uppdateringar (prev => ...)
+    const setOccupied = setOccupiedSeats;
 
     const clearBooking = useCallback(() => {
         setSelectedSeats([]);
@@ -104,41 +62,11 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
     }, []);
 
     const value = useMemo(() => ({
-        // state
-        selectedSeats,
-        occupiedSeats,
-        tickets,
-        selectedSnack,
-        email,
-
-        // derived
-        ticketCount,
-        ticketTotal,
-        snackTotal,
-        totalAmount,
-
-        // actions
-        toggleSeat,
-        setOccupied,
-        clearBooking,
-
-        setTickets,
-        setSelectedSnack,
-        setEmail,
-    }), [
-        selectedSeats,
-        occupiedSeats,
-        toggleSeat,
-        setOccupied,
-        clearBooking,
-        tickets,
-        selectedSnack,
-        email,
-        ticketCount,
-        ticketTotal,
-        snackTotal,
-        totalAmount,
-    ]);
+        selectedSeats, occupiedSeats, tickets, selectedSnack, email,
+        ticketCount, ticketTotal, snackTotal, totalAmount,
+        toggleSeat, setOccupied, clearBooking,
+        setTickets, setSelectedSnack, setEmail,
+    }), [selectedSeats, occupiedSeats, toggleSeat, setOccupied, clearBooking, tickets, selectedSnack, email, ticketCount, ticketTotal, snackTotal, totalAmount]);
 
     return (
         <BookingContext.Provider value={value}>
@@ -147,10 +75,8 @@ export function BookingProvider({ children }: { children: ReactNode; }) {
     );
 }
 
-export function useBooking(): BookingContextType {
+export function useBooking() {
     const context = useContext(BookingContext);
-    if (!context) {
-        throw new Error("useBooking must be used within BookingProvider");
-    }
+    if (!context) throw new Error("useBooking must be used within BookingProvider");
     return context;
 }
