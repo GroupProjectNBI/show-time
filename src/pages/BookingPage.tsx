@@ -27,7 +27,7 @@ export default function BookingPage() {
 
     const {
         selectedSeats, occupiedSeats, toggleSeat, setOccupied,
-        tickets, ticketCount, selectedSnack, email, totalAmount, clearBooking,
+        ticketCount, selectedSnack, email, totalAmount, clearBooking,
     } = useBooking();
 
     // 1. Hämta statisk data (film, salong, redan sålda stolar)
@@ -156,7 +156,7 @@ export default function BookingPage() {
     if (!seatArray || !screening || !movie) return <div className="text-white p-10">Laddar...</div>;
 
     const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
-    const currentTheater = seatArray[0];
+    // const currentTheater = seatArray[0];
 
     return (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center">
