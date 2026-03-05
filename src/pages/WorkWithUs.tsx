@@ -3,13 +3,15 @@ WorkWithUs.route = {
   index: -1 // ska inte synas i headern
 };
 
+import Image from "../parts/Image";
+
 export default function WorkWithUs() {
   return (
     <div className="workwithus-page">
 
       {/* HERO SECTION */}
       <section className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden rounded-3xl mb-2">
-        <img
+        <Image
           src="/images/Commercials/jobbahososs.png"
           alt="Arbeta hos oss"
           className="absolute inset-0 w-full h-full object-cover scale-110 rounded-3xl"
@@ -85,12 +87,12 @@ export default function WorkWithUs() {
       {/* IMAGE GRID */}
       <section className="w-full max-w-6xl mx-auto px-6 pb-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 animate-fadeIn">
-          <img
+          <Image
             src="/images/Commercials/salong1.png"
             alt="Biograf"
             className="w-full h-[450px] object-cover rounded-2xl shadow-2xl hover:scale-[1.02] transition-transform duration-700"
           />
-          <img
+          <Image
             src="/images/Commercials/salong2.png"
             alt="Biograf"
             className="w-full h-[450px] object-cover rounded-2xl shadow-2xl hover:scale-[1.02] transition-transform duration-700"

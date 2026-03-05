@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import routes from "../routes";
 import { useAuth } from "../context/AuthContext";
-
+import Image from "../parts/Image";
 type HeaderProps = {
   openMembership: () => void;
   openLogin: () => void;
@@ -52,7 +52,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
               <div className="flex items-center gap-6">
 
                 <Link to="/" onClick={() => setExpanded(false)} className="shrink-0">
-                  <img
+                  <Image
                     src="/images/logos/show-time.png"
                     alt="Show-Time"
                     className="h-48 w-auto mt-2 transition-transform duration-300 hover:scale-105"
@@ -118,7 +118,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                       Logga ut
                     </button>
 
-                    <img
+                    <Image
                       src={user.avatar}
                       className="w-10 h-10 rounded-full border border-white/20"
                       alt="avatar"

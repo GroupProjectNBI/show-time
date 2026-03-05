@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-
+import { Image } from "lucide-react";
 function AboutPage() {
   const { hash } = useLocation();
 
@@ -19,7 +19,7 @@ function AboutPage() {
 
       {/* HERO SECTION */}
       <section className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden rounded-2xl -mb-10">
-        <img
+        <Image
           src="/images/Commercials/biografhus.png"
           alt="Biograf"
           className="absolute inset-0 w-full h-full object-cover scale-110"
@@ -64,7 +64,7 @@ function AboutPage() {
       {/* CINEMATIC IMAGE */}
       <section className="px-6 md:px-10 pb-20">
         <div className="max-w-6xl mx-auto overflow-hidden rounded-2xl shadow-2xl animate-fadeIn">
-          <img
+          <Image
             src="/images/Commercials/salong1.png"
             alt="Biograf"
             className="w-full h-[350px] md:h-[550px] object-cover hover:scale-[1.05] transition-transform duration-700"

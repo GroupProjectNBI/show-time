@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import AvatarSelector from "./AvatarSelector";
-
+import Image from "./Image";
 interface Avatar {
   id: number;
   url: string;
@@ -38,7 +38,7 @@ export default function AvatarSection({
 
       {/* --- AVATAR + BYT KNAPP --- */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-        <img
+        <Image
           src={currentAvatar?.url}
           alt="Avatar"
           onClick={() => setZoom(true)}
@@ -59,7 +59,7 @@ export default function AvatarSection({
           onClick={() => setZoom(false)}
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 cursor-pointer p-4"
         >
-          <img
+          <Image
             src={currentAvatar?.url}
             alt="Avatar (zoom)"
             className="w-64 h-64 sm:w-72 sm:h-72 rounded-full border border-white/20 shadow-2xl"

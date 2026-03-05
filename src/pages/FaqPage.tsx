@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Image } from "lucide-react";
 FAQPage.route = {
   path: "/faq",
   index: -1
@@ -106,7 +107,7 @@ export default function FAQPage() {
         {/*RIGHT: HERO IAMGE */}
         <div>
           <div className="w-full h-[475px] rounded-3xl overflow-hidden shadow-2xl">
-            <img
+            <Image
               src="/images/Commercials/FAQimage.png"
               alt="FAQ Hero"
               className="w-full h-full object cover"

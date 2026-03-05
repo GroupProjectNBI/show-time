@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
+import Image from "./Image";
 interface Movie {
     id: number;
     title?: string;
@@ -150,7 +150,7 @@ const MovieCarousel3D = ({ popularMovie }: MovieCarouselProps) => {
                     /* ÄNDRING: brightness-75 istället för 50 på sidokorten = mer spotlight */
                     ${isActive ? 'shadow-[0_25px_80px_rgba(198,169,106,0.4)] border-white/30 brightness-100' : 'brightness-75 hover:brightness-90'}
                   `}>
-                                        <img
+                                        <Image
                                             src={`/images/posters/${movie.id}.webp`}
                                             alt={movie.title}
                                             className="w-full h-full object-cover"
