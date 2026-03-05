@@ -34,7 +34,7 @@ services:
 
       # 3. Porten inuti containern
       - "traefik.http.services.cinema.loadbalancer.server.port=${PORT}"
-      - "traefik.http.routers.cinema.priority=1" # Högre prioritet så den inte krockar med root-domänen
+      - "traefik.http.routers.cinema.priority=100" # Högre prioritet så den inte krockar med root-domänen
 
     networks:
       - traefik-net # <-- Rättat stavfel här!
