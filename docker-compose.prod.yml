@@ -37,8 +37,8 @@ services:
       - "traefik.http.routers.cinema.priority=10" # Högre prioritet så den inte krockar med root-domänen
 
     networks:
-      - web
+      - wtraefik-netb
 
 networks:
-  web:
-    external: true
+  traefik-net:
+    external: true # <--- Berätta för Docker att nätverket redan finns
