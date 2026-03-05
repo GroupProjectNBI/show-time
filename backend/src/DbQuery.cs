@@ -12,32 +12,53 @@ public static class DbQuery
 
     static DbQuery()
     {
-        var configPath = Path.Combine(
-            AppContext.BaseDirectory, "..", "..", "..", "db-config.json"
-        );
-        var configJson = File.ReadAllText(configPath);
-        var config = JSON.Parse(configJson);
+        // 1. Kolla om vi har en färdig connection string från miljövariabler (Docker-vägen)
+        var envConn = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
-        connectionString =
-            $"Server={config.host};Port={config.port};Database={config.database};" +
-            $"User={config.username};Password={config.password};";
-
-        var db = new MySqlConnection(connectionString);
-        db.Open();
-
-        // Create tables if they don't exist
-        if (config.createTablesIfNotExist == true)
+        if (!string.IsNullOrEmpty(envConn))
         {
+            connectionString = envConn;
+
+            // I Docker kör vi oftast table creation och seeding som standard
+            using var db = new MySqlConnection(connectionString);
+            db.Open();
             CreateTablesIfNotExist(db);
-        }
-
-        // Seed data if tables are empty
-        if (config.seedDataIfEmpty == true)
-        {
             SeedDataIfEmpty(db);
+            db.Close();
         }
+        else
+        {
+            // 2. Fallback: Om ingen miljövariabel finns, leta efter filen (Lokal-vägen)
+            // Vi gör sökvägen lite smartare så den letar både lokalt och i debug-mappar
+            var configPath = "db-config.json";
 
-        db.Close();
+            // Om filen inte finns direkt, testa din gamla debug-sökväg
+            if (!File.Exists(configPath))
+            {
+                configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
+            }
+
+            if (File.Exists(configPath))
+            {
+                var configJson = File.ReadAllText(configPath);
+                var config = JSON.Parse(configJson);
+
+                connectionString =
+                    $"Server={config.host};Port={config.port};Database={config.database};" +
+                    $"User={config.username};Password={config.password};";
+
+                using var db = new MySqlConnection(connectionString);
+                db.Open();
+                if (config.createTablesIfNotExist == true) { CreateTablesIfNotExist(db); }
+                if (config.seedDataIfEmpty == true) { SeedDataIfEmpty(db); }
+                db.Close();
+            }
+            else
+            {
+                // Om vi hamnar här har vi varken miljövariabler eller fil - då måste vi varna!
+                Console.WriteLine("CRITICAL ERROR: No database configuration found (ENV or JSON).");
+            }
+        }
     }
 
     private static void CreateTablesIfNotExist(MySqlConnection db)

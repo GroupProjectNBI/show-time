@@ -1,0 +1,143 @@
+name: Cinema Build and Deploy
+
+on:
+    push:
+        branches: ["feauture/deploy"]
+    pull_request:
+        branches: ["main"]
+        types: [closed]
+
+jobs:
+    build:
+        # Kör vid push till feature-branch ELLER vid merge till main
+        if: |
+            github.event_name == 'push' || 
+            (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            # --- HÄMTA ALLA HEMLIGHETER FRÅN TVÅ PATHS ---
+            - name: Import Secrets from Vault
+              uses: hashicorp/vault-action@v3
+              with:
+                  url: https://vault.jarllindquist.com
+                  method: approle
+                  roleId: ${{ secrets.VAULT_ROLE_ID }}
+                  secretId: ${{ secrets.VAULT_SECRET_ID }}
+                  secrets: |
+                      # 1. Infrastruktur (Docker Hub)
+                      kv/data/server-deploy DOCKER_USERNAME | DOCKER_USERNAME ;
+                      kv/data/server-deploy DOCKER_PASSWORD | DOCKER_PASSWORD ;
+                      # 2. App-specifikt (Cinema)
+                      kv/data/show-time as_production     | ASPNETCORE_ENVIRONMENT ;
+                      kv/data/show-time db                | DB_NAME ;
+                      kv/data/show-time db_create_tables  | DB_CREATE_TABLES ;
+                      kv/data/show-time db_host           | DB_HOST ;
+                      kv/data/show-time db_pass           | DB_PASS ;
+                      kv/data/show-time db_port           | DB_PORT ;
+                      kv/data/show-time db_seed_data      | DB_SEED_DATA ;
+                      kv/data/show-time db_user           | DB_USER ;
+                      kv/data/show-time debug_on          | DEBUG_ON ;
+                      kv/data/show-time frontend_path     | FRONTEND_PATH ;
+                      kv/data/show-time port              | PORT ;
+                      kv/data/show-time session_lifetime  | SESSION_LIFETIME
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ env.DOCKER_USERNAME }}
+                  password: ${{ env.DOCKER_PASSWORD }}
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  # Använder din Docker Hub-användare + projekt-namnet
+                  tags: |
+                      ${{ env.DOCKER_USERNAME }}/cinema-app:latest
+                      ${{ env.DOCKER_USERNAME }}/cinema-app:${{ github.sha }}
+
+    deploy:
+        needs: build
+        if: |
+            github.event_name == 'push' || 
+            (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Import Secrets from Vault
+              uses: hashicorp/vault-action@v3
+              with:
+                  url: https://vault.jarllindquist.com
+                  method: approle
+                  roleId: ${{ secrets.VAULT_ROLE_ID }}
+                  secretId: ${{ secrets.VAULT_SECRET_ID }}
+                  secrets: |
+                      # 1. Infrastruktur (SSH & Server)
+                      kv/data/server-deploy SSH_HOST | SERVER_HOST ;
+                      kv/data/server-deploy SSH_USERNAME | SERVER_USER ;
+                      kv/data/server-deploy SERVER_PORT | SERVER_PORT ;
+                      kv/data/server-deploy SSH_PRIVATE_KEY | SSH_PRIVATE_KEY ;
+                      kv/data/server-deploy DOCKER_USERNAME | DOCKER_USERNAME ;
+                      kv/data/server-deploy DOCKER_PASSWORD | DOCKER_PASSWORD ;
+                      # 2. App-specifikt (Cinema) för att kunna injicera i scriptet
+                      kv/data/show-time as_production     | ASPNETCORE_ENVIRONMENT ;
+                      kv/data/show-time db                | DB_NAME ;
+                      kv/data/show-time db_create_tables  | DB_CREATE_TABLES ;
+                      kv/data/show-time db_host           | DB_HOST ;
+                      kv/data/show-time db_pass           | DB_PASS ;
+                      kv/data/show-time db_port           | DB_PORT ;
+                      kv/data/show-time db_seed_data      | DB_SEED_DATA ;
+                      kv/data/show-time db_user           | DB_USER ;
+                      kv/data/show-time debug_on          | DEBUG_ON ;
+                      kv/data/show-time frontend_path     | FRONTEND_PATH ;
+                      kv/data/show-time port              | PORT ;
+                      kv/data/show-time session_lifetime  | SESSION_LIFETIME
+
+            - name: Copy docker-compose files to VPS
+              uses: appleboy/scp-action@master
+              with:
+                  host: ${{ env.SERVER_HOST }}
+                  username: ${{ env.SERVER_USER }}
+                  key: ${{ env.SSH_PRIVATE_KEY }}
+                  port: ${{ env.SERVER_PORT }}
+                  source: "docker-compose.yml,docker-compose.prod.yml"
+                  target: "/home/${{ env.SERVER_USER }}/show-time"
+
+            - name: Execute Deploy Commands
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ env.SERVER_HOST }}
+                  username: ${{ env.SERVER_USER }}
+                  key: ${{ env.SSH_PRIVATE_KEY }}
+                  port: ${{ env.SERVER_PORT }}
+                  # Vi skickar med alla miljövariabler till SSH-scriptet
+                  envs: DOCKER_USERNAME,DOCKER_PASSWORD,PORT,FRONTEND_PATH,DB_HOST,DB_PORT,DB_NAME,DB_USER,DB_PASS,DB_CREATE_TABLES,DB_SEED_DATA,DEBUG_ON,SESSION_LIFETIME,ASPNETCORE_ENVIRONMENT
+                  script: |
+                      mkdir -p /home/$SERVER_USER/show-time
+                      cd /home/$SERVER_USER/show-time
+
+                      # Logga in på Docker Hub på servern
+                      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+                      # Starta om appen med alla variabler injicerade
+                      PORT=$PORT \
+                      FRONTEND_PATH=$FRONTEND_PATH \
+                      DB_HOST=$DB_HOST \
+                      DB_PORT=$DB_PORT \
+                      DB_NAME=$DB_NAME \
+                      DB_USER=$DB_USER \
+                      DB_PASS=$DB_PASS \
+                      DB_CREATE_TABLES=$DB_CREATE_TABLES \
+                      DB_SEED_DATA=$DB_SEED_DATA \
+                      DEBUG_ON=$DEBUG_ON \
+                      SESSION_LIFETIME=$SESSION_LIFETIME \
+                      ASPNETCORE_ENVIRONMENT=$ASPNETCORE_ENVIRONMENT \
+                      docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --pull always
+
+                      docker image prune -f
