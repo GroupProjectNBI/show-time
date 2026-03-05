@@ -27,18 +27,18 @@ jobs:
                   secrets: |
                       kv/data/server-deploy DOCKER_USERNAME | DOCKER_USERNAME ;
                       kv/data/server-deploy DOCKER_PASSWORD | DOCKER_PASSWORD ;
-                      kv/data/show-time as_production     | ASPNETCORE_ENVIRONMENT ;
-                      kv/data/show-time db                | DB_NAME ;
-                      kv/data/show-time db_create_tables  | DB_CREATE_TABLES ;
-                      kv/data/show-time db_host           | DB_HOST ;
-                      kv/data/show-time db_pass           | DB_PASS ;
-                      kv/data/show-time db_port           | DB_PORT ;
-                      kv/data/show-time db_seed_data      | DB_SEED_DATA ;
-                      kv/data/show-time db_user           | DB_USER ;
-                      kv/data/show-time debug_on          | DEBUG_ON ;
-                      kv/data/show-time frontend_path     | FRONTEND_PATH ;
-                      kv/data/show-time port              | PORT ;
-                      kv/data/show-time session_lifetime  | SESSION_LIFETIME
+                      kv/data/showtime as_production | ASPNETCORE_ENVIRONMENT ;
+                      kv/data/showtime db | DB_NAME ;
+                      kv/data/showtime db_create_tables | DB_CREATE_TABLES ;
+                      kv/data/showtime db_host | DB_HOST ;
+                      kv/data/showtime db_pass | DB_PASS ;
+                      kv/data/showtime db_port | DB_PORT ;
+                      kv/data/showtime db_seed_data | DB_SEED_DATA ;
+                      kv/data/showtime db_user | DB_USER ;
+                      kv/data/showtime debug_on | DEBUG_ON ;
+                      kv/data/showtime frontend_path | FRONTEND_PATH ;
+                      kv/data/showtime port | PORT ;
+                      kv/data/showtime session_lifetime | SESSION_LIFETIME
 
             - name: Log in to Docker Hub
               uses: docker/login-action@v3
@@ -72,6 +72,19 @@ jobs:
                   method: approle
                   roleId: ${{ secrets.VAULT_ROLE_ID }}
                   secretId: ${{ secrets.VAULT_SECRET_ID }}
+                  secrets: |
+                      kv/data/server-deploy SSH_HOST | SERVER_HOST ;
+                      kv/data/server-deploy SSH_USERNAME | SERVER_USER ;
+                      kv/data/server-deploy SERVER_PORT | SERVER_PORT ;
+                      kv/data/server-deploy SSH_PRIVATE_KEY | SSH_PRIVATE_KEY ;
+                      kv/data/showtime db | DB_NAME ;
+                      kv/data/showtime db_host | DB_HOST ;
+                      kv/data/showtime db_pass | DB_PASS ;
+                      kv/data/showtime db_port | DB_PORT ;
+                      kv/data/showtime db_user | DB_USER ;
+                      kv/data/showtime port | PORT ;
+                      kv/data/showtime frontend_path | FRONTEND_PATH ;
+                      kv/data/showtime as_production | ASPNETCORE_ENVIRONMENT
 
             - name: Copy docker-compose files to VPS
               uses: appleboy/scp-action@master
@@ -94,8 +107,10 @@ jobs:
                   script: |
                       mkdir -p /home/$SERVER_USER/show-time
                       cd /home/$SERVER_USER/show-time
+                      # Docker login för att kunna dra ner imagen
                       echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
+                      # Starta upp
                       PORT=$PORT \
                       FRONTEND_PATH=$FRONTEND_PATH \
                       DB_HOST=$DB_HOST \
