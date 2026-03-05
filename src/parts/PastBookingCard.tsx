@@ -4,10 +4,16 @@ type HistoricalBookingCardProps = {
   title: string;
   dateLabel: string;
   timeLabel: string;
+
+  // NYTT: movieId behövs för att kunna visa rätt poster
+  movieId: number;
+
   theaterLabel: string;
   seatsLabel?: string;
   ticketsLabel?: string;
-  posterUrl?: string;
+
+  // posterUrl tas bort eftersom vi bygger poster-path från movieId
+  // posterUrl?: string;
 
   // Info om när filmen sågs
   seenLabel: string;
@@ -17,10 +23,10 @@ export default function HistoricalBookingCard({
   title,
   dateLabel,
   timeLabel,
+  movieId, // NYTT: tar emot movieId
   theaterLabel,
   seatsLabel,
   ticketsLabel,
-  posterUrl,
   seenLabel,
 
 }: HistoricalBookingCardProps) {
@@ -35,19 +41,24 @@ export default function HistoricalBookingCard({
     >
       <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-[140px_1fr] sm:gap-6 sm:p-5">
         {/* Poster */}
+        {/* NYTT: Vi hämtar postern baserat på movieId istället för posterUrl */}
         <div className="overflow-hidden rounded-xl bg-black/20">
-          {posterUrl ? (
-            <img
-              src={posterUrl}
-              alt={title}
-              loading="lazy"
-              className="h-44 w-full object-cover sm:h-full"
-            />
-          ) : (
-            <div className="flex h-44 w-full items-center justify-center text-sm text-white/40 sm:h-full">
-              Poster saknas
-            </div>
-          )}
+          <img
+            src={`/images/posters/${movieId}.webp`} // NYTT
+            alt={title}
+            loading="lazy"
+            className="h-44 w-full object-cover sm:h-full"
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              const next = e.currentTarget.nextElementSibling as HTMLElement | null;
+              if (next) next.style.display = "flex";
+            }}
+          />
+
+          {/* placeholder visas om poster saknas */}
+          <div className="hidden h-44 w-full items-center justify-center text-sm text-white/40 sm:h-full">
+            Poster saknas
+          </div>
         </div>
 
         {/* Content */}
@@ -56,7 +67,7 @@ export default function HistoricalBookingCard({
             <h3 className="truncate text-lg font-semibold text-accent sm:text-xl">
               {title}
             </h3>
-            
+
             {/* Checkbox för "sedd" */}
             <span className=" 
               flex items-center gap-1
