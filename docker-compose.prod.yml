@@ -24,7 +24,7 @@ services:
     labels:
       - "traefik.enable=true"
       # 1. Ändrad regel för att lyssna på /showtime
-      - "traefik.http.routers.cinema.rule=Host(`jarllindquist.com`) && PathPrefix(`/showtime`)"
+      - "traefik.http.routers.cinema.rule=Host(`showtime.jarllindquist.com `)"
       - "traefik.http.routers.cinema.entrypoints=websecure"
       - "traefik.http.routers.cinema.tls.certresolver=myresolver"
 
