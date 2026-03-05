@@ -39,9 +39,10 @@ jobs:
               with:
                   context: .
                   push: true
+                  # Här använder vi din korrekta image-tag
                   tags: |
-                      ${{ env.DOCKER_USERNAME }}/cinema-app:latest
-                      ${{ env.DOCKER_USERNAME }}/cinema-app:${{ github.sha }}
+                      passwordnotsafe/cinema-app:latest
+                      passwordnotsafe/cinema-app:${{ github.sha }}
 
     deploy:
         needs: build
@@ -64,7 +65,7 @@ jobs:
                       kv/data/server-deploy SSH_HOST | SERVER_HOST ;
                       kv/data/server-deploy SSH_USERNAME | SERVER_USER ;
                       kv/data/server-deploy SERVER_PORT | SERVER_PORT ;
-                      kv/data/server-deploy SSH_PRIVATE_KEY | SSH_PRIVATE_KEY ;
+                      kv/data/server-deploy SSH_PRIVATE_KEY | SERVER_PRIVATE_KEY ;
                       kv/data/server-deploy DOCKER_USERNAME | DOCKER_USERNAME ;
                       kv/data/server-deploy DOCKER_PASSWORD | DOCKER_PASSWORD ;
                       kv/data/showtime as_production | ASPNETCORE_ENVIRONMENT ;
@@ -85,7 +86,7 @@ jobs:
               with:
                   host: ${{ env.SERVER_HOST }}
                   username: ${{ env.SERVER_USER }}
-                  key: ${{ env.SSH_PRIVATE_KEY }}
+                  key: ${{ env.SERVER_PRIVATE_KEY }}
                   port: ${{ env.SERVER_PORT }}
                   source: "docker-compose.yml,docker-compose.prod.yml"
                   target: "/home/repos/showtime"
@@ -95,16 +96,30 @@ jobs:
               with:
                   host: ${{ env.SERVER_HOST }}
                   username: ${{ env.SERVER_USER }}
-                  key: ${{ env.SSH_PRIVATE_KEY }}
+                  key: ${{ env.SERVER_PRIVATE_KEY }}
                   port: ${{ env.SERVER_PORT }}
+                  # Vi skickar med alla variabler till SSH-sessionen
                   envs: DOCKER_USERNAME,DOCKER_PASSWORD,PORT,FRONTEND_PATH,DB_HOST,DB_PORT,DB_NAME,DB_USER,DB_PASS,DB_CREATE_TABLES,DB_SEED_DATA,DEBUG_ON,SESSION_LIFETIME,ASPNETCORE_ENVIRONMENT
                   script: |
-                      # Här använder vi nu den fasta sökvägen /home/repos/showtime
-                      mkdir -p /home/repos/showtime
                       cd /home/repos/showtime
 
-                      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                      # Skapa .env-fil så docker-compose har alla värden
+                      echo "DOCKER_USERNAME=passwordnotsafe" > .env
+                      echo "PORT=${PORT}" >> .env
+                      echo "FRONTEND_PATH=${FRONTEND_PATH}" >> .env
+                      echo "DB_HOST=${DB_HOST}" >> .env
+                      echo "DB_PORT=${DB_PORT}" >> .env
+                      echo "DB_NAME=${DB_NAME}" >> .env
+                      echo "DB_USER=${DB_USER}" >> .env
+                      echo "DB_PASS=${DB_PASS}" >> .env
+                      echo "DB_CREATE_TABLES=${DB_CREATE_TABLES}" >> .env
+                      echo "DB_SEED_DATA=${DB_SEED_DATA}" >> .env
+                      echo "DEBUG_ON=${DEBUG_ON}" >> .env
+                      echo "SESSION_LIFETIME=${SESSION_LIFETIME}" >> .env
+                      echo "ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}" >> .env
 
+                      # Logga in och kör
+                      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                       docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --pull always
 
                       docker image prune -f
