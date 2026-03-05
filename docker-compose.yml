@@ -1,14 +1,10 @@
 services:
   cinema-app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: cinema_main
-    ports:
-      - "3001:3001"
-    environment:
-      - PORT=3001
-      - FRONTEND_PATH=wwwroot
-      - CONNECTION_STRING=${DB_URL}
-      - ASPNETCORE_ENVIRONMENT=Production
+    image: passwordnotsafe/cinema-app:latest
     restart: unless-stopped
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+    external: true

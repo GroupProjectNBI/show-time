@@ -117,6 +117,8 @@ jobs:
                       echo "DEBUG_ON=${DEBUG_ON}" >> .env
                       echo "SESSION_LIFETIME=${SESSION_LIFETIME}" >> .env
                       echo "ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}" >> .env
+                      # LÄGG TILL DENNA RAD:
+                      echo "CONNECTION_STRING=Server=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Uid=${DB_USER};Pwd=${DB_PASS};" >> .env
 
                       # Logga in och kör
                       echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
