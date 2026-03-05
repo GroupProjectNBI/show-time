@@ -25,19 +25,19 @@ jobs:
                   roleId: ${{ secrets.VAULT_ROLE_ID }}
                   secretId: ${{ secrets.VAULT_SECRET_ID }}
                   secrets: |
-                      kv/data/server-deploy DOCKER_USERNAME | DOCKER_USERNAME 
-                      kv/data/server-deploy DOCKER_PASSWORD | DOCKER_PASSWORD 
-                      kv/data/show-time as_production     | ASPNETCORE_ENVIRONMENT 
-                      kv/data/show-time db                | DB_NAME 
-                      kv/data/show-time db_create_tables  | DB_CREATE_TABLES 
-                      kv/data/show-time db_host           | DB_HOST 
-                      kv/data/show-time db_pass           | DB_PASS 
-                      kv/data/show-time db_port           | DB_PORT 
-                      kv/data/show-time db_seed_data      | DB_SEED_DATA 
-                      kv/data/show-time db_user           | DB_USER 
-                      kv/data/show-time debug_on          | DEBUG_ON 
-                      kv/data/show-time frontend_path     | FRONTEND_PATH 
-                      kv/data/show-time port              | PORT 
+                      kv/data/server-deploy DOCKER_USERNAME | DOCKER_USERNAME ;
+                      kv/data/server-deploy DOCKER_PASSWORD | DOCKER_PASSWORD ;
+                      kv/data/show-time as_production     | ASPNETCORE_ENVIRONMENT ;
+                      kv/data/show-time db                | DB_NAME ;
+                      kv/data/show-time db_create_tables  | DB_CREATE_TABLES ;
+                      kv/data/show-time db_host           | DB_HOST ;
+                      kv/data/show-time db_pass           | DB_PASS ;
+                      kv/data/show-time db_port           | DB_PORT ;
+                      kv/data/show-time db_seed_data      | DB_SEED_DATA ;
+                      kv/data/show-time db_user           | DB_USER ;
+                      kv/data/show-time debug_on          | DEBUG_ON ;
+                      kv/data/show-time frontend_path     | FRONTEND_PATH ;
+                      kv/data/show-time port              | PORT ;
                       kv/data/show-time session_lifetime  | SESSION_LIFETIME
 
             - name: Log in to Docker Hub
