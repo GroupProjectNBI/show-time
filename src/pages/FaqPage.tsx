@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Image } from "lucide-react";
+import Image from "../parts/Image";
+
 FAQPage.route = {
   path: "/faq",
   index: -1
@@ -55,8 +56,8 @@ export default function FAQPage() {
 
       {/* INTRO SECTION */}
       <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text accent mb-4">
-          Fågor & Svar
+        <h1 className="text-4xl md:text-5xl font-bold text-accent mb-4">
+          Frågor & Svar
         </h1>
         <p className="text-lg md:text-xl text-accent/80 max-w-2xl mx-auto">
           Välkommen till oss på KundService! Vad behöver du hjälp med?
@@ -95,7 +96,7 @@ export default function FAQPage() {
                 </div>
 
                 {isOpen && (
-                  <p className="mt-3 text-accent/80 leadning-relaxed">
+                  <p className="mt-3 text-accent/80 leading-relaxed">
                     {item.a}
                   </p>
                 )}
@@ -104,13 +105,14 @@ export default function FAQPage() {
           })}
         </div>
 
-        {/*RIGHT: HERO IAMGE */}
+        {/*RIGHT: HERO IMAGE */}
         <div>
           <div className="w-full h-[475px] rounded-3xl overflow-hidden shadow-2xl">
+            {/* 3. Här används nu din Image-komponent med stort I */}
             <Image
               src="/images/Commercials/FAQimage.png"
               alt="FAQ Hero"
-              className="w-full h-full object cover"
+              className="w-full h-full object-cover"
             />
           </div>
         </div>
