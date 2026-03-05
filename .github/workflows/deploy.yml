@@ -78,14 +78,14 @@ jobs:
                   roleId: ${{ secrets.VAULT_ROLE_ID }}
                   secretId: ${{ secrets.VAULT_SECRET_ID }}
                   secrets: |
-                      # 1. Infrastruktur (SSH & Server)
+
                       kv/data/server-deploy SSH_HOST | SERVER_HOST ;
                       kv/data/server-deploy SSH_USERNAME | SERVER_USER ;
                       kv/data/server-deploy SERVER_PORT | SERVER_PORT ;
                       kv/data/server-deploy SSH_PRIVATE_KEY | SSH_PRIVATE_KEY ;
                       kv/data/server-deploy DOCKER_USERNAME | DOCKER_USERNAME ;
                       kv/data/server-deploy DOCKER_PASSWORD | DOCKER_PASSWORD ;
-                      # 2. App-specifikt (Cinema) för att kunna injicera i scriptet
+
                       kv/data/show-time as_production     | ASPNETCORE_ENVIRONMENT ;
                       kv/data/show-time db                | DB_NAME ;
                       kv/data/show-time db_create_tables  | DB_CREATE_TABLES ;
