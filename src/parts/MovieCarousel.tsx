@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"; // För att kunna navigera till filmsidan utan att ladda om hela sidan
 import Carousel from "react-multi-carousel"; // Själva karusell-komponenten
 import "react-multi-carousel/lib/styles.css"; // Standard-CSS för att karusellen ska fungera (viktig!)
-import Image from "./Image";
+
 // Definierar hur ett film-objekt ser ut. '?' på title betyder att den är valfri.
 interface Movie {
   id: number;
@@ -83,7 +83,7 @@ const MovieCarousel = ({ popularMovie }: MovieCarouselProps) => {
               {/* border-white/10: En svag, genomskinlig vit ram */}
               <div className="overflow-hidden rounded-xl shadow-lg border border-white/10">
 
-                <Image
+                <img
                   src={`/images/posters/${movie.id}.webp`}
                   alt={movie.title || "Film"} // Visar texten "Film" om titel saknas
 

@@ -1,11 +1,13 @@
-import Image from "./Image";
 export default function OfferBanner() {
   return (
     <section className="relative w-full h-[200px] sm:h-[230px] lg:h-[260px] rounded-3xl overflow-hidden">
-      <Image
+     
+      <img
         src="/images/Commercials/popga.jpg"
         alt="Popcorn offer"
         className="absolute inset-0 w-full h-full object-cover scale-[1.03] brightness-105 contrast-110 saturate-110"
+     
+     
       />
 
       {/* Overlay/läsbarhet*/}

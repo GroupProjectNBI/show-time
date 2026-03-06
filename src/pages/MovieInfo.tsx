@@ -5,7 +5,7 @@ import fetchJson from "../utils/fetchJson";
 import { calculatingTime } from "../utils/lengthcalc";
 import { formatTime } from "../utils/formatTime";
 import Trailer from "../parts/Trailer";
-import Image from "../parts/Image";
+
 
 // --- Interfaces ---
 interface Review {
@@ -103,10 +103,10 @@ function MovieInfo() {
                         {/* --- VÄNSTER (Poster) --- */}
                         <div className="flex flex-col items-center lg:items-start lg:sticky lg:top-24">
                             <div className="relative w-[240px] md:w-[300px] lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group bg-black">   {/* group för hover-effekt, bg-black för att undvika de grå kanterna */}
-
+                            
 
                                 {/* Bakgrundsposter (fyller boxen så inga grå ytor syns) */}
-                                <Image
+                                <img
                                     src={`/images/posters/${movie.movieId}.webp`}
                                     className="absolute inset-0 w-full h-full object-cover blur-2xl scale-110 opacity-40"
                                     alt=""
@@ -114,8 +114,8 @@ function MovieInfo() {
                                 />
                                 {/* Suddig bakgrund fyller hela boxen så inga tomma/grå ytor syns */}
 
-
-                                <Image
+                                
+                                <img
                                     src={`/images/posters/${movie.movieId}.webp`}
                                     className={`relative z-10 w-full h-full object-${posterFit} transition-transform duration-700 group-hover:scale-105 ${posterFit === "cover" ? "scale-[1.08]" : ""}`}
                                     alt={movie.title}

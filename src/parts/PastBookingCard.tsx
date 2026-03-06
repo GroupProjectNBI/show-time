@@ -1,5 +1,5 @@
 import { Calendar, Clock, MapPin, Ticket, Armchair, CheckCircle2 } from "lucide-react";
-import Image from "./Image";
+
 type HistoricalBookingCardProps = {
   title: string;
   dateLabel: string;
@@ -37,7 +37,7 @@ export default function HistoricalBookingCard({
         {/* Poster */}
         <div className="overflow-hidden rounded-xl bg-black/20">
           {posterUrl ? (
-            <Image
+            <img
               src={posterUrl}
               alt={title}
               loading="lazy"
@@ -56,7 +56,7 @@ export default function HistoricalBookingCard({
             <h3 className="truncate text-lg font-semibold text-accent sm:text-xl">
               {title}
             </h3>
-
+            
             {/* Checkbox för "sedd" */}
             <span className=" 
               flex items-center gap-1

@@ -1,5 +1,5 @@
 import { Calendar, Clock, MapPin, Ticket, Armchair, QrCode, X } from "lucide-react";
-import Image from "./Image";
+
 type UpcomingBookingCardProps = {
   title: string;
   dateLabel: string;
@@ -37,7 +37,7 @@ export default function UpcomingBookingCard({
         {/* Poster: om posterUrl saknas visas placeholder,så UI inte “kraschar” visuellt */}
         <div className="overflow-hidden rounded-xl bg-black/20">
           {posterUrl ? (
-            <Image
+            <img
               src={posterUrl}
               alt={title}
               loading="lazy"

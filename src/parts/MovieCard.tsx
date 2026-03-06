@@ -6,7 +6,6 @@ type MovieCardProps = {
   theaterLabel: string;    // "Stora Salongen"
   posterUrl?: string;
 };
-import Image from "./Image";
 
 export default function MovieCard({
   title,
@@ -24,7 +23,7 @@ export default function MovieCard({
           {/* Poster */}
           <div className="sm:shrink-0 sm:p-6 p-5">
             {posterUrl ? (
-              <Image
+              <img
                 src={posterUrl}
                 alt={title}
                 loading="lazy"

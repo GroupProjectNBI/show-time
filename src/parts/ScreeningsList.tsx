@@ -3,7 +3,7 @@ import { calculatingTime } from "../utils/lengthcalc";
 import { useNavigate } from "react-router-dom";
 import { formatTime } from "../utils/formatTime";
 import { Clock, MapPin, Film, Ticket, ChevronRight } from "lucide-react";
-import Image from "./Image";
+
 type Props = {
   screenings: Screening[];
 };
@@ -61,7 +61,7 @@ export default function ScreeningsList({ screenings }: Props) {
               <div className="space-y-4 md:hidden px-2">
                 <div className="flex items-center gap-4">
                   <div className="h-24 w-16 shrink-0 overflow-hidden rounded-lg shadow-xl">
-                    <Image src={`/images/posters/${s.movieId}.webp`} className="w-full h-full object-cover" alt={s.movieTitle} />
+                    <img src={`/images/posters/${s.movieId}.webp`} className="w-full h-full object-cover" alt={s.movieTitle} />
                   </div>
                   <div className="flex flex-col gap-1">
                     <div className="text-lg font-bold text-white">{s.movieTitle}</div>
@@ -86,7 +86,7 @@ export default function ScreeningsList({ screenings }: Props) {
                   </div>
 
                   <div className="h-32 w-22 shrink-0 overflow-hidden rounded-xl bg-[#1a1a1a] shadow-2xl group-hover:scale-105 transition-transform duration-500 border border-white/5">
-                    <Image
+                    <img
                       src={`/images/posters/${s.movieId}.webp`}
                       className="w-full h-full object-cover"
                       alt={s.movieTitle}

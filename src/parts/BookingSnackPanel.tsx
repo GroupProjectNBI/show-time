@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useBooking } from "../context/BookingContext";
 import { isValidEmail } from "../utils/email";
-import Image from "./Image";
+
 type Props = {
   movieTitle: string;
   seatsLabelLines: string[];
@@ -104,7 +104,7 @@ export default function BookingSnackPanel({
           {/* Höger: bild + text + snackval */}
           <div>
             <div className="overflow-hidden rounded-xl bg-[#2b282a] shadow-[0_12px_28px_rgba(0,0,0,0.35)]">
-              <Image
+              <img
                 src={imageSrc}
                 alt="Snacks"
                 className="h-[125px] w-full object-cover sm:h-[145px]"

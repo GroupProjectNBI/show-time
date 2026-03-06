@@ -9,7 +9,7 @@ interface AvatarSelectorProps {
     selectedId: number;
     onSelect: (id: number) => void;
 }
-import Image from "./Image";
+
 // AvatarSelector visar alla tillgängliga profilbilder i en grid.
 // skickar bara tillbaka vilket avatar-id användaren klickade på.
 // Själva sparandet sker i (AvatarSection/MyPage/AuthContext)
@@ -37,7 +37,7 @@ export default function AvatarSelector({
             `}
                         aria-label={`Välj avatar ${avatar.id}`}
                     >
-                        <Image
+                        <img
                             src={avatar.url}
                             alt={`Avatar ${avatar.id}`}
                             className="w-14 h-14 sm:w-16 sm:h-16 rounded-full mx-auto"

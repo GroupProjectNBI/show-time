@@ -23,22 +23,16 @@ services:
 
     labels:
       - "traefik.enable=true"
-      # 1. Ändrad regel för att lyssna på /showtime
       - "traefik.http.routers.cinema.rule=Host(`showtime.jarllindquist.com`)"
       - "traefik.http.routers.cinema.entrypoints=websecure"
       - "traefik.http.routers.cinema.tls.certresolver=myresolver"
 
-      # 2. Middleware: Klipp bort /showtime innan anropet når din C#-kod
-      - "traefik.http.middlewares.showtime-strip.stripprefix.prefixes=/showtime"
-      - "traefik.http.routers.cinema.middlewares=showtime-strip"
-
       # 3. Porten inuti containern
       - "traefik.http.services.cinema.loadbalancer.server.port=${PORT}"
-      - "traefik.http.routers.cinema.priority=100" # Högre prioritet så den inte krockar med root-domänen
-
+      - "traefik.http.routers.cinema.priority=100" # Kan vara kvar för säkerhets skull, men krockar inte längre ändå!
     networks:
-      - traefik-net # <-- Rättat stavfel här!
+      - traefik-net #
 
 networks:
   traefik-net:
-    external: true # <--- Berätta för Docker att nätverket redan finns
+    external: true

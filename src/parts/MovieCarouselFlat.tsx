@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import Image from "./Image";
+
 interface Movie {
     id: number;
     title?: string;
@@ -53,7 +53,7 @@ const MovieCarouselFlat = ({ popularMovie }: MovieCarouselProps) => {
                         <Link to={`/film_info/${movie.id}`}>
                             <div className="overflow-hidden rounded-2xl shadow-lg border border-white/5 bg-[#1a1a1a] transition-all duration-300 group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(198,169,106,0.2)]">
 
-                                <Image
+                                <img
                                     src={`/images/posters/${movie.id}.webp`}
                                     alt={movie.title || "Film"}
                                     // Anpassade höjder för den platta designen
