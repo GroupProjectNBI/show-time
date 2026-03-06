@@ -208,7 +208,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                 {user && (
                   <>
                     <Link
-                      to="/mypage"
+                      to="/min-sida"
                       onClick={closeMenu}
                       className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
                     >

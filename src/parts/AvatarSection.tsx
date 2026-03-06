@@ -30,7 +30,7 @@ export default function AvatarSection({
   }, [currentAvatarId]);
 
   const currentAvatar = avatars.find(a => a.id === currentAvatarId);
-  const previewAvatar = avatars.find(a => a.id === previewId);
+
 
   return (
     <div className="mb-12 w-full max-w-md">

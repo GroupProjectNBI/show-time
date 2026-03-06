@@ -21,6 +21,7 @@ interface AuthContextType {
     checkLogin: () => Promise<void>;
     updateAvatar: (avatarId: number) => Promise<boolean>;
     changePassword: (newPassword: string) => void;
+    loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,7 +29,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Rättade stavfel: AutProvider -> AuthProvider
 export function AuthProvider({ children }: { children: ReactNode; }) {
     const [user, setUser] = useState<User | null>(null);
-
+    const [loading, setLoading] = useState(true); // Börja som true! för att hantera väntan på data inhämtning
     // hydrateAvatar "fyller på" användaren med rätt avatar-bild.
     // Användaren har bara ett avatarId sparat i databasen.
     // En extra API-förfrågan görs för att hämta själva bildens URL.
@@ -55,12 +56,14 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
                 if (response.email) {
                     const hydrated = await hydrateAvatar(response);
                     setUser(hydrated);
-
+                    setLoading(false);
                 } else {
                     setUser(null);
+                    setLoading(false);
                 }
             } else {
                 setUser(null);
+                setLoading(false);
             }
         } catch (error) {
             console.error("Login check failed:", error);
@@ -163,7 +166,8 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         create,
         checkLogin,
         updateAvatar,
-        changePassword
+        changePassword,
+        loading
     };
 
     // 7. Return flyttad till roten av komponenten!
