@@ -56,7 +56,6 @@ export default function MyPage() {
         setLoading(true);
 
         const result = await fetchJson("/api/v_user_bookings");
-        console.log("Hämtade bokningar:", result);
 
         if (result && !result.error) {
           const now = new Date();
