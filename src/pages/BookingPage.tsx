@@ -138,6 +138,8 @@ export default function BookingPage() {
             });
             if (!res?.insertId) throw new Error("Bokning misslyckades");
 
+            // TODO: När EmailService finns ska cancelLink byggas här och skickas med i bokningsmailet.
+            
             for (const sId of selectedSeats) {
                 await fetchJson("/api/Ticket", {
                     method: "POST", headers: { "Content-Type": "application/json" },

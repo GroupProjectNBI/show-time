@@ -28,9 +28,38 @@ public static class RestApi
         //     return RestResult.Parse(context, SQLQuery(sql, parameters, context));
         // });
 
-        // 1. Specifik route för att hämta bokningsvyn
+        // 1. Specifik route för att avboka en bokning via länk.
+        App.MapGet("/api/bookings/{bookingId}/cancel", (HttpContext context, int bookingId) =>
+        {
 
-        
+            Console.WriteLine("Cancel route reached");
+            var booking = SQLQueryOne(
+                "SELECT id FROM Booking WHERE id = @bookingId",
+                new { bookingId },
+                context
+            );
+
+            if (booking == null || booking.HasKey("error") || booking.id == null)
+            {
+                return Results.Text("Bokningen hittades inte.");
+            }
+
+            SQLQueryOne(
+                "DELETE FROM Ticket WHERE bookingId = @bookingId",
+                new { bookingId },
+                context
+            );
+
+            SQLQueryOne(
+                "DELETE FROM Booking WHERE id = @bookingId",
+                new { bookingId },
+                context
+            );
+
+            return Results.Text("Din bokning är nu avbokad.");
+        });
+
+
         App.MapPost("/api/{table}", (
             HttpContext context, string table, JsonElement bodyJson
         ) =>
