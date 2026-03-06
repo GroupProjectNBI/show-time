@@ -20,59 +20,62 @@ interface AvatarItem {
 export default function MyPage() {
   const { user, changePassword, logout, updateAvatar } = useAuth();
 
-  // --- STATES ---
-  const [bookings, setBookings] = useState<any[]>([]); // Kommande
-  const [pastBookings, setPastBookings] = useState<any[]>([]); // Historik
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [pastBookings, setPastBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [avatarList, setAvatarList] = useState<AvatarItem[]>([]);
 
-  // 1. --- HÄMTA AVATARER ---
   useEffect(() => {
     async function loadAvatars() {
       try {
         const res = await fetchJson("/api/Avatar");
+
         if (Array.isArray(res)) {
           const mapped: AvatarItem[] = res
             .filter((a) => a && typeof a.id === "number" && typeof a.url === "string")
             .map((a) => ({ id: a.id, url: a.url }));
+
           setAvatarList(mapped);
+        } else {
+          setAvatarList([]);
         }
       } catch (err) {
         console.error("Kunde inte hämta avatars:", err);
+        setAvatarList([]);
       }
     }
+
     loadAvatars();
   }, []);
 
-  // 2. --- HÄMTA OCH FILTRERA BOKNINGAR ---
   useEffect(() => {
     if (!user?.email) return;
 
     const loadBookings = async () => {
       try {
         setLoading(true);
-        const result = await fetchJson(`/api/v_user_bookings`);
+
+        const result = await fetchJson("/api/v_user_bookings");
 
         if (result && !result.error) {
           const now = new Date();
 
-          // 1. Filtrera på användarens e-post
           const mine = result.filter(
             (b: any) => b.email?.toLowerCase() === user.email.toLowerCase()
           );
 
-          // 2. Filtrera fram kommande bokningar (startTime >= nu) och sortera ASC
           const myUpcoming = mine
             .filter((b: any) => new Date(b.startTime) >= now)
-            .sort((a: any, b: any) =>
-              new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
+            .sort(
+              (a: any, b: any) =>
+                new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
             );
 
-          // 3. Filtrera fram tidigare bokningar (startTime < nu) och sortera DESC
           const myPast = mine
             .filter((b: any) => new Date(b.startTime) < now)
-            .sort((a: any, b: any) =>
-              new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+            .sort(
+              (a: any, b: any) =>
+                new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
             );
 
           setBookings(myUpcoming);
@@ -88,13 +91,11 @@ export default function MyPage() {
     loadBookings();
   }, [user?.email]);
 
-  // 3. --- AVBOKA FUNKTION ---
   const handleCancelBooking = async (id: number) => {
     const confirmCancel = window.confirm("Är du säker på att du vill avboka denna film?");
     if (!confirmCancel) return;
 
     try {
-      // Radera biljetter först pga Foreign Key constraints
       const ticketsData = await fetchJson(`/api/Ticket?where=BookingId=${id}`);
 
       if (ticketsData && ticketsData.length > 0) {
@@ -103,10 +104,8 @@ export default function MyPage() {
         }
       }
 
-      // Radera bokningen
       await fetchJson(`/api/Booking/${id}`, { method: "DELETE" });
 
-      // Uppdatera UI: Ta bort från kommande bokningar
       setBookings((prev) => prev.filter((b) => (b.bookingId || b.id) !== id));
       alert("Bokningen är nu avbokad.");
     } catch (error) {
@@ -122,22 +121,22 @@ export default function MyPage() {
       <h1 className="text-4xl font-bold mb-10 text-center">Min sida</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* -------- VÄNSTER KOLUMN (Profilinställningar) -------- */}
         <div>
           <UsernameField
             initialValue={user?.userName ?? ""}
             onSave={(newName) => console.log("Spara nytt namn:", newName)}
           />
+
           <EmailField
             initialValue={user?.email ?? ""}
             onSave={(newEmail) => console.log("Spara ny email:", newEmail)}
           />
+
           <div className="mt-6">
             <ChangePasswordForm onSubmit={changePassword} />
           </div>
         </div>
 
-        {/* -------- HÖGER KOLUMN (Avatar) -------- */}
         <div className="flex justify-center md:justify-end">
           <AvatarSection
             currentAvatarId={user?.avatarUrl ?? 1}
@@ -149,7 +148,6 @@ export default function MyPage() {
         </div>
       </div>
 
-      {/* ---------------- KOMMANDE BOKNINGAR ---------------- */}
       <h2 className="text-2xl font-semibold mt-16 mb-6">Kommande bokningar</h2>
 
       {loading ? (
@@ -162,8 +160,13 @@ export default function MyPage() {
             <UpcomingBookingCard
               key={booking.bookingId || booking.id}
               id={booking.bookingId || booking.id}
+              movieId={booking.movieId}
               title={booking.movieTitle}
-              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
+              dateLabel={
+                booking.startTime
+                  ? formatScreeningDate(booking.startTime)
+                  : "Okänt datum"
+              }
               timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
                 hour: "2-digit",
                 minute: "2-digit",
@@ -178,10 +181,8 @@ export default function MyPage() {
         </div>
       )}
 
-      {/* -------- DIVIDER -------- */}
       <div className="my-10 h-px bg-white/10" />
 
-      {/* ---------------- HISTORISKA BOKNINGAR ---------------- */}
       <h2 className="text-2xl font-semibold mt-0 mb-4">Tidigare bokningar</h2>
 
       {loading ? (
@@ -193,14 +194,13 @@ export default function MyPage() {
           {pastBookings.map((booking) => (
             <PastBookingCard
               key={booking.bookingId || booking.id}
+              movieId={booking.movieId}
               title={booking.movieTitle}
-              // dateLabel={new Date(booking.startTime).toLocaleDateString("sv-SE", {
-              //   weekday: "short",
-              //   day: "numeric",
-              //   month: "long",
-              //   year: "numeric",
-              // })}
-              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
+              dateLabel={
+                booking.startTime
+                  ? formatScreeningDate(booking.startTime)
+                  : "Okänt datum"
+              }
               timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
                 hour: "2-digit",
                 minute: "2-digit",
