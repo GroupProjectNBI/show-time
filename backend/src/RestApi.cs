@@ -32,7 +32,7 @@ public static class RestApi
         App.MapGet("/api/bookings/{bookingId}/cancel", (HttpContext context, int bookingId) =>
         {
 
-            Console.WriteLine("Cancel route reached");
+            
             var booking = SQLQueryOne(
                 "SELECT id FROM Booking WHERE id = @bookingId",
                 new { bookingId },
