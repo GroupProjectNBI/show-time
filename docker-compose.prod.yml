@@ -30,6 +30,21 @@ services:
       # 3. Porten inuti containern
       - "traefik.http.services.cinema.loadbalancer.server.port=${PORT}"
       - "traefik.http.routers.cinema.priority=100" # Kan vara kvar för säkerhets skull, men krockar inte längre ändå!
+
+      # --- 🛡️ 1. Rate Limiting (Stoppar spam och överbelastning) ---
+      - "traefik.http.middlewares.cinema-limit.ratelimit.average=100"
+      - "traefik.http.middlewares.cinema-limit.ratelimit.burst=50"
+
+      # --- 🛡️ 2. Security Headers (Skyddar besökarnas webbläsare) ---
+      - "traefik.http.middlewares.cinema-headers.headers.browserXssFilter=true"
+      - "traefik.http.middlewares.cinema-headers.headers.contentTypeNosniff=true"
+      - "traefik.http.middlewares.cinema-headers.headers.forceSTSHeader=true"
+      - "traefik.http.middlewares.cinema-headers.headers.stsSeconds=31536000"
+      - "traefik.http.middlewares.cinema-headers.headers.frameDeny=true"
+
+      # --- 🔗 3. Aktivera skydden på routern ---
+      - "traefik.http.routers.cinema.middlewares=cinema-limit,cinema-headers"
+
     networks:
       - traefik-net #
 
