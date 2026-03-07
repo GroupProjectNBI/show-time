@@ -12,52 +12,58 @@ public static class DbQuery
 
     static DbQuery()
     {
-        // 1. Kolla om vi har en färdig connection string från miljövariabler (Docker-vägen)
-        var envConn = Environment.GetEnvironmentVariable("CONNECTION_STRING");
-
-        if (!string.IsNullOrEmpty(envConn))
+        try
         {
-            connectionString = envConn;
+            // 1. Kolla om vi har en färdig connection string från miljövariabler (Docker-vägen)
+            var envConn = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
-            // I Docker kör vi oftast table creation och seeding som standard
-            using var db = new MySqlConnection(connectionString);
-            db.Open();
-            CreateTablesIfNotExist(db);
-            SeedDataIfEmpty(db);
-            db.Close();
-        }
-        else
-        {
-            // 2. Fallback: Om ingen miljövariabel finns, leta efter filen (Lokal-vägen)
-            // Vi gör sökvägen lite smartare så den letar både lokalt och i debug-mappar
-            var configPath = "db-config.json";
-
-            // Om filen inte finns direkt, testa din gamla debug-sökväg
-            if (!File.Exists(configPath))
+            if (!string.IsNullOrEmpty(envConn))
             {
-                configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
-            }
-
-            if (File.Exists(configPath))
-            {
-                var configJson = File.ReadAllText(configPath);
-                var config = JSON.Parse(configJson);
-
-                connectionString =
-                    $"Server={config.host};Port={config.port};Database={config.database};" +
-                    $"User={config.username};Password={config.password};";
+                // Vi lägger till pooling-inställningar även här för säkerhets skull om de saknas i ENV
+                connectionString = envConn.Contains("Pooling") ? envConn : envConn + ";Pooling=true;MinPoolSize=1;MaxPoolSize=100;ConnectionTimeout=30;";
 
                 using var db = new MySqlConnection(connectionString);
                 db.Open();
-                if (config.createTablesIfNotExist == true) { CreateTablesIfNotExist(db); }
-                if (config.seedDataIfEmpty == true) { SeedDataIfEmpty(db); }
+                CreateTablesIfNotExist(db);
+                SeedDataIfEmpty(db);
                 db.Close();
             }
             else
             {
-                // Om vi hamnar här har vi varken miljövariabler eller fil - då måste vi varna!
-                Console.WriteLine("CRITICAL ERROR: No database configuration found (ENV or JSON).");
+                // 2. Fallback: Lokal-vägen (JSON-fil)
+                var configPath = "db-config.json";
+
+                if (!File.Exists(configPath))
+                {
+                    configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
+                }
+
+                if (File.Exists(configPath))
+                {
+                    var configJson = File.ReadAllText(configPath);
+                    var config = JSON.Parse(configJson);
+
+                    // Här använder vi din robusta connection string med Pooling!
+                    connectionString = $"Server={config.host};Port={config.port};Database={config.database};" +
+                                       $"User={config.username};Password={config.password};" +
+                                       "Pooling=true;MinPoolSize=1;MaxPoolSize=100;ConnectionTimeout=30;";
+
+                    using var db = new MySqlConnection(connectionString);
+                    db.Open();
+                    if (config.createTablesIfNotExist == true) { CreateTablesIfNotExist(db); }
+                    if (config.seedDataIfEmpty == true) { SeedDataIfEmpty(db); }
+                    db.Close();
+                }
+                else
+                {
+                    Console.WriteLine("CRITICAL ERROR: No database configuration found (ENV or JSON).");
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            // Din livräddare: logga felet men låt backend starta ändå!
+            Console.WriteLine("!!! DATABASE INIT ERROR: " + ex.Message);
         }
     }
 
@@ -248,48 +254,42 @@ public static class DbQuery
     }
 
     // Run a query - rows are returned as an array of objects
-    public static Arr SQLQuery(
-        string sql, object parameters = null, HttpContext context = null
-    )
+    // --- 2. METODEN (Den du använder i din kod) ---
+    public static Arr SQLQuery(string sql, object parameters = null, HttpContext context = null)
     {
         var paras = parameters == null ? Obj() : Obj(parameters);
         using var db = new MySqlConnection(connectionString);
-        db.Open();
-        var command = db.CreateCommand();
-        command.CommandText = @sql;
-        var entries = (Arr)paras.GetEntries();
-        entries.ForEach(x => command.Parameters.AddWithValue("@" + x[0], x[1]));
-        if (context != null)
-        {
-            DebugLog.Add(context, new
-            {
-                sqlQuery = sql.Regplace(@"\s+", " "),
-                sqlParams = paras
-            });
-        }
         var rows = Arr();
+
         try
         {
-            if (sql.StartsWith("SELECT ", true, null))
+            // FLYTTA IN OPEN HÄR - extremt viktigt för att undvika Unhandled Exception!
+            db.Open();
+
+            var command = db.CreateCommand();
+            command.CommandText = @sql;
+            var entries = (Arr)paras.GetEntries();
+            entries.ForEach(x => command.Parameters.AddWithValue("@" + x[0], x[1]));
+
+            // ... (din logik för SELECT vs INSERT/UPDATE/DELETE) ...
+            if (sql.TrimStart().StartsWith("SELECT ", StringComparison.OrdinalIgnoreCase))
             {
-                var reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    rows.Push(ObjFromReader(reader));
-                }
-                reader.Close();
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) rows.Push(ObjFromReader(reader));
             }
             else
             {
                 rows.Push(new
                 {
-                    command = sql.Split(" ")[0].ToUpper(),
+                    command = sql.Trim().Split(" ")[0].ToUpper(),
                     rowsAffected = command.ExecuteNonQuery()
                 });
             }
         }
         catch (Exception err)
         {
+            // Om MySQL-timeout händer, fångas det här och returneras som ett objekt istället för krasch
+            Console.WriteLine("SQL ERROR: " + err.Message);
             rows.Push(new { error = err.Message });
         }
         return rows;
