@@ -23,7 +23,7 @@ export default function BookingPage() {
     const [realtimeLockedSeats, setRealtimeLockedSeats] = useState<number[]>([]);
 
     const navigate = useNavigate();
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams<{ id: string; }>();
     const prevSelectedSeatsRef = useRef<number[]>([]);
 
     const {
@@ -182,7 +182,7 @@ export default function BookingPage() {
     // const currentTheater = seatArray[0];
 
     return (
-        <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center">
+        <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center pb-2">
             <MovieCard title={screening.movieTitle} genre={movie.categories} ageLimit={movie.ageLimit + " +"}
                 dateTimeLabel={formatScreeningDate(screening.startTime)} theaterLabel={screening.theaterName + " Salongen"}
                 posterUrl={`/images/posters/${screening.movieId}.webp`} />

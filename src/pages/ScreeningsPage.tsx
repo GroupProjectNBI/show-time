@@ -138,7 +138,7 @@ export default function ScreeningsPage() {
   const inputClass = "w-full bg-[#1a1a1a] text-white border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#c0a060] transition-colors appearance-none cursor-pointer";
 
   return (
-    <div className="min-h-screen pt-8 pb-20">
+    <div className="min-h-screen pt-8 pb-0">
       <div className="mx-auto w-[min(1200px,calc(100%-32px))]">
 
         {/* HEADER */}
