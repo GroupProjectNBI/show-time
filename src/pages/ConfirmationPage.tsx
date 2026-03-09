@@ -176,7 +176,8 @@ export default function ConfirmationPage() {
               </p>
 
               <p>
-                Dina platser är reserverade fram tills en timme före filmens start.
+                Betalning sker på plats när du hämtar ut dina biljetter, det går bra att hämta ut dina biljetter redan nu och fram till en timme innan filmens start.
+                För att avboka klicka på avbokningslänken i mailet eller avboka på "mina sidor"
               </p>
 
               <p>

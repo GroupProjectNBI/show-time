@@ -23,7 +23,7 @@ export default function FAQPage() {
     },
     {
       q: "Hur köper jag biljetter?",
-      a: "Biljetter kan köpas via vår hemsida eller på plats innan föreställning."
+      a: "Biljetter bokas enklast via vår hemsida, betalning sker dock på plats."
     },
     {
       q: "Får jag ta med egen mat, snacks och dryck?",
