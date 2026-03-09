@@ -114,6 +114,12 @@ function AboutPage() {
                 behov. Slå dig ner och njut av filmen!
               </p>
             </div>
+            {/* Card 3 */}
+            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl transition animate-fadeIn delay-200">
+              <h3 className="text-xl font-semibold mb-4 text-accent">FAQ</h3>
+              <p className="text-accent leading-relaxed">
+                "Välkommen till vår kundservice och FAQ! Här har vi samlat svar på de vanligaste frågorna som dyker upp inför, under och efter ditt biobesök. Vi vet att det kan finnas funderingar kring allt från hur du hämtar ut dina digitala biljetter till vilka regler som gäller för snacks i salongen eller hur våra åldersgränser fungerar.</p>
+            </div>
 
           </div>
         </div>
