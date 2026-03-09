@@ -30,7 +30,34 @@ public static class RestApi
 
         // 1. Specifik route för att hämta bokningsvyn
 
-        
+
+
+
+        App.MapGet("/api/{table}/{id}", (
+            HttpContext context, string table, string id
+        ) =>
+            RestResult.Parse(context, SQLQueryOne(
+                $"SELECT * FROM {table} WHERE id = @id",
+                ReqBodyParse(table, Obj(new { id })).body,
+                context
+            ))
+        );
+
+
+        App.MapGet("/api/{table}", (
+            HttpContext context, string table
+        ) =>
+        {
+            var query = RestQuery.Parse(context.Request.Query);
+            if (query.error != null)
+            {
+                return RestResult.Parse(context, Arr(Obj(new { error = query.error })));
+            }
+            var sql = $"SELECT * FROM {table}" + query.sql;
+            return RestResult.Parse(context, SQLQuery(sql, query.parameters, context));
+        });
+
+        // POST-route för att spara ny data (t.ex. en ny bokning)
         App.MapPost("/api/{table}", (
             HttpContext context, string table, JsonElement bodyJson
         ) =>
@@ -46,6 +73,7 @@ public static class RestApi
             var values = parsed.insertValues;
             var sql = $"INSERT INTO {table}({columns}) VALUES({values})";
             var result = SQLQueryOne(sql, parsed.body, context);
+            // Om INSERT lyckades utan fel, hämta det nya id:t och lägg till i resultatet som skickas tillbaka
             if (!result.HasKey("error"))
             {
                 // Get the insert id and add to our result
@@ -54,33 +82,46 @@ public static class RestApi
                        FROM {table} ORDER BY id DESC LIMIT 1"
                 ).__insertId;
             }
+            // --- LOGIK FÖR BOKNINGSBEKRÄFTELSE (MAIL) ---
+            if (table == "Booking")
+            {
+                Console.WriteLine("--- Försöker skicka bokningsmail ---"); // DEBUG-INFO
+                try
+                {
+                    // 1. Hämta användaren från sessionen
+                    var sessionUser = Session.Get(context, "user");
+                    string userEmail = sessionUser?.email;
+                    // Kolla i terminalen om emailen hittas
+                    Console.WriteLine("Användarens e-post från session: " + (userEmail ?? "INGEN EMAIL HITTAD"));
+
+                    if (!string.IsNullOrEmpty(userEmail))
+                    {
+                        // 2. Förbered HTML-mailet med Show-Time design
+                        string subject = "Din bokningsbekräftelse - Show-Time";
+                        string bodyHtml = $@"
+                                <div style='font-family: sans-serif; background-color: #121212; color: white; padding: 30px; border-radius: 10px;'>
+                                    <h1 style='color: #e50914; border-bottom: 2px solid #e50914; padding-bottom: 10px;'>Show-Time Malmö</h1>
+                                    <h2 style='color: #ffcc00;'>Tack för din bokning!</h2>
+                                    <p>Vi har nu tagit emot din bokning. Du hittar alla detaljer och din biljett under <strong>'Min sida'</strong> på webbplatsen.</p>
+                                    <div style='background: #1a1a1a; padding: 20px; border: 1px dashed #444; margin-top: 20px;'>
+                                        <p style='margin: 0;'>Vi ser fram emot att träffa dig i biosalongen!</p>
+                                    </div>
+                                    <p style='font-size: 12px; color: #888; margin-top: 30px;'>Detta är ett automatiskt meddelande från Show-Time Biograf.</p>
+                                </div>";
+
+                        // 3. Anropa EmailService
+                        EmailService.SendEmail(userEmail, subject, bodyHtml);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Kunde inte skicka mail: " + ex.Message);
+                }
+            }
             return RestResult.Parse(context, result);
         });
-        
 
-        App.MapGet("/api/{table}", (
-            HttpContext context, string table
-        ) =>
-        {
-            var query = RestQuery.Parse(context.Request.Query);
-            if (query.error != null)
-            {
-                return RestResult.Parse(context, Arr(Obj(new { error = query.error })));
-            }
-            var sql = $"SELECT * FROM {table}" + query.sql;
-            return RestResult.Parse(context, SQLQuery(sql, query.parameters, context));
-        });
-
-        App.MapGet("/api/{table}/{id}", (
-            HttpContext context, string table, string id
-        ) =>
-            RestResult.Parse(context, SQLQueryOne(
-                $"SELECT * FROM {table} WHERE id = @id",
-                ReqBodyParse(table, Obj(new { id })).body,
-                context
-            ))
-        );
-
+        // PUT-route för att uppdatera befintlig data (t.ex. ändra profil)
         App.MapPut("/api/{table}/{id}", (
             HttpContext context, string table, string id, JsonElement bodyJson
         ) =>
