@@ -5,7 +5,8 @@ interface EmailFieldProps {
   onSave: (newEmail: string) => void;
 }
 
-export default function EmailField({ }: EmailFieldProps) {
+export default function EmailField({ initialValue }: EmailFieldProps) {
+
 
 
 
@@ -18,13 +19,14 @@ export default function EmailField({ }: EmailFieldProps) {
         {/* INPUT */}
         <input
           type="email"
+          value={initialValue}
           disabled={true}
           className="
             w-full rounded-xl bg-white/10 border border-white/20 px-4 py-2 text-accent placeholder-accent/40 focus:outline-none
             opacity-100"
           opacity-60="cursor-not-allowed" />
 
-
+        
       </div>
     </div>
 
