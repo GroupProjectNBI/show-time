@@ -20,8 +20,13 @@
 
 
 export default async function fetchJson(url: string, options = {}) {
-  return await fetch(window.location.hostname === 'jarllindquist.com' ? `/showtime${url}` : url, options).then(a => a.json());
-}   
+  // Kolla om vi är i produktion genom att se om '/showtime/' finns i URL-fältet
+  const isProd = window.location.pathname.startsWith('/showtime');
+  const finalUrl = isProd ? `/showtime${url}` : url;
+
+  return await fetch(finalUrl, options).then(a => a.json());
+}
+
     // Wait for the the backend to return data when we
     // call the REST-api asking for a list of all animals
     
