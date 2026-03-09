@@ -12,32 +12,30 @@ public static class DbQuery
 
     static DbQuery()
     {
-        var configPath = Path.Combine(
-            AppContext.BaseDirectory, "..", "..", "..", "db-config.json"
-        );
-        var configJson = File.ReadAllText(configPath);
-        var config = JSON.Parse(configJson);
-
-        connectionString =
-            $"Server={config.host};Port={config.port};Database={config.database};" +
-            $"User={config.username};Password={config.password};";
-
-        var db = new MySqlConnection(connectionString);
-        db.Open();
-
-        // Create tables if they don't exist
-        if (config.createTablesIfNotExist == true)
+        try
         {
-            CreateTablesIfNotExist(db);
-        }
+            var configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
+            var configJson = File.ReadAllText(configPath);
+            var config = JSON.Parse(configJson);
 
-        // Seed data if tables are empty
-        if (config.seedDataIfEmpty == true)
+            // Lägg till Pooling och Timeout här i strängen!
+            connectionString = $"Server={config.host};Port={config.port};Database={config.database};" +
+                               $"User={config.username};Password={config.password};" +
+                               "Pooling=true;MinPoolSize=1;MaxPoolSize=100;ConnectionTimeout=30;";
+
+            using var db = new MySqlConnection(connectionString);
+            db.Open(); // Om denna smäller fångas det av catch nedan
+
+            if (config.createTablesIfNotExist == true) CreateTablesIfNotExist(db);
+            if (config.seedDataIfEmpty == true) SeedDataIfEmpty(db);
+
+            db.Close();
+        }
+        catch (Exception ex)
         {
-            SeedDataIfEmpty(db);
+            // Logga felet men krascha inte hela backend!
+            Console.WriteLine("!!! DATABASE INIT ERROR: " + ex.Message);
         }
-
-        db.Close();
     }
 
     private static void CreateTablesIfNotExist(MySqlConnection db)
@@ -227,48 +225,42 @@ public static class DbQuery
     }
 
     // Run a query - rows are returned as an array of objects
-    public static Arr SQLQuery(
-        string sql, object parameters = null, HttpContext context = null
-    )
+    // --- 2. METODEN (Den du använder i din kod) ---
+    public static Arr SQLQuery(string sql, object parameters = null, HttpContext context = null)
     {
         var paras = parameters == null ? Obj() : Obj(parameters);
         using var db = new MySqlConnection(connectionString);
-        db.Open();
-        var command = db.CreateCommand();
-        command.CommandText = @sql;
-        var entries = (Arr)paras.GetEntries();
-        entries.ForEach(x => command.Parameters.AddWithValue("@" + x[0], x[1]));
-        if (context != null)
-        {
-            DebugLog.Add(context, new
-            {
-                sqlQuery = sql.Regplace(@"\s+", " "),
-                sqlParams = paras
-            });
-        }
         var rows = Arr();
+
         try
         {
-            if (sql.StartsWith("SELECT ", true, null))
+            // FLYTTA IN OPEN HÄR - extremt viktigt för att undvika Unhandled Exception!
+            db.Open();
+
+            var command = db.CreateCommand();
+            command.CommandText = @sql;
+            var entries = (Arr)paras.GetEntries();
+            entries.ForEach(x => command.Parameters.AddWithValue("@" + x[0], x[1]));
+
+            // ... (din logik för SELECT vs INSERT/UPDATE/DELETE) ...
+            if (sql.TrimStart().StartsWith("SELECT ", StringComparison.OrdinalIgnoreCase))
             {
-                var reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    rows.Push(ObjFromReader(reader));
-                }
-                reader.Close();
+                using var reader = command.ExecuteReader();
+                while (reader.Read()) rows.Push(ObjFromReader(reader));
             }
             else
             {
                 rows.Push(new
                 {
-                    command = sql.Split(" ")[0].ToUpper(),
+                    command = sql.Trim().Split(" ")[0].ToUpper(),
                     rowsAffected = command.ExecuteNonQuery()
                 });
             }
         }
         catch (Exception err)
         {
+            // Om MySQL-timeout händer, fångas det här och returneras som ett objekt istället för krasch
+            Console.WriteLine("SQL ERROR: " + err.Message);
             rows.Push(new { error = err.Message });
         }
         return rows;
