@@ -1,4 +1,5 @@
 namespace WebApp;
+
 public static class RestResult
 {
     private static dynamic RowModifier(dynamic row)
@@ -36,10 +37,10 @@ public static class RestResult
             // 404 = Not found
             // 200 = OK
             statusCode =
-                result == null ? 404 :
-                r.HasKey("error") ? 500 :
-                r.HasKey("rowsAffected") && r.rowsAffected == 0 ? 404 :
-                200;
+    result == null ? 404 :
+    r.HasKey("error") ? (r.error.Contains("No user") ? 401 : 500) : // Ge 401 istället för 500 för inloggningsmiss
+    r.HasKey("rowsAffected") && r.rowsAffected == 0 ? 404 :
+    200;
 
             result = RowModifier(r);
         }

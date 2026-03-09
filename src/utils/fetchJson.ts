@@ -20,11 +20,23 @@
 
 
 export default async function fetchJson(url: string, options = {}) {
-  // Kolla om vi är i produktion genom att se om '/showtime/' finns i URL-fältet
   const isProd = window.location.pathname.startsWith('/showtime');
   const finalUrl = isProd ? `/showtime${url}` : url;
 
-  return await fetch(finalUrl, options).then(a => a.json());
+  const response = await fetch(finalUrl, options);
+
+  // Om servern svarar med t.ex. 500 eller 404
+  if (!response.ok) {
+    console.error(`Fetch error: ${response.status} ${response.statusText}`);
+    return { error: `Server error: ${response.status}` };
+  }
+
+  try {
+    return await response.json();
+  } catch (err) {
+    console.error("Kunde inte tolka JSON: ", err);
+    return { error: "Invalid JSON response from server" };
+  }
 }
 
     // Wait for the the backend to return data when we
