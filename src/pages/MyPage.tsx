@@ -137,7 +137,8 @@ export default function MyPage() {
           </div>
         </div>
 
-        <div className="flex justify-center md:justify-end">
+        <div className="flex justify-center md:justify-end md:translate-x-40">
+
           <AvatarSection
             currentAvatarId={user?.avatarUrl ?? 1}
             avatars={safeAvatarList}
