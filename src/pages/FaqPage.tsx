@@ -1,7 +1,8 @@
 import { useState } from "react";
 FAQPage.route = {
   path: "/faq",
-  index: -1
+  menuLabel: "FAQ",
+  index: 3
 };
 
 export default function FAQPage() {
