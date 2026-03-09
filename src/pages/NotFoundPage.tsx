@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function NotFoundPage() {
   return (
-    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-accent px-6 overflow-hidden relative font-sans">
+    <div className="min-h-screen bg-[#050505] flex flex-col items-center justify-center text-accent px-6 overflow-hidden relative font-sans pb-2">
 
       {/* 1. ATMOSFÄR: Mjuk glöd (Guld/Primary) */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[130px] pointer-events-none z-0"></div>
