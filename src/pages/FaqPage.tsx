@@ -50,7 +50,7 @@ export default function FAQPage() {
   ];
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 py-16">
+    <div className="w-full max-w-6xl mx-auto px-6 py-16 pb-2">
 
       {/* INTRO SECTION */}
       <div className="text-center mb-16">

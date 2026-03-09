@@ -14,22 +14,52 @@ public static class DbQuery
     {
         try
         {
-            var configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
-            var configJson = File.ReadAllText(configPath);
-            var config = JSON.Parse(configJson);
+            // 1. Kolla om vi har en färdig connection string från miljövariabler (Docker-vägen)
+            var envConn = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 
-            // Lägg till Pooling och Timeout här i strängen!
-            connectionString = $"Server={config.host};Port={config.port};Database={config.database};" +
-                               $"User={config.username};Password={config.password};" +
-                               "Pooling=true;MinPoolSize=1;MaxPoolSize=100;ConnectionTimeout=30;";
+            if (!string.IsNullOrEmpty(envConn))
+            {
+                // Vi lägger till pooling-inställningar även här för säkerhets skull om de saknas i ENV
+                connectionString = envConn.Contains("Pooling") ? envConn : envConn + ";Pooling=true;MinPoolSize=1;MaxPoolSize=100;ConnectionTimeout=30;";
 
-            using var db = new MySqlConnection(connectionString);
-            db.Open(); // Om denna smäller fångas det av catch nedan
+                using var db = new MySqlConnection(connectionString);
+                db.Open();
+                CreateTablesIfNotExist(db);
+                SeedDataIfEmpty(db);
+                db.Close();
+            }
+            else
+            {
+                // 2. Fallback: Lokal-vägen (JSON-fil)
+                var configPath = "db-config.json";
 
-            if (config.createTablesIfNotExist == true) CreateTablesIfNotExist(db);
-            if (config.seedDataIfEmpty == true) SeedDataIfEmpty(db);
+                // Om filen inte finns direkt, testa debug-sökvägen
+                if (!File.Exists(configPath))
+                {
+                    configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
+                }
 
-            db.Close();
+                if (File.Exists(configPath))
+                {
+                    var configJson = File.ReadAllText(configPath);
+                    var config = JSON.Parse(configJson);
+
+                    // Robust connection string med Pooling!
+                    connectionString = $"Server={config.host};Port={config.port};Database={config.database};" +
+                                       $"User={config.username};Password={config.password};" +
+                                       "Pooling=true;MinPoolSize=1;MaxPoolSize=100;ConnectionTimeout=30;";
+
+                    using var db = new MySqlConnection(connectionString);
+                    db.Open();
+                    if (config.createTablesIfNotExist == true) { CreateTablesIfNotExist(db); }
+                    if (config.seedDataIfEmpty == true) { SeedDataIfEmpty(db); }
+                    db.Close();
+                }
+                else
+                {
+                    Console.WriteLine("CRITICAL ERROR: No database configuration found (ENV or JSON).");
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -37,7 +67,6 @@ public static class DbQuery
             Console.WriteLine("!!! DATABASE INIT ERROR: " + ex.Message);
         }
     }
-
     private static void CreateTablesIfNotExist(MySqlConnection db)
     {
         var createTablesSql = @"

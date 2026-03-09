@@ -67,7 +67,7 @@ function MovieInfo() {
     const actorList = movie.actors ? movie.actors.split(', ') : [];
 
     return (
-        <div className="min-h-screen bg-[#1a1a1a] text-stone-100 font-sans pb-40 relative overflow-x-hidden">
+        <div className="min-h-screen bg-[#1a1a1a] text-stone-100 font-sans pb-2 relative overflow-x-hidden">
 
             {/* --- 1. CINEMATIC BACKGROUND --- */}
             <div className="absolute top-0 left-0 w-full h-[50vh] md:h-[700px] overflow-hidden z-0 pointer-events-none">
@@ -103,7 +103,7 @@ function MovieInfo() {
                         {/* --- VÄNSTER (Poster) --- */}
                         <div className="flex flex-col items-center lg:items-start lg:sticky lg:top-24">
                             <div className="relative w-[240px] md:w-[300px] lg:w-full aspect-[2/3] rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 group bg-black">   {/* group för hover-effekt, bg-black för att undvika de grå kanterna */}
-                            
+
 
                                 {/* Bakgrundsposter (fyller boxen så inga grå ytor syns) */}
                                 <img
@@ -114,7 +114,7 @@ function MovieInfo() {
                                 />
                                 {/* Suddig bakgrund fyller hela boxen så inga tomma/grå ytor syns */}
 
-                                
+
                                 <img
                                     src={`/images/posters/${movie.movieId}.webp`}
                                     className={`relative z-10 w-full h-full object-${posterFit} transition-transform duration-700 group-hover:scale-105 ${posterFit === "cover" ? "scale-[1.08]" : ""}`}
