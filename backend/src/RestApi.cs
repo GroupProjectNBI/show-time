@@ -111,12 +111,38 @@ public static class RestApi
 
                         // 3. Anropa EmailService
                         EmailService.SendEmail(userEmail, subject, bodyHtml);
+                        Console.WriteLine($"[Booking] Bekräftelse skickad till {userEmail}");
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine("Kunde inte skicka mail: " + ex.Message);
                 }
+                // 2. Om vi skapar en NY VISNING (Screening)
+        if (table == "Screening")
+        {
+            try
+            {
+                // Här kan du skicka mail till admin eller användare om en ny visning lagts till
+                var sessionUser = Session.Get(context, "user");
+                string adminEmail = sessionUser?.email; // Skickar bekräftelse till den som skapade visningen
+
+                if (!string.IsNullOrEmpty(adminEmail))
+                {
+                    string subject = "Ny visning skapad - Show-Time Admin";
+                    string bodyHtml = $@"
+                        <div style='font-family: sans-serif; border: 2px solid #ffcc00; padding: 20px;'>
+                            <h1 style='color: #ffcc00;'>Systemmeddelande</h1>
+                            <p>En ny visning (Screening) har lagts till i systemet.</p>
+                            <p>Kontrollera visningsschemat för att säkerställa att allt ser korrekt ut.</p>
+                        </div>";
+
+                    EmailService.SendEmail(adminEmail, subject, bodyHtml);
+                    Console.WriteLine("[Screening] Admin-notis skickad.");
+                }
+            }
+            catch (Exception ex) { Console.WriteLine("Mail-fel (Screening): " + ex.Message); }
+        }
             }
             return RestResult.Parse(context, result);
         });
