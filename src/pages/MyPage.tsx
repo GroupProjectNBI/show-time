@@ -117,7 +117,7 @@ export default function MyPage() {
   const safeAvatarList: AvatarItem[] = avatarList.length > 0 ? avatarList : [];
 
   return (
-    <div className="max-w-5xl mx-auto mt-32 px-4 pb-20 text-accent">
+    <div className="max-w-5xl mx-auto mt-32 px-4 pb-2 text-accent">
       <h1 className="text-4xl font-bold mb-10 text-center">Min sida</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
