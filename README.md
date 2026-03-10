@@ -1,6 +1,6 @@
-# 🎬 Movie-Maker (ShowTime Bio)
-Repo : 
-**Group E:**
+# 🎬 ShowTime (Filmvisarna)
+[Länk till repot](https://github.com/GroupProjectNBI/show-time)
+**Group E/5:**
 * [Jarl (@webcrunch)](https://github.com/webcrunch)
 * [Edvin (@Grevendev)](https://github.com/Grevendev)
 * [Kifle (@KHS1993)](https://github.com/KHS1993)
@@ -13,10 +13,13 @@ Ett komplett och modernt bokningssystem för en biograf. Projektet hanterar allt
 
 ## ✨ Nyckelfunktioner (Features)
 
-* **Dynamiskt Bioprogram:** Frontend som hämtar och filtrerar aktuella visningar blixtsnabbt (utan caching-spöken!).
-* **Evighetsmaskinen (Auto-Scheduling):** Databasen är självkörande. Ett SQL-event körs varje natt kl. 03:00 och kopierar förra veckans schema till nästa vecka, med inbyggt skydd mot krockar (`Filmlängd + 30 minuter städning`).
-* **Sätesbokning & Bekräftelser:** Visuellt gränssnitt för att boka platser. Bekräftelsemail skickas automatiskt ut via **Mailpit** (lokal SMTP-server).
-* **AI-Assistent:** Integrerad AI-chatt som hjälper besökare att hitta rätt film.
+* Dynamiskt Bioprogram: Frontend som hämtar och filtrerar aktuella visningar blixtsnabbt (utan caching-spöken!).
+
+* Evighetsmaskinen (Auto-Scheduling): Databasen är självkörande. Ett SQL-event körs varje natt kl. 03:00 och kopierar förra veckans schema till nästa vecka, med inbyggt skydd mot krockar (Filmlängd + 30 minuter städning).
+
+* Sätesbokning & Bekräftelser: Visuellt gränssnitt för att boka platser. Bekräftelsemail skickas automatiskt ut via Mailpit (lokal SMTP-server).
+
+* AI-Assistent: Integrerad AI-chatt som hjälper besökare att hitta rätt film.
 
 ---
 
@@ -34,7 +37,8 @@ Ett komplett och modernt bokningssystem för en biograf. Projektet hanterar allt
 För att köra detta projekt lokalt behöver du ha följande installerat:
 * [Node.js](https://nodejs.org/) (v18+)
 * [.NET 1o SDK](https://dotnet.microsoft.com/)
-* [MySQL](https://www.mysql.com/) eller [Docker Desktop](https://www.docker.com/) (rekommenderas)
+* [MySQL](https://www.mysql.com/)  
+* [Docker Desktop](https://www.docker.com/) (rekommenderas men inget krav )
 
 ---
 
