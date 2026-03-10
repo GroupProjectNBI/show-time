@@ -52,7 +52,7 @@ Om du vill köra alla delar separat på din maskin:
    2. Mailpit (E-post)
 Ladda ner och starta Mailpit. Den kommer att lyssna på port 1025 för inkommande mail och visa en webbinkorg på http://localhost:8025.
 
-3. Backend (C#)
+###  3. Backend (C#)
 Gå till backend-mappen: cd backend
 
 Skapa/kopiera filen db-config.json och fyll i dina lokala databasuppgifter.
@@ -70,7 +70,8 @@ Starta utvecklingsservern:
 
 Bash
 npm run dev
-🐳 Kom igång med Docker (Enklaste vägen)
+
+### 🐳 Kom igång med Docker (Enklaste vägen)
 För en blixtsnabb setup med databas och Mailpit färdigkonfigurerat:
 
 Se till att Docker är igång.
@@ -86,6 +87,8 @@ MySQL-databasen på port 3306.
 Mailpit (Webb-UI på localhost:8025, SMTP på 1025).
 
 Starta sedan Frontend och Backend manuellt enligt instruktionerna ovan (eller via Docker om ni har byggt containers för dem också!).
+
+---
 
 ## 📊 Databasmodell (ER-diagram)
 
@@ -228,7 +231,8 @@ Vår pipeline är designad för säker och smidig continuous delivery till vår 
 * **GitHub Actions:** Hanterar automatisk deployment av applikationen till produktionsmiljön när ny kod slås ihop med `main`-branchen.
 * **HashiCorp Vault:** Istället för att förlita oss på standardlösningar hanterar vi våra databas-strängar och API-nycklar (secrets) via HashiCorp Vault. Detta säkerställer en enterprise-klassad säkerhet under hela deployment-processen och innebär att inga känsliga uppgifter någonsin exponeras.
 
-🧠 Arkitektur & Smarta Lösningar
+### 🧠 Arkitektur & Smarta Lösningar
+
 Varför krockar aldrig våra filmer?
 Systemet använder ett noga uträknat SQL-event. Istället för att manuellt lägga in filmer, har vi en "Golden Week" inskriven i databasen. Eventet använder en WHERE NOT EXISTS-koll samt kontrollerar tiden med logiken (startTime + duration + 30 minuter buffer) för att säkerställa att personalen hinner städa salongen innan nästa film börjar!
 
