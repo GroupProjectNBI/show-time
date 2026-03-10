@@ -104,7 +104,6 @@ erDiagram
     SEAT ||--o{ TICKET : "is booked as"
     TICKETTYPE ||--o{ TICKET : "defines"
     MOVIE ||--o{ REVIEW : "receives"
-    BOOKING ||--o{ EMAILSUSERUNDEFINED : "logs email"
     
     %% Kopplingstabeller för Många-till-Många
     MOVIE ||--o{ MOVIETOCATEGORY : "has"
@@ -116,7 +115,7 @@ erDiagram
     USER {
         int id PK
         string userName
-        string email
+        string email UK
         string password
         int avatarUrl FK
         enum role
@@ -173,7 +172,7 @@ erDiagram
         boolean status
         timestamp bookingDate
         int totalAmount
-        int userId FK
+        string email FK
     }
 
     TICKET {
@@ -220,13 +219,6 @@ erDiagram
         int id PK
         int actorId FK
         int movieId FK
-    }
-
-    EMAILSUSERUNDEFINED {
-        int id PK
-        string email
-        int bookingId FK
-        date created
     }
 ```
 
