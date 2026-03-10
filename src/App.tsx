@@ -70,7 +70,7 @@ export default function App() {
             />
 
             {/* Main tar upp allt ledigt utrymme och centrerar innehållet */}
-            <main className="flex-grow">
+            <main className={`flex-grow ${isAboutPage ? "" : "pb-2"}`}>
               <Main />
             </main>
             <div className={isAboutPage ? "footer-about" : ""}>
