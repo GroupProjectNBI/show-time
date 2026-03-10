@@ -1,7 +1,8 @@
 import { useState } from "react";
 FAQPage.route = {
   path: "/faq",
-  index: -1
+  menuLabel: "FAQ",
+  index: 3
 };
 
 export default function FAQPage() {
@@ -22,7 +23,7 @@ export default function FAQPage() {
     },
     {
       q: "Hur köper jag biljetter?",
-      a: "Biljetter kan köpas via vår hemsida eller på plats innan föreställning."
+      a: "Biljetter bokas enklast via vår hemsida, betalning sker dock på plats."
     },
     {
       q: "Får jag ta med egen mat, snacks och dryck?",
@@ -50,7 +51,7 @@ export default function FAQPage() {
   ];
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 py-16">
+    <div className="w-full max-w-6xl mx-auto px-6 py-16 pb-2">
 
       {/* INTRO SECTION */}
       <div className="text-center mb-16">

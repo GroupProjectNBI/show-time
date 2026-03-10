@@ -135,7 +135,7 @@ export default function ConfirmationPage() {
   }
 
   return (
-    <div className="flex-grow bg-[#1a1a1a] px-4 py-14 text-accent min-h-screen">
+    <div className="flex-grow bg-[#1a1a1a] px-4 py-14 text-accent min-h-screen pb-2">
       <div className="mx-auto w-full max-w-5xl">
         {/* TOP */}
         <div className="mb-8">
@@ -176,7 +176,8 @@ export default function ConfirmationPage() {
               </p>
 
               <p>
-                Dina platser är reserverade fram tills en timme före filmens start.
+                Betalning sker på plats när du hämtar ut dina biljetter, det går bra att hämta ut dina biljetter redan nu och fram till en timme innan filmens start.
+                För att avboka klicka på avbokningslänken i mailet eller avboka på "mina sidor"
               </p>
 
               <p>

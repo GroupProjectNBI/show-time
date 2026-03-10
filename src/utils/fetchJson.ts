@@ -19,8 +19,26 @@
 */
 
 
-export default async function fetchJson(url: string, options = {}) { return await fetch(url, options).then(async a => a.json()) }
-   
+export default async function fetchJson(url: string, options = {}) {
+  const isProd = window.location.pathname.startsWith('/showtime');
+  const finalUrl = isProd ? `/showtime${url}` : url;
+
+  const response = await fetch(finalUrl, options);
+
+  // Om servern svarar med t.ex. 500 eller 404
+  if (!response.ok) {
+    console.error(`Fetch error: ${response.status} ${response.statusText}`);
+    return { error: `Server error: ${response.status}` };
+  }
+
+  try {
+    return await response.json();
+  } catch (err) {
+    console.error("Kunde inte tolka JSON: ", err);
+    return { error: "Invalid JSON response from server" };
+  }
+}
+
     // Wait for the the backend to return data when we
     // call the REST-api asking for a list of all animals
     
