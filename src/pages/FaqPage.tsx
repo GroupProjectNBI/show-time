@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useOverlay } from "../context/OverlayContext";
+
 FAQPage.route = {
   path: "/faq",
   index: -1
@@ -7,7 +9,10 @@ FAQPage.route = {
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const toogle = (i: number) => {
+  // Hämta overlay-funktioner EN gång, på toppnivå
+  const { openAiChat } = useOverlay();
+
+  const toggle = (i: number) => {
     setOpenIndex(openIndex === i ? null : i);
   };
 
@@ -54,26 +59,29 @@ export default function FAQPage() {
 
       {/* INTRO SECTION */}
       <div className="text-center mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold text accent mb-4">
-          Fågor & Svar
+        <h1 className="text-4xl md:text-5xl font-bold text-accent mb-4">
+          Frågor & Svar
         </h1>
         <p className="text-lg md:text-xl text-accent/80 max-w-2xl mx-auto">
-          Välkommen till oss på KundService! Vad behöver du hjälp med?
+          Välkommen till oss på KundService. Vad behöver du hjälp med?
         </p>
 
-        <button className="
-        mt-6 px-6 py-3 rounded-xl
-        bg-accent text-primary font-semibold
-        hover:bg-accent/90 transition
-        ">
+        <button
+          onClick={openAiChat}
+          className="
+            mt-6 px-6 py-3 rounded-xl
+            bg-accent text-primary font-semibold
+            hover:bg-accent/90 transition
+          "
+        >
           Chatta med oss
         </button>
       </div>
 
-      {/* TWO-COLUMN LAYOUT*/}
+      {/* TWO-COLUMN LAYOUT */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
 
-        {/*LEFT: FAQ ACCORDION*/}
+        {/* LEFT: FAQ ACCORDION */}
         <div className="space-y-4">
           {faqs.map((item, i) => {
             const isOpen = openIndex === i;
@@ -81,7 +89,7 @@ export default function FAQPage() {
               <div
                 key={i}
                 className="bg-white/5 border border-white/10 rounded-xl p-4 cursor-pointer transition hover:bg-white/10"
-                onClick={() => toogle(i)}
+                onClick={() => toggle(i)}
               >
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-accent">
@@ -94,7 +102,7 @@ export default function FAQPage() {
                 </div>
 
                 {isOpen && (
-                  <p className="mt-3 text-accent/80 leadning-relaxed">
+                  <p className="mt-3 text-accent/80 leading-relaxed">
                     {item.a}
                   </p>
                 )}
@@ -103,19 +111,19 @@ export default function FAQPage() {
           })}
         </div>
 
-        {/*RIGHT: HERO IAMGE */}
+        {/* RIGHT: HERO IMAGE */}
         <div>
           <div className="w-full h-[475px] rounded-3xl overflow-hidden shadow-2xl">
             <img
               src="/images/Commercials/FAQimage.png"
               alt="FAQ Hero"
-              className="w-full h-full object cover"
+              className="w-full h-full object-cover"
             />
           </div>
         </div>
       </div>
 
-      {/*CATEGORY BUTTONS */}
+      {/* CATEGORY BUTTONS */}
       <div className="mb-16">
         <h2 className="text-2xl font-semibold text-accent mb-6">
           Fler frågor och svar
@@ -126,11 +134,11 @@ export default function FAQPage() {
             <button
               key={i}
               className="
-            px-5 py-2 rounded-xl
-            bg-white/5 border border-white/10
-            text-accent font-medium
-            hover:bg-white/10 transition
-            "
+                px-5 py-2 rounded-xl
+                bg-white/5 border border-white/10
+                text-accent font-medium
+                hover:bg-white/10 transition
+              "
             >
               {cat}
             </button>
@@ -138,7 +146,7 @@ export default function FAQPage() {
         </div>
       </div>
 
-      {/*CONTACT FORM */}
+      {/* CONTACT FORM */}
       <div id="kontakt" className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl">
         <h2 className="text-2xl font-semibold text-accent mb-6">
           Kontakta oss
@@ -172,10 +180,10 @@ export default function FAQPage() {
           <button
             type="submit"
             className="
-          px-6 py-3 rounded-xl
-          bg-accent text-primary font-semibold
-          hover:bg-accent/90 transition
-          "
+              px-6 py-3 rounded-xl
+              bg-accent text-primary font-semibold
+              hover:bg-accent/90 transition
+            "
           >
             Skicka
           </button>
