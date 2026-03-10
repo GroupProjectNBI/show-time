@@ -21,6 +21,11 @@ Det är inte tillåtet att ta med egen mat eller dryck. Vi erbjuder snacks, popc
 Vi visar filmer för alla åldrar och följer gällande åldersgränser.
 Kontakta oss gärna i förväg om du har särskilda behov.
 
+Vid frågor om avbokning gäller som följande:
+Avbokning sker som smidigast via mina sidor och avbokningsknappen, är man inte medlem så finns det en avbokningslänk i det mail man fick när man genomförde reservationen. 
+
+Vid frågor om betalning så gäller som följande, betalning sker på plats i samband med att man hämtar ut biljetterna. Biljetterna går att hämta ut från det att man har skapat en bokning fram tills en timme innan bion börjar. Vi tar både kontanter och kort. För företagsfaktura vänligen kontakta oss för offert via frågeformuläret längre ner på denna sidan. 
+
 
 
 Om en användare frågar om vilka filmer som går idag eller ett specifikt datum, kolla upp det på https://showtime.jarllindquist.com/screenings du följer tidszonen för Europa, Sverige.
