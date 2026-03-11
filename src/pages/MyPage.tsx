@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import fetchJson from "../utils/fetchJson";
 import { formatScreeningDate } from "../utils/formatTime";
+import toast from "react-hot-toast";
 
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
@@ -18,71 +19,59 @@ interface AvatarItem {
 }
 
 export default function MyPage() {
-  const { user, changePassword, logout, updateAvatar } = useAuth();
+  const { user, logout, updateAvatar } = useAuth();
 
   const [bookings, setBookings] = useState<any[]>([]);
   const [pastBookings, setPastBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [avatarList, setAvatarList] = useState<AvatarItem[]>([]);
 
+  // Hämta tillgängliga avatarer
   useEffect(() => {
     async function loadAvatars() {
       try {
         const res = await fetchJson("/api/Avatar");
-
         if (Array.isArray(res)) {
           const mapped: AvatarItem[] = res
             .filter((a) => a && typeof a.id === "number" && typeof a.url === "string")
             .map((a) => ({ id: a.id, url: a.url }));
-
           setAvatarList(mapped);
-        } else {
-          setAvatarList([]);
         }
       } catch (err) {
-        console.error("Kunde inte hämta avatars:", err);
-        setAvatarList([]);
+        toast.error("Kunde inte ladda profilbilder.");
       }
     }
-
     loadAvatars();
   }, []);
 
+  // Hämta användarens bokningar
   useEffect(() => {
     if (!user?.email) return;
 
     const loadBookings = async () => {
       try {
         setLoading(true);
-
         const result = await fetchJson("/api/v_user_bookings");
 
         if (result && !result.error) {
           const now = new Date();
-
           const mine = result.filter(
             (b: any) => b.email?.toLowerCase() === user.email.toLowerCase()
           );
 
           const myUpcoming = mine
             .filter((b: any) => new Date(b.startTime) >= now)
-            .sort(
-              (a: any, b: any) =>
-                new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-            );
+            .sort((a: any, b: any) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
           const myPast = mine
             .filter((b: any) => new Date(b.startTime) < now)
-            .sort(
-              (a: any, b: any) =>
-                new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
-            );
+            .sort((a: any, b: any) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
 
           setBookings(myUpcoming);
           setPastBookings(myPast);
         }
       } catch (error) {
-        console.error("Kunde inte hämta bokningar:", error);
+        toast.error("Kunde inte hämta dina bokningar.");
       } finally {
         setLoading(false);
       }
@@ -91,10 +80,12 @@ export default function MyPage() {
     loadBookings();
   }, [user?.email]);
 
+  // Avboka film
   const handleCancelBooking = async (id: number) => {
     const confirmCancel = window.confirm("Är du säker på att du vill avboka denna film?");
     if (!confirmCancel) return;
 
+    const toastId = toast.loading("Avbokar...");
     try {
       const ticketsData = await fetchJson(`/api/Ticket?where=BookingId=${id}`);
 
@@ -107,10 +98,32 @@ export default function MyPage() {
       await fetchJson(`/api/Booking/${id}`, { method: "DELETE" });
 
       setBookings((prev) => prev.filter((b) => (b.bookingId || b.id) !== id));
-      alert("Bokningen är nu avbokad.");
+      toast.success("Bokningen är nu avbokad.", { id: toastId });
     } catch (error) {
-      console.error("Fel vid avbokning:", error);
-      alert("Kunde inte avboka. Vänligen försök igen.");
+      toast.error("Kunde inte avboka. Vänligen försök igen.", { id: toastId });
+    }
+  };
+
+  // Lösenordsåterställning (Anropas från ChangePasswordForm)
+  const handlePasswordReset = async (code: string, newPassword: string) => {
+    if (!user?.email) return;
+
+    const result = await fetchJson("/api/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: user.email,
+        code: code,
+        newPassword: newPassword
+      })
+    });
+
+    if (result && result.success) {
+      // Vi kastar inget här, ChangePasswordForm sköter sin egen success-toast!
+      return;
+    } else {
+      // Vi kastar ett fel så att ChangePasswordForm kan fånga det och visa en error-toast
+      throw new Error(result?.error || "Ogiltig kod eller tekniskt fel.");
     }
   };
 
@@ -120,30 +133,38 @@ export default function MyPage() {
     <div className="max-w-5xl mx-auto mt-16 px-4 pb-20 text-accent">
       <h1 className="text-4xl font-bold mb-10 text-center">Min sida</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 itsm-start">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+        <div className="space-y-6">
           <UsernameField
             initialValue={user?.userName ?? ""}
-            onSave={(newName) => console.log("Spara nytt namn:", newName)}
+            onSave={(newName) => {
+              console.log("Namn uppdaterat:", newName);
+              toast.success("Användarnamn sparat!");
+            }}
           />
 
           <EmailField
             initialValue={user?.email ?? ""}
-            onSave={(newEmail) => console.log("Spara ny email:", newEmail)}
+            onSave={(newEmail) => {
+              console.log("Email uppdaterad:", newEmail);
+              toast.success("E-postadress sparad!");
+            }}
           />
 
-          <div className="mt-6">
-            <ChangePasswordForm onSubmit={changePassword} />
+          <div className="mt-8">
+            <ChangePasswordForm onSubmit={handlePasswordReset} />
           </div>
         </div>
 
         <div className="flex justify-center md:justify-end md:translate-x-40">
-
           <AvatarSection
             currentAvatarId={user?.avatarUrl ?? 1}
             avatars={safeAvatarList}
             onChange={async (newId) => {
-              if (updateAvatar) await updateAvatar(newId);
+              if (updateAvatar) {
+                await updateAvatar(newId);
+                toast.success("Profilbild uppdaterad!", { icon: '📸' });
+              }
             }}
           />
         </div>
@@ -163,15 +184,8 @@ export default function MyPage() {
               id={booking.bookingId || booking.id}
               movieId={booking.movieId}
               title={booking.movieTitle}
-              dateLabel={
-                booking.startTime
-                  ? formatScreeningDate(booking.startTime)
-                  : "Okänt datum"
-              }
-              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
+              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
               seatsLabel={booking.seats || "Information saknas"}
@@ -197,30 +211,22 @@ export default function MyPage() {
               key={booking.bookingId || booking.id}
               movieId={booking.movieId}
               title={booking.movieTitle}
-              dateLabel={
-                booking.startTime
-                  ? formatScreeningDate(booking.startTime)
-                  : "Okänt datum"
-              }
-              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
+              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
               seatsLabel={booking.seats || "Information saknas"}
-              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}`}
+              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", { day: "numeric", month: "long", year: "numeric" })}`}
             />
           ))}
         </div>
       )}
 
       <div className="mt-12">
-        <AccountActions onLogout={() => void logout()} />
+        <AccountActions onLogout={() => {
+          logout?.();
+          toast("Utloggad. Välkommen åter!", { icon: '👋' });
+        }} />
       </div>
     </div>
   );

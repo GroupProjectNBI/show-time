@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../context/AuthContext"; // Hämta inloggad användare
 
 
@@ -17,7 +17,7 @@ export default function AiChatOverlay({ onClose }: AiChatOverlayProps) {
   const { user } = useAuth(); // Inloggad användare
 
   // Avatarer
-  const aiAvatar = "/images/logos/kino-chat.png"; // Kino / AI
+  // const aiAvatar = "/images/logos/kino-chat.png"; // Kino / AI
   const userAvatar = user?.avatar || "/images/logos/avatarChatUser.png"; // DB-avatar eller fallback
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
