@@ -72,7 +72,7 @@ export default function AiChatOverlay({ onClose }: AiChatOverlayProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-sm bg-black/60 p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur/20 bg-black/60 p-4">
       <div className="relative w-[90%] max-w-2xl bg-accent/90 rounded-3xl p-8 shadow-2xl border border-white/10 flex flex-col h-[80vh]">
 
         <button
