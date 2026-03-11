@@ -24,21 +24,8 @@ export default function WorkApplication() {
             Bli en del av vårt team och skapa bioupplevelser som stannar kvar
           </p>
 
-          {/*BUTTONS*/}
-          <div className="mt-6 flex flex-col sm:flex-row gap-4 animate-fadeIn delay-300">
-            <button
-              className="
-            px-6 py-3 rounded-xl
-            bg-white/10 border border-white/20
-            text-accent font-semibold
-            backdrop-blur-sm
-            hover:bg-white/20 hover:border-white/30
-            transition
-            "
-            >
-              Ansök
-            </button>
-          </div>
+
+
         </div>
       </section>
 

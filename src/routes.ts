@@ -8,6 +8,7 @@ import ScreeningsPage from './pages/ScreeningsPage.tsx';
 import BookingPage from './pages/BookingPage.tsx';
 import ConfirmationPage from './pages/ConfirmationPage.tsx';
 import WorkWithUs from "./pages/WorkWithUs.tsx";
+import WorkApplication from './pages/WorkApplicationPage.tsx';
 import Faq from "./pages/FaqPage.tsx";
 import StartPage from './pages/StartPage.tsx';
 import MovieInfo from './pages/MovieInfo.tsx';
@@ -25,6 +26,7 @@ export default [
   BookingPage,
   ConfirmationPage,
   WorkWithUs,
+  WorkApplication,
   StartPage,
   MovieInfo,
   Faq,
