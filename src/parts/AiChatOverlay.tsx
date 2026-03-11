@@ -139,7 +139,7 @@ export default function AiChatOverlay({ onClose }: AiChatOverlayProps) {
           })}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -150,7 +150,7 @@ export default function AiChatOverlay({ onClose }: AiChatOverlayProps) {
 
           <button
             onClick={sendMessage}
-            className="px-6 py-3 rounded-xl bg-red-600 text-white font-bold uppercase text-xs tracking-widest hover:bg-red-700 transition"
+            className="px-6 py-3 rounded-xl bg-red-600 text-white font-bold uppercase text-xs tracking-widest hover:bg-red-700 transition w-full sm:w-auto"
           >
             Skicka
           </button>
