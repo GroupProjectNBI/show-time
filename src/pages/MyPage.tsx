@@ -18,7 +18,7 @@ interface AvatarItem {
 }
 
 export default function MyPage() {
-  const { user, changePassword, logout, updateAvatar } = useAuth();
+  const { user, changePassword, changeUserName, logout, updateAvatar } = useAuth();
 
   const [bookings, setBookings] = useState<any[]>([]);
   const [pastBookings, setPastBookings] = useState<any[]>([]);
@@ -124,13 +124,12 @@ export default function MyPage() {
         <div>
           <UsernameField
             initialValue={user?.userName ?? ""}
-            onSave={(newName) => console.log("Spara nytt namn:", newName)}
+            onSave={(newName) => changeUserName(newName, "name")}
           />
 
           <EmailField
             initialValue={user?.email ?? ""}
-            onSave={(newEmail) => console.log("Spara ny email:", newEmail)}
-          />
+            onSave={(newEmail) => console.log("Spara ny email:", newEmail)} />
 
           <div className="mt-6">
             <ChangePasswordForm onSubmit={changePassword} />
