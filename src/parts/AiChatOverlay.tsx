@@ -18,7 +18,7 @@ export default function AiChatOverlay({ onClose }: AiChatOverlayProps) {
 
   // Avatarer
   const aiAvatar = "/images/logos/kino-chat.png"; // Kino / AI
-  const userAvatar = user?.avatar || "/images/avatars/avatar3.png"; // DB-avatar eller fallback
+  const userAvatar = user?.avatar || "/images/logos/avatarChatUser.png"; // DB-avatar eller fallback
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
