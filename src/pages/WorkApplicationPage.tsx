@@ -41,6 +41,25 @@ export default function WorkApplication() {
           </div>
         </div>
       </section>
+
+      {/*TEXT SECTION*/}
+      <section className="w-full max-w-6xl mx-auto px-6 py-12 pb-10">
+        <div className="max-w-3xl space-y-8 leading-relaxed text-accent text-lg animate-fadeIn">
+
+          {/*Första paragrafen - större*/}
+          <p className="text-xl md:text-2xl font-semibold text-accent">
+            Hos oss är biobesöket mer än en film - det är en upplevelse.
+          </p>
+
+          <p>
+            Vi arbetar i team för service, kvalitet och nöjda medarbetare. Att arbeta hos oss innebär att vara en del av ett team där glädje, tempo och professionalism spelar roll.
+          </p>
+
+          <p>
+            Vill du vara med och skapa minnesvärda biobesök? Se våra lediga jobb och ansök redan idag.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
