@@ -145,7 +145,7 @@ export default function AiChatOverlay({ onClose }: AiChatOverlayProps) {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             placeholder="Skriv ett meddelande..."
-            className="flex-1 rounded-xl bg-accent/90 border border-accent/10 px-4 py-3 text-black"
+            className="flex-1 rounded-xl bg-accent/90 border border-accent/10 px-4 py-3 text-black placeholder:text-black"
           />
 
           <button
