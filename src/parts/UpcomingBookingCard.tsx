@@ -48,7 +48,7 @@ export default function UpcomingBookingCard({
             src={`/images/posters/${movieId}.webp`} // NYTT
             alt={title}
             loading="lazy"
-            className="h-44 w-full object-cover sm:h-full"
+            className="h-full w-full object-contain sm:h-full"
 
             // fallback om bilden saknas
             onError={(e) => {
@@ -80,36 +80,61 @@ export default function UpcomingBookingCard({
           </div>
 
           {/* Information om bokningen - för att hålla spacing finare i mobil och desktop */}
-          <div className="mt-3 grid grid-cols-1 gap-2 text-sm text-accent/80 sm:grid-cols-2">
+          {/* Information om bokningen */}
+          <div className="mt-3 grid grid-cols-1 gap-y-4 gap-x-2 text-sm text-accent/80 sm:grid-cols-2 items-start">
 
-            <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-accent/70" />
-              <span className="truncate">{dateLabel}</span>
+            {/* Datum */}
+            <div className="flex items-start gap-2">
+              <Calendar size={16} className="text-accent/70 mt-1 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Datum</span>
+                <span className="truncate">{dateLabel}</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Clock size={16} className="text-accent/70" />
-              <span className="truncate">{timeLabel}</span>
+            {/* Tid */}
+            <div className="flex items-start gap-2">
+              <Clock size={16} className="text-accent/70 mt-1 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Tid</span>
+                <span className="truncate">{timeLabel}</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:col-span-2">
-              <MapPin size={16} className="text-accent/70" />
-              <span className="truncate">{theaterLabel}</span>
+            {/* Salong (Full bredd) */}
+            <div className="flex items-start gap-2 sm:col-span-2 border-t border-white/5 pt-2">
+              <MapPin size={16} className="text-accent/70 mt-1 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Salong</span>
+                <span className="truncate">{theaterLabel}</span>
+              </div>
             </div>
 
-            {/* Renderas bara om ticketsLabel finns, komponenten anpassar sig automatiskt */}
+            {/* Biljetter - NU MED SAMMA STRUKTUR SOM PLATSER */}
             {ticketsLabel && (
-              <div className="flex items-center gap-2">
-                <Ticket size={16} className="text-accent/70" />
-                <span className="truncate">{ticketsLabel}</span>
+              <div className="flex items-start gap-2">
+                <Ticket size={16} className="text-accent/70 mt-1 shrink-0" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Biljetter</span>
+                  <span className="truncate font-medium text-accent">{ticketsLabel}</span>
+                </div>
               </div>
             )}
 
-            {/* Renderas bara om seatsLabel finns */}
+            {/* Platser */}
             {seatsLabel && (
-              <div className="flex items-center gap-2">
-                <Armchair size={16} className="text-accent/70" />
-                <span className="truncate">Platser: {seatsLabel}</span>
+              <div className="flex items-start gap-2">
+                <Armchair size={16} className="text-accent/70 mt-1 shrink-0" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Platser</span>
+                  <div className="flex flex-col gap-1">
+                    {seatsLabel.split("; ").map((seat, index) => (
+                      <span key={index} className="text-sm font-medium text-accent">
+                        {seat}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           </div>

@@ -21,7 +21,7 @@ Globals = Obj(new
     isSpa = true,
     // Vi hämtar värdena säkert här:
     port = GetSetting(0, "PORT", "3001"),
-    serverName = "Minimal API Backend",
+    serverName = "Show-Time Super Backend",
     frontendPath = GetSetting(1, "FRONTEND_PATH", "wwwroot"),
     sessionLifeTimeHours = 2
 });
