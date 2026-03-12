@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
-const navigate = useNavigate();
-
 WorkWithUs.route = {
-  path: '/jobba-hos-oss',
+  path: "/jobba-hos-oss",
   index: -1 // ska inte synas i headern
 };
 
 export default function WorkWithUs() {
+  const navigate = useNavigate(); // ✔️ Hooken måste ligga här
+
   return (
     <div className="workwithus-page">
 
@@ -30,19 +30,17 @@ export default function WorkWithUs() {
 
           {/* BUTTONS */}
           <div className="mt-6 flex flex-col sm:flex-row gap-4 animate-fadeIn delay-300">
-
-
             <button
               onClick={() => navigate("/lediga-jobb")}
               className="
-    px-6 py-3 rounded-xl
-    bg-accent text-primary font-semibold
-    hover:bg-accent/90
-    transition"
+                px-6 py-3 rounded-xl
+                bg-accent text-primary font-semibold
+                hover:bg-accent/90
+                transition
+              "
             >
               Lediga jobb
             </button>
-
           </div>
         </div>
       </section>
@@ -51,7 +49,6 @@ export default function WorkWithUs() {
       <section className="w-full max-w-6xl mx-auto px-6 py-12 pb-10">
         <div className="max-w-3xl space-y-8 leading-relaxed text-accent text-lg animate-fadeIn">
 
-          {/* Första paragrafen – större, som AboutPage */}
           <p className="text-xl md:text-2xl font-semibold text-accent">
             Hos oss är biobesöket mer än en film - det är en upplevelse.
           </p>
