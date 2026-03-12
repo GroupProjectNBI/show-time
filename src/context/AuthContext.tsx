@@ -21,6 +21,7 @@ interface AuthContextType {
     checkLogin: () => Promise<void>;
     updateAvatar: (avatarId: number) => Promise<boolean>;
     changePassword: (newPassword: string) => void;
+    changeUserName: (value: string, role: string) => void;
     loading: boolean;
 }
 
@@ -150,13 +151,27 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         checkLogin();
     }, []);
 
-    //Change password
+    //Change password. denna kan vi ta bort. 
     function changePassword(newPassword: string) {
         console.log("Byter lösenord till:", newPassword);
         //TODO: implementera riktig API-logik
         //exempelvis 
         //await fetchJson("/api/cange-password", {
         // method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({password: newPasswprd})});
+    }
+
+
+    //Change password
+    async function changeUserName(value: string, role: string) {
+        if (!user) return false;
+        console.log("Byter lösenord till:", value);
+        let changeValue;
+        if (role == "name") changeValue = JSON.stringify({ userName: value });
+        else changeValue = JSON.stringify({ email: value });
+
+        await fetchJson(`/api/User/${user.id}`, {
+            method: "PUT", headers: { "Content-Type": "application/json" }, body: changeValue
+        });
     }
 
     const value = {
@@ -167,6 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         checkLogin,
         updateAvatar,
         changePassword,
+        changeUserName,
         loading
     };
 
