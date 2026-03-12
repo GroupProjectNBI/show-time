@@ -61,7 +61,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                 </Link>
 
                 {/* DESKTOP NAV */}
-                <nav className="hidden md:flex items-center gap-3" aria-label="Huvudmeny">
+                <nav className="hidden md:flex items-center gap-4" aria-label="Huvudmeny">
                   {menuRoutes.map(({ menuLabel, path }, i) => {
                     const active = isActive(path);
 
@@ -71,10 +71,11 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                         to={path}
                         aria-current={active ? "page" : undefined}
                         className={[
-                          "rounded-full px-4 py-1.5 text-base font-semibold transition duration-200",
-                          "hover:bg-white/5",
-                          active ? "text-accent" : "text-accent/60 hover:text-accent/90",
-                          active ? "bg-transparent shadow-none drop-shadow-[0_12px_16px_rgba(0,0,0,0.55)]" : "",
+                          // FONT & SPACING
+"rounded-full px-4 py-1.5 text-[13px] font-bold uppercase tracking-[0.15em] transition-all duration-300",
+          active 
+            ? "text-accent drop-shadow-[0_0_8px_rgba(192,160,96,0.4)]" 
+            : "text-accent/70 hover:text-white hover:bg-white/5"// Inaktiv är ljusare guld som blir vit vid hover
                         ].join(" ")}
                         onClick={() => setExpanded(false)}
                       >
@@ -87,8 +88,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                   {!user && (
                     <button
                       onClick={openMembership}
-                      className="rounded-full px-4 py-1.5 text-base font-semibold text-accent/60 hover:text-accent/90 hover:bg-white/5 transition"
-                    >
+className="rounded-full px-4 py-1.5 text-[13px] font-bold uppercase tracking-[0.15em] text-accent/70 hover:text-white hover:bg-white/5 transition-all duration-300"                    >
                       Bli medlem
                     </button>
                   )}
@@ -96,8 +96,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                   {user && (
                     <Link
                       to="/min-sida"
-                      className="rounded-full px-4 py-1.5 text-base font-semibold text-accent/60 hover:text-accent/90 hover:bg-white/5 transition"
-                    >
+className="rounded-full px-4 py-1.5 text-[13px] font-bold uppercase tracking-[0.15em] text-accent/70 hover:text-white hover:bg-white/5 transition-all duration-300"                    >
                       Min sida
                     </Link>
                   )}
@@ -106,22 +105,19 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
               </div>
 
               {/* RIGHT: login/logout only */}
-              <div className="ml-auto hidden md:flex items-center gap-4">
-
+<div className="ml-auto hidden md:flex items-center gap-6">
                 {/* INLOGGAD */}
                 {user && (
                   <>
                     <button
                       onClick={logout}
-                      className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
-                    >
+className="rounded-full border border-accent/30 px-6 py-1.5 text-[12px] font-bold uppercase tracking-[0.1em] text-accent/80 transition-all duration-300 hover:bg-accent hover:text-primary hover:border-accent"                    >
                       Logga ut
                     </button>
 
                     <img
                       src={user.avatar}
-                      className="w-10 h-10 rounded-full border border-white/20"
-                      alt="avatar"
+className="w-10 h-10 rounded-full border-2 border-accent/20 shadow-[0_0_15px_rgba(192,160,96,0.2)] object-cover"                      alt="avatar"
                     />
                   </>
                 )}
@@ -130,8 +126,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                 {!user && (
                   <button
                     onClick={openLogin}
-                    className="rounded-full border-accent/80 px-5 py-1.5 text-base font-semibold text-accent/70 transition duration-200 hover:bg-accent hover:text-primary"
-                  >
+className="rounded-full border border-accent/50 px-8 py-2 text-[12px] font-black uppercase tracking-[0.2em] text-accent transition-all duration-300 hover:bg-accent hover:text-primary shadow-[0_0_20px_rgba(192,160,96,0.1)] active:scale-95"                  >
                     Logga in
                   </button>
                 )}
@@ -173,9 +168,8 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                       to={path}
                       onClick={closeMenu}
                       className={[
-                        "block w-full rounded-xl px-4 py-3 text-base font-semibold transition",
-                        "hover:bg-white/10",
-                        active ? "text-accent" : "text-accent/70 hover:text-accent",
+"block w-full rounded-xl px-4 py-3 text-[13px] font-bold uppercase tracking-[0.2em] transition-all",                        "hover:bg-white/10",
+                        active ? "text-accentbg-white/5" : "text-accent/70 hover:text-white",
                         active ? "bg-transparent shadow-none drop-shadow-[0_12px_16px_rgba(0,0,0,0.55)]" : "",
                         "text-center"
                       ].join(" ")}
@@ -190,14 +184,15 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                   <>
                     <button
                       onClick={() => { openMembership(); closeMenu(); }}
-                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
+                      className="block w-full text-center rounded-xl px-4 py-3 text-[13px] font-bold uppercase tracking-[0.2em] text-accent/70 hover:text-white transition"
                     >
                       Bli medlem
                     </button>
 
                     <button
                       onClick={() => { openLogin(); closeMenu(); }}
-                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
+                      className="mt-2 block w-full text-center rounded-xl bg-accent py-3 text-[13px] font-black uppercase tracking-[0.2em] text-primary transition active:scale-95"
+          
                     >
                       Logga in
                     </button>
@@ -210,15 +205,13 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                     <Link
                       to="/min-sida"
                       onClick={closeMenu}
-                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
-                    >
+className="block w-full text-center rounded-xl px-4 py-3 text-[13px] font-bold uppercase tracking-[0.2em] text-accent/70 hover:text-white transition"                    >
                       Min sida
                     </Link>
 
                     <button
                       onClick={() => { logout(); closeMenu(); }}
-                      className="block w-full text-center rounded-xl px-4 py-3 text-base font-semibold text-accent/70 hover:text-accent transition hover:bg-white/10"
-                    >
+className="mt-2 block w-full text-center rounded-xl border border-accent/30 py-3 text-[13px] font-bold uppercase tracking-[0.2em] text-accent/70 transition"                    >
                       Logga ut
                     </button>
                   </>

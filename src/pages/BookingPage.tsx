@@ -14,7 +14,7 @@ import BookingSnackPanel from "../parts/BookingSnackPanel";
 import { isValidEmail, normalizeEmail } from "../utils/email";
 import * as signalR from '@microsoft/signalr';
 import { findBestSeats } from "../utils/seatFinder";
-
+import { calculateSeat } from "../utils/seatCalculator";
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
@@ -30,6 +30,16 @@ export default function BookingPage() {
         selectedSeats, occupiedSeats, toggleSeat, setOccupied,
         ticketCount, selectedSnack, email, totalAmount, clearBooking, setSelectedSeats
     } = useBooking();
+
+
+    useEffect(() => {
+        // Den här koden körs när man kommer in på sidan
+
+        return () => {
+            // Den här "cleanup"-funktionen körs när man LÄMNAR sidan
+            clearBooking();
+        };
+    }, [clearBooking]); // Vi lyssnar på clearBooking
 
     // 1. Hämta statisk data (film, salong, redan sålda stolar)
     useEffect(() => {
@@ -133,18 +143,29 @@ export default function BookingPage() {
     useEffect(() => {
         if (!seatArray || seatArray.length === 0 || !screening || ticketCount === 0) return;
 
+        // Vi kör bara auto-väljaren om vi har färre stolar än biljetter
         if (selectedSeats.length < ticketCount) {
             const theater = seatArray[0];
             const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
             const allUnavailable = [...occupiedSeats, ...realtimeLockedSeats];
 
-            const bestSeats = findBestSeats(ticketCount, theater.seatsPerRow, baseIdOffset, allUnavailable);
+            // NYTT: Vi tar den senast valda stolen som startpunkt
+            const lastSelected = selectedSeats.length > 0
+                ? selectedSeats[selectedSeats.length - 1]
+                : undefined;
+
+            const bestSeats = findBestSeats(
+                ticketCount,
+                theater.seatsPerRow,
+                baseIdOffset,
+                allUnavailable,
+                lastSelected // Skicka med ankaren!
+            );
 
             if (bestSeats.length > 0) {
                 setSelectedSeats(bestSeats);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ticketCount, seatArray, screening, occupiedSeats, realtimeLockedSeats]);
 
     // 5. Genomför bokning
@@ -202,8 +223,15 @@ export default function BookingPage() {
                 ))}
             </div>
             <div className="mt-10 w-full max-w-[1200px] px-6">
-                <BookingSnackPanel movieTitle={screening.movieTitle} onBook={handleBook}
-                    seatsLabelLines={selectedSeats.map(s => `Stol ${s}`)} />
+                <BookingSnackPanel
+                    movieTitle={screening.movieTitle}
+                    onBook={handleBook}
+                    // Vi skapar de snygga raderna här innan vi skickar ner dem
+                    seatsLabelLines={selectedSeats.map(sId => {
+                        const layout = calculateSeat(sId);
+                        return layout.label; // t.ex. "Rad 2, Stol 5"
+                    })}
+                />
             </div>
         </div>
     );

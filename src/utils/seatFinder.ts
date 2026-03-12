@@ -2,63 +2,112 @@ export function findBestSeats(
     ticketCount: number,
     seatsPerRow: number[],
     baseIdOffset: number,
-    unavailableSeats: number[] // Både sålda i DB och låsta i realtid
+    unavailableSeats: number[],
+    anchorSeatId?: number // <--- Vi tar emot senast klickade stol
 ): number[] {
-    // Om vi inte valt några biljetter än, returnera tom array
     if (ticketCount === 0) return [];
 
+    // --- STEG 1: Om vi har en ankarstol, leta på den raden först ---
+    if (anchorSeatId) {
+        const adjacentGroup = findAdjacentOnSameRow(
+            anchorSeatId,
+            ticketCount,
+            seatsPerRow,
+            baseIdOffset,
+            unavailableSeats
+        );
+        if (adjacentGroup.length === ticketCount) return adjacentGroup;
+    }
+
+    // --- STEG 2: Om ingen ankarstol finns, eller om raden var full ---
+    // Kör den vanliga "Sweet Spot"-logiken (din befintliga kod)
+    return searchGlobalBest(ticketCount, seatsPerRow, baseIdOffset, unavailableSeats);
+}
+
+function findAdjacentOnSameRow(
+    anchorId: number,
+    count: number,
+    seatsPerRow: number[],
+    offset: number,
+    unavailable: number[]
+): number[] {
+    let rowStartId = offset + 1;
+    let rowEndId = 0;
+
+    for (const rowSize of seatsPerRow) {
+        rowEndId = rowStartId + rowSize - 1;
+        if (anchorId >= rowStartId && anchorId <= rowEndId) break;
+        rowStartId += rowSize;
+    }
+
+    // --- NY PRIORITERING: Centrera runt ankaren ---
+    // Vi skapar en lista på "start-offsets" som vi vill prova i ordning.
+    // Om vi vill ha 3 stolar, vill vi helst att ankaren är i mitten (index 1 i gruppen).
+    const middleIndex = Math.floor((count - 1) / 2);
+
+    const searchOffsets = [];
+    // 1. Prova perfekt centrerat
+    searchOffsets.push(middleIndex);
+
+    // 2. Fyll på med resten av möjligheterna (närmast mitten först)
+    for (let i = 0; i < count; i++) {
+        if (i !== middleIndex) searchOffsets.push(i);
+    }
+    // searchOffsets blir t.ex. [1, 0, 2] för 3 biljetter. 
+    // Den provar index 1 (centrerat) först, sen index 0, sen index 2.
+
+    for (const offsetInGroup of searchOffsets) {
+        const potentialGroup: number[] = [];
+        let isPossible = true;
+        const startId = anchorId - offsetInGroup;
+
+        for (let i = 0; i < count; i++) {
+            const currentId = startId + i;
+            if (currentId < rowStartId || currentId > rowEndId || unavailable.includes(currentId)) {
+                isPossible = false;
+                break;
+            }
+            potentialGroup.push(currentId);
+        }
+
+        if (isPossible) return potentialGroup;
+    }
+
+    return [];
+}
+
+// Din befintliga logik (flyttad till en egen sub-funktion för renhet)
+function searchGlobalBest(ticketCount: number, seatsPerRow: number[], baseIdOffset: number, unavailableSeats: number[]): number[] {
     let bestGroup: number[] = [];
-    let bestScore = Infinity; // Vi letar efter den LÄGSTA straffpoängen
-
+    let bestScore = Infinity;
     const totalRows = seatsPerRow.length;
-    // Sweet spot: ca 60% bak i salongen. (t.ex. rad 6 av 10)
-    // Vi lägger stort straff på rader långt fram, men mindre straff på rader längre bak.
     const idealRow = Math.floor(totalRows * 0.6);
+    let currentSeatId = baseIdOffset + 1;
 
-    let currentSeatId = baseIdOffset + 1; // Start-ID för första stolen (t.ex. 1 eller 82)
-
-    // 1. Gå igenom salongen rad för rad
     for (let rowIndex = 0; rowIndex < totalRows; rowIndex++) {
         const seatsInThisRow = seatsPerRow[rowIndex];
-
-        // Mitten på just den här raden (t.ex. stol 5 och 6 om raden har 10 stolar)
         const idealCol = seatsInThisRow / 2;
 
-        // Har raden ens tillräckligt många stolar för vårt sällskap?
         if (seatsInThisRow >= ticketCount) {
-
-            // 2. Titta på alla möjliga "grupper" av stolar på denna rad
-            // Om vi vill ha 3 stolar på en rad med 10, kan vi sitta på plats 0-1-2, 1-2-3, osv.
             for (let colIndex = 0; colIndex <= seatsInThisRow - ticketCount; colIndex++) {
-
                 const currentGroupIds: number[] = [];
                 let isGroupAvailable = true;
 
-                // 3. Kolla om alla stolar i just denna grupp är lediga
                 for (let i = 0; i < ticketCount; i++) {
                     const seatId = currentSeatId + colIndex + i;
-
                     if (unavailableSeats.includes(seatId)) {
                         isGroupAvailable = false;
-                        break; // Avbryt, någon sitter redan här!
+                        break;
                     }
                     currentGroupIds.push(seatId);
                 }
 
-                // 4. Om hela gruppen är ledig, dags att poängsätta den!
                 if (isGroupAvailable) {
-                    // Avstånd från den perfekta raden. Vi multiplicerar med 2 för att 
-                    // straffa "fel rad" hårdare än "lite vid sidan av mitten".
                     const rowDistance = Math.abs(rowIndex - idealRow) * 2;
-
-                    // Avstånd från mitten av raden (vi räknar från mitten av vårt sällskap)
                     const centerOfOurGroup = colIndex + (ticketCount / 2);
                     const colDistance = Math.abs(centerOfOurGroup - idealCol);
-
-                    // Total straffpoäng
                     const totalScore = rowDistance + colDistance;
 
-                    // Är detta den bästa placeringen hittills?
                     if (totalScore < bestScore) {
                         bestScore = totalScore;
                         bestGroup = currentGroupIds;
@@ -66,10 +115,7 @@ export function findBestSeats(
                 }
             }
         }
-
-        // Räkna upp ID:t så vi hamnar på rätt nummer för nästa rad
         currentSeatId += seatsInThisRow;
     }
-
-    return bestGroup; // Returnerar de absolut bästa, sammanhängande stolarna!
+    return bestGroup;
 }
