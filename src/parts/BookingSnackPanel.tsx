@@ -81,21 +81,29 @@ export default function BookingSnackPanel({
 
           {/* Vänster: titel + biljetter + säten */}
           <div>
-            <div className="text-[16px] font-semibold text-accent">
+            <div className="text-[16px] font-semibold text-accent uppercase tracking-tight">
               {movieTitle}
             </div>
 
-            <div className="mt-1 text-[14px] font-semibold text-accent/90">
-              {ticketCount} biljetter
+            <div className="mt-1 text-[14px] font-bold text-accent/90 flex items-center gap-2">
+              <span className="bg-accent/20 px-2 py-0.5 rounded text-[10px] text-accent border border-accent/30">
+                {ticketCount}st
+              </span>
+              Biljetter
             </div>
 
-            <div className="mt-4 space-y-1 text-[12px] font-semibold text-accent/80">
+            {/* Här renderas nu "Rad X, Stol Y" */}
+            <div className="mt-4 space-y-1.5 text-[12px] font-medium text-accent/80 border-l border-accent/20 pl-3">
               {seatsLabelLines.slice(0, 7).map((line, idx) => (
-                <div key={idx}>{line}</div>
+                <div key={idx} className="flex items-center gap-2">
+                  <div className="w-1 h-1 rounded-full bg-accent/40" />
+                  {line}
+                </div>
               ))}
+
               {seatsLabelLines.length > 7 && (
-                <div className="text-accent/60 text-[12px]">
-                  + {seatsLabelLines.length - 7} till
+                <div className="text-accent/60 text-[11px] italic pl-3">
+                  + {seatsLabelLines.length - 7} till platser...
                 </div>
               )}
             </div>
