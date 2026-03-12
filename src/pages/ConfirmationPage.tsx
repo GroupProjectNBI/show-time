@@ -298,7 +298,7 @@ export default function ConfirmationPage() {
 }
 
 // En liten hjälp-komponent för kvittoraderna för att hålla koden ren
-function ReceiptRow({ label, value }: { label: string, value: string }) {
+function ReceiptRow({ label, value }: { label: string, value: string; }) {
   return (
     <div className="flex justify-between border-b border-white/5 pb-3">
       <span className="text-accent/40 font-bold uppercase text-[10px] tracking-widest">{label}</span>

@@ -1,4 +1,8 @@
+//  Lägg detta allra högst upp i filen, utanför komponenten
+let cookieShownThisSession = false;
+
 import { useLocation } from 'react-router-dom';
+
 import Header from "./partials/Header";
 import Main from './partials/Main';
 import Footer from './partials/Footer';
@@ -7,7 +11,9 @@ import { BookingProvider } from './context/BookingContext';
 import { AuthProvider } from './context/AuthContext';
 import { OverlayProvider } from './context/OverlayContext';
 
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+
 import MembershipOverlay from "./parts/MembershipOverlay";
 import LoginOverlay from "./parts/LoginOverlay";
 import CookiePopup from './parts/CookiePopup';
@@ -20,19 +26,25 @@ export default function App() {
 
   const [showLogin, setShowLogin] = useState(false);
   const [showMembership, setShowMembership] = useState(false);
-  const [showCookies, setShowCookies] = useState(true);
-  const [showAiChat, setShowAiChat] = useState(false); //  Chat state
 
-  // Scroll to top vid sidbyte
-  if (location.pathname) {
+  //  Cookie-popup visas EN gång per sidladdning
+  const [showCookies, setShowCookies] = useState(() => {
+    if (cookieShownThisSession) return false;
+    cookieShownThisSession = true;
+    return true;
+  });
+
+  const [showAiChat, setShowAiChat] = useState(false);
+
+  //  Scroll to top vid sidbyte — FIX som stoppar remount på FAQ
+  useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }
+  }, [location.pathname]);
 
   return (
     <AuthProvider>
       <BookingProvider>
 
-        {/*  OverlayProvider med AI-chat */}
         <OverlayProvider
           value={{
             openMembership: () => setShowMembership(true),
@@ -41,12 +53,12 @@ export default function App() {
           }}
         >
 
-          {/*  Membership */}
+          {/* Membership */}
           {showMembership && (
             <MembershipOverlay onClose={() => setShowMembership(false)} />
           )}
 
-          {/*  Login */}
+          {/* Login */}
           {showLogin && (
             <LoginOverlay
               onClose={() => setShowLogin(false)}
@@ -57,7 +69,12 @@ export default function App() {
             />
           )}
 
-          {/*  Cookies */}
+          {/* AI Chat Overlay */}
+          {showAiChat && (
+            <AiChatOverlay onClose={() => setShowAiChat(false)} />
+          )}
+
+          {/*  CookiePopup visas bara om showCookies = true */}
           {showCookies && (
             <CookiePopup
               onAccept={() => setShowCookies(false)}
@@ -65,12 +82,7 @@ export default function App() {
             />
           )}
 
-          {/* AI Chat Overlay (måste ligga UTANFÖR CookiePopup) */}
-          {showAiChat && (
-            <AiChatOverlay onClose={() => setShowAiChat(false)} />
-          )}
-
-          {/*  Hela sidlayouten */}
+          {/* Layout */}
           <div className="min-h-screen flex flex-col">
 
             <Header
