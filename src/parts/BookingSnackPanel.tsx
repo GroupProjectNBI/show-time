@@ -93,20 +93,13 @@ export default function BookingSnackPanel({
             </div>
 
             {/* Här renderas nu "Rad X, Stol Y" */}
-            <div className="mt-4 space-y-1.5 text-[12px] font-medium text-accent/80 border-l border-accent/20 pl-3">
-              {seatsLabelLines.slice(0, 7).map((line, idx) => (
-                <div key={idx} className="flex items-center gap-2">
-                  <div className="w-1 h-1 rounded-full bg-accent/40" />
-                  {line}
-                </div>
-              ))}
+            {seatsLabelLines.map((line, idx) => (
+              <div key={idx} className="flex items-center gap-2">
+                <div className="w-1 h-1 rounded-full bg-accent/40" />
+                {line}
+              </div>
+            ))}
 
-              {seatsLabelLines.length > 7 && (
-                <div className="text-accent/60 text-[11px] italic pl-3">
-                  + {seatsLabelLines.length - 7} till platser...
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Höger: bild + text + snackval */}
