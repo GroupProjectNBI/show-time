@@ -5,6 +5,34 @@ public static class PasswordResetHandler
 {
     public static void Start()
     {
+        App.MapPost("/api/contact", (HttpContext context, JsonElement bodyJson) =>
+                  {
+                      var body = JSON.Parse(bodyJson.ToString());
+
+                      // 1. Hämta email och tvinga den till en ren sträng direkt
+                      string name = body.name?.ToString() ?? "Anonym";
+                      string email = body.email?.ToString() ?? "Ingen adress";
+                      string message = body.message?.ToString() ?? "";
+
+
+
+                      //   Här skapar vi den "snygga designen"
+                      string subject = $@"Formulär fråga från - {name}";
+                      string htmlBody = $@"
+                          <div style='background-color: #1a1a1a; color: #ffffff; font-family: sans-serif; padding: 40px; border-radius: 20px; max-width: 600px; border: 1px solid #C6A96A;'>
+                              <h1 style='color: #C6A96A; border-bottom: 1px solid #C6A96A; padding-bottom: 10px;'>Nytt meddelande från webben</h1>
+                              <p style='font-size: 16px; margin-top: 20px;'><strong>Från:</strong> {name} ({email})</p>
+                              <div style='background-color: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; margin-top: 20px; font-style: italic; color: #e0e0e0;'>
+                                  ""{message}""
+                              </div>
+                              <p style='margin-top: 30px; font-size: 12px; color: #888;'>Detta mail skickades via kontaktformuläret på Show-Time FAQ-sida.</p>
+                          </div>
+                      ";
+
+                      EmailService.SendEmail(email, subject, htmlBody);
+
+                      return RestResult.Parse(context, new { success = true, message = "Mail skickat till systemet!" });
+                  });
 
         App.MapPost("/api/request-password-reset", (HttpContext context, JsonElement bodyJson) =>
            {
