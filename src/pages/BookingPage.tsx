@@ -133,18 +133,29 @@ export default function BookingPage() {
     useEffect(() => {
         if (!seatArray || seatArray.length === 0 || !screening || ticketCount === 0) return;
 
+        // Vi kör bara auto-väljaren om vi har färre stolar än biljetter
         if (selectedSeats.length < ticketCount) {
             const theater = seatArray[0];
             const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
             const allUnavailable = [...occupiedSeats, ...realtimeLockedSeats];
 
-            const bestSeats = findBestSeats(ticketCount, theater.seatsPerRow, baseIdOffset, allUnavailable);
+            // NYTT: Vi tar den senast valda stolen som startpunkt
+            const lastSelected = selectedSeats.length > 0
+                ? selectedSeats[selectedSeats.length - 1]
+                : undefined;
+
+            const bestSeats = findBestSeats(
+                ticketCount,
+                theater.seatsPerRow,
+                baseIdOffset,
+                allUnavailable,
+                lastSelected // Skicka med ankaren!
+            );
 
             if (bestSeats.length > 0) {
                 setSelectedSeats(bestSeats);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ticketCount, seatArray, screening, occupiedSeats, realtimeLockedSeats]);
 
     // 5. Genomför bokning
