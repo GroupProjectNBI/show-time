@@ -50,7 +50,7 @@ export default function WorkApplication() {
           </p>
         </div>
       </section>
-      {/* LEDIGA JOBB SEKTION */}
+      {/* LEDIGA JOBB */}
       <section className="w-full max-w-6xl mx-auto px-6 pb-20">
         <h2 className="text-3xl font-bold text-accent mb-8">
           Lediga tjänster

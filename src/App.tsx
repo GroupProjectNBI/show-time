@@ -1,4 +1,4 @@
-// 👇 Lägg detta allra högst upp i filen, utanför komponenten
+//  Lägg detta allra högst upp i filen, utanför komponenten
 let cookieShownThisSession = false;
 
 import { useLocation } from 'react-router-dom';
@@ -11,7 +11,7 @@ import { BookingProvider } from './context/BookingContext';
 import { AuthProvider } from './context/AuthContext';
 import { OverlayProvider } from './context/OverlayContext';
 
-// ⭐ Lägg till useEffect här
+
 import { useState, useEffect } from "react";
 
 import MembershipOverlay from "./parts/MembershipOverlay";
@@ -27,7 +27,7 @@ export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showMembership, setShowMembership] = useState(false);
 
-  // ⭐ Cookie-popup visas EN gång per sidladdning
+  //  Cookie-popup visas EN gång per sidladdning
   const [showCookies, setShowCookies] = useState(() => {
     if (cookieShownThisSession) return false;
     cookieShownThisSession = true;
@@ -36,7 +36,7 @@ export default function App() {
 
   const [showAiChat, setShowAiChat] = useState(false);
 
-  // ⭐ Scroll to top vid sidbyte — FIX som stoppar remount på FAQ
+  //  Scroll to top vid sidbyte — FIX som stoppar remount på FAQ
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [location.pathname]);
@@ -74,7 +74,7 @@ export default function App() {
             <AiChatOverlay onClose={() => setShowAiChat(false)} />
           )}
 
-          {/* ⭐ CookiePopup visas bara om showCookies = true */}
+          {/*  CookiePopup visas bara om showCookies = true */}
           {showCookies && (
             <CookiePopup
               onAccept={() => setShowCookies(false)}

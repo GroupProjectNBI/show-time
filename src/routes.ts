@@ -41,6 +41,6 @@ const faqRoute: Route = {
 };
 
 
-// ⭐ Exportera allt
+// Exportera allt
 export default [...dynamicPages, faqRoute]
   .sort((a, b) => (a.index || 0) - (b.index || 0));
