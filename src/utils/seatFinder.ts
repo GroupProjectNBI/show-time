@@ -31,7 +31,6 @@ function findAdjacentOnSameRow(
     offset: number,
     unavailable: number[]
 ): number[] {
-    // 1. Hitta exakt vilka ID-gränser denna rad har
     let rowStartId = offset + 1;
     let rowEndId = 0;
 
@@ -41,17 +40,29 @@ function findAdjacentOnSameRow(
         rowStartId += rowSize;
     }
 
-    // 2. Prova olika "fönster" runt ankarstolen
-    // Vi provar att sätta ankaren som första stol, sen som andra, osv.
-    // Detta gör att vi automatiskt "vänder" om det är stopp åt ena hållet.
-    for (let offsetInGroup = 0; offsetInGroup < count; offsetInGroup++) {
+    // --- NY PRIORITERING: Centrera runt ankaren ---
+    // Vi skapar en lista på "start-offsets" som vi vill prova i ordning.
+    // Om vi vill ha 3 stolar, vill vi helst att ankaren är i mitten (index 1 i gruppen).
+    const middleIndex = Math.floor((count - 1) / 2);
+
+    const searchOffsets = [];
+    // 1. Prova perfekt centrerat
+    searchOffsets.push(middleIndex);
+
+    // 2. Fyll på med resten av möjligheterna (närmast mitten först)
+    for (let i = 0; i < count; i++) {
+        if (i !== middleIndex) searchOffsets.push(i);
+    }
+    // searchOffsets blir t.ex. [1, 0, 2] för 3 biljetter. 
+    // Den provar index 1 (centrerat) först, sen index 0, sen index 2.
+
+    for (const offsetInGroup of searchOffsets) {
         const potentialGroup: number[] = [];
         let isPossible = true;
         const startId = anchorId - offsetInGroup;
 
         for (let i = 0; i < count; i++) {
             const currentId = startId + i;
-            // KOLL: Är vi utanför radens gränser? Eller är stolen upptagen?
             if (currentId < rowStartId || currentId > rowEndId || unavailable.includes(currentId)) {
                 isPossible = false;
                 break;
@@ -62,7 +73,7 @@ function findAdjacentOnSameRow(
         if (isPossible) return potentialGroup;
     }
 
-    return []; // Hittade inget på denna rad
+    return [];
 }
 
 // Din befintliga logik (flyttad till en egen sub-funktion för renhet)

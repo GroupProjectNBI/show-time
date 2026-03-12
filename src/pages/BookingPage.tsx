@@ -31,6 +31,16 @@ export default function BookingPage() {
         ticketCount, selectedSnack, email, totalAmount, clearBooking, setSelectedSeats
     } = useBooking();
 
+
+    useEffect(() => {
+        // Den här koden körs när man kommer in på sidan
+
+        return () => {
+            // Den här "cleanup"-funktionen körs när man LÄMNAR sidan
+            clearBooking();
+        };
+    }, [clearBooking]); // Vi lyssnar på clearBooking
+
     // 1. Hämta statisk data (film, salong, redan sålda stolar)
     useEffect(() => {
         if (!id) return;
