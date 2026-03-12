@@ -46,15 +46,15 @@ export default function BookingPage() {
         if (!id) return;
         (async () => {
             try {
-                const screeningRes = await fetchJson(`/api/v_screenings?where=id=${id}`);
+                const screeningRes = await fetchJson(`/api/v_screenings?where=id=${id}`);//svenska
                 const current = screeningRes[0];
                 setScreening(current);
                 if (current) {
                     const tId = current.theaterName === "Stora" ? 1 : 2;
-                    setSeatArray(await fetchJson(`/api/Theater?where=id=${tId}`));
-                    const mRes = await fetchJson(`/api/v_getMovieDetailsView?where=movieId=${current.movieId}`);
+                    setSeatArray(await fetchJson(`/api/Theater?where=id=${tId}`));//svenska
+                    const mRes = await fetchJson(`/api/v_getMovieDetailsView?where=movieId=${current.movieId}`);//svenska
                     if (mRes?.[0]) setMovie(mRes[0]);
-                    const occ = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`);
+                    const occ = await fetchJson(`/api/v_occupied_seats?where=screeningId=${id}`); //svenska?
                     setOccupied(occ.map((o: any) => o.seatId));
                 }
             } catch (e) { console.error("Data-laddning fel:", e); }
@@ -193,7 +193,7 @@ export default function BookingPage() {
                 await connection.invoke("ConfirmBooking", parseInt(id!, 10), selectedSeats);
             }
             clearBooking();
-            navigate(`/confirmation/${code}`);
+            navigate(`/bekraftelse/${code}`);
         } catch (e) { alert("Något gick fel vid bokningen!"); }
     };
 
@@ -235,4 +235,4 @@ export default function BookingPage() {
     );
 }
 
-BookingPage.route = { path: "/booking/:id" };
+BookingPage.route = { path: "/bokning/:id" };

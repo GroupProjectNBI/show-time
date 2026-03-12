@@ -51,7 +51,7 @@ export default function ConfirmationPage() {
         console.log("Hämtar bokning för ref:", bookingRef);
 
         // 1. Hämta bokningen via ref
-        const bookingResult = await fetchJson(`/api/Booking?where=bookingRef=${bookingRef}`);
+        const bookingResult = await fetchJson(`/api/Booking?where=bookingRef=${bookingRef}`); //kan denna vara på svenska
 
         if (!bookingResult || bookingResult.length === 0) {
           setError("Kunde inte hitta bokningen.");
@@ -75,10 +75,10 @@ export default function ConfirmationPage() {
         }
 
         // 2. Hämta biljetter & Visning parallellt
-        const ticketsPromise = fetchJson(`/api/Ticket?where=bookingId=${foundBooking.id}`);
+        const ticketsPromise = fetchJson(`/api/Ticket?where=bookingId=${foundBooking.id}`); //kan denna vara på svenska
 
         // Använd det säkra ID:t här:
-        const screeningPromise = fetchJson(`/api/v_screenings?where=id=${screeningIdToFetch}`);
+        const screeningPromise = fetchJson(`/api/v_screenings?where=id=${screeningIdToFetch}`); //kan denna vara på svenska
 
         const [ticketsResult, screeningResult] = await Promise.all([ticketsPromise, screeningPromise]);
 
@@ -308,8 +308,8 @@ function ReceiptRow({ label, value }: { label: string, value: string; }) {
 }
 
 ConfirmationPage.route = {
-  path: "/confirmation/:bookingRef",
-  menuLabel: "Confirmation",
+  path: "/bekraftelse/:bookingRef",
+  menuLabel: "Bekräftelse",
   hideInMenu: true,
   index: -2,
 };

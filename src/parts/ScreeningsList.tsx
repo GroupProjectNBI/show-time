@@ -17,7 +17,7 @@ export default function ScreeningsList({ screenings }: Props) {
 
   const goToBooking = (e: React.MouseEvent, id: number | string) => {
     e.stopPropagation();
-    navigate(`/booking/${id}`);
+    navigate(`/bokning/${id}`);
   };
 
   const getDisplayDate = (dateString: string) => {
