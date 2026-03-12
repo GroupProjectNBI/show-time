@@ -1,47 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useOverlay } from "../context/OverlayContext";
-
-FAQPage.route = {
-  path: "/faq",
-  menuLabel: "FAQ",
-  index: 3
-};
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  // Hämta overlay-funktioner EN gång, på toppnivå
+  // Overlay
   const { openAiChat } = useOverlay();
+
+  // Location för hash-scroll
+  const location = useLocation();
+
+  // Scrolla till #kontakt om URL innehåller hash
+  useEffect(() => {
+    if (!location.hash) return;
+
+    const el = document.querySelector(location.hash);
+    if (!el) return;
+
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }, [location.hash]);
 
   const toggle = (i: number) => {
     setOpenIndex(openIndex === i ? null : i);
   };
 
   const faqs = [
-    {
-      q: "Hur många salonger har ni?",
-      a: "Vi har två salonger som visar olika filmer och föreställningar."
-    },
-    {
-      q: "Vilka filmer visar ni?",
-      a: "Vi visar aktuella biofilmer, samt utvalda visingar beroende på säsong och efterfrågan."
-    },
-    {
-      q: "Hur köper jag biljetter?",
-      a: "Biljetter bokas enklast via vår hemsida, betalning sker dock på plats."
-    },
-    {
-      q: "Får jag ta med egen mat, snacks och dryck?",
-      a: "Det är inte tillåtet att ta med egen mat eller dryck. Vi erbjuder snacks, popcorn och dryck i vår kiosk."
-    },
-    {
-      q: "Är biografen barnvänlig?",
-      a: "Ja, vi visar filmer för alla åldrar och följer gällande åldersgränser."
-    },
-    {
-      q: "Är biografen tillgänglighetsanpassad?",
-      a: "Ja, kontakta oss gärna i förväg om du har särskilda behov."
-    }
+    { q: "Hur många salonger har ni?", a: "Vi har två salonger som visar olika filmer och föreställningar." },
+    { q: "Vilka filmer visar ni?", a: "Vi visar aktuella biofilmer, samt utvalda visingar beroende på säsong och efterfrågan." },
+    { q: "Hur köper jag biljetter?", a: "Biljetter bokas enklast via vår hemsida, betalning sker dock på plats." },
+    { q: "Får jag ta med egen mat, snacks och dryck?", a: "Det är inte tillåtet att ta med egen mat eller dryck. Vi erbjuder snacks, popcorn och dryck i vår kiosk." },
+    { q: "Är biografen barnvänlig?", a: "Ja, vi visar filmer för alla åldrar och följer gällande åldersgränser." },
+    { q: "Är biografen tillgänglighetsanpassad?", a: "Ja, kontakta oss gärna i förväg om du har särskilda behov." }
   ];
 
   const categories = [
