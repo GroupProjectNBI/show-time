@@ -2,12 +2,6 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useOverlay } from "../context/OverlayContext";
 
-FAQPage.route = {
-  path: "/faq",
-  menuLabel: "FAQ",
-  index: 3
-};
-
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -19,15 +13,15 @@ export default function FAQPage() {
 
   // Scrolla till #kontakt om URL innehåller hash
   useEffect(() => {
-    if (location.hash) {
-      const el = document.querySelector(location.hash);
-      if (el) {
-        setTimeout(() => {
-          el.scrollIntoView({ behavior: "smooth" });
-        }, 100); // liten delay så sidan hinner renderas
-      }
-    }
-  }, [location]);
+    if (!location.hash) return;
+
+    const el = document.querySelector(location.hash);
+    if (!el) return;
+
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  }, [location.hash]);
 
   const toggle = (i: number) => {
     setOpenIndex(openIndex === i ? null : i);
