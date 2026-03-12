@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import fetchJson from "../../utils/fetchJson";
-import SnackModal from "./SnackModal";
-import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import SnackModal from "./SnackModal.tsx";
+import ConfirmDeleteModal from "./ConfirmDeleteModal.tsx";
 
 interface SnackItem {
   id: number;
