@@ -237,4 +237,4 @@ export default function BookingPage() {
     );
 }
 
-BookingPage.route = { path: "/booking/:id" };
+BookingPage.route = { path: "/bokning/:id" };

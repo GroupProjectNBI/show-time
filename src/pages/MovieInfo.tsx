@@ -209,7 +209,7 @@ function MovieInfo() {
                                             <button
                                                 key={screen.screeningId}
                                                 className="group relative flex flex-col items-center justify-center bg-primary hover:bg-red-800 hover:scale-105 border border-white/10 rounded-xl py-4 transition-all duration-300 shadow-lg"
-                                                onClick={() => navigate(`/booking/${screen.screeningId}`)}
+                                                onClick={() => navigate(`/bokning/${screen.screeningId}`)}
                                             >
                                                 <span className="text-lg font-bold text-white mb-1">
                                                     {formatTime(screen.startTime)}
