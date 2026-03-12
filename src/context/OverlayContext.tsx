@@ -6,6 +6,7 @@ import { createContext, useContext } from "react";
 type OverlayContextValue = {
   openMembership: () => void;
   openLogin: () => void;
+  openAiChat: () => void; // Lagt till
 };
 
 const OverlayContext = createContext<OverlayContextValue | null>(null);
@@ -17,7 +18,11 @@ export function OverlayProvider({
   value: OverlayContextValue;
   children: React.ReactNode;
 }) {
-  return <OverlayContext.Provider value={value}>{children}</OverlayContext.Provider>;
+  return (
+    <OverlayContext.Provider value={value}>
+      {children}
+    </OverlayContext.Provider>
+  );
 }
 
 export function useOverlay() {

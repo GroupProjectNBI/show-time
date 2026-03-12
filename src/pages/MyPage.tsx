@@ -11,14 +11,14 @@ import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
 import AccountActions from "../parts/AccountActions";
 import ProtectedRoute from "../parts/ProtectedRoute";
-
+import { formatSeatString } from "../utils/seatCalculator";
 interface AvatarItem {
   id: number;
   url: string;
 }
 
 export default function MyPage() {
-  const { user, changePassword, logout, updateAvatar } = useAuth();
+  const { user, changePassword, changeUserName, logout, updateAvatar } = useAuth();
 
   const [bookings, setBookings] = useState<any[]>([]);
   const [pastBookings, setPastBookings] = useState<any[]>([]);
@@ -124,13 +124,12 @@ export default function MyPage() {
         <div>
           <UsernameField
             initialValue={user?.userName ?? ""}
-            onSave={(newName) => console.log("Spara nytt namn:", newName)}
+            onSave={(newName) => changeUserName(newName, "name")}
           />
 
           <EmailField
             initialValue={user?.email ?? ""}
-            onSave={(newEmail) => console.log("Spara ny email:", newEmail)}
-          />
+            onSave={(newEmail) => console.log("Spara ny email:", newEmail)} />
 
           <div className="mt-6">
             <ChangePasswordForm onSubmit={changePassword} />
@@ -174,7 +173,7 @@ export default function MyPage() {
               })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={booking.seats || "Information saknas"}
+              seatsLabel={formatSeatString(booking.seats)}
               onCancel={handleCancelBooking}
               cancelDisabled={false}
             />
@@ -208,7 +207,7 @@ export default function MyPage() {
               })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={booking.seats || "Information saknas"}
+              seatsLabel={formatSeatString(booking.seats)}
               seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
                 day: "numeric",
                 month: "long",
