@@ -30,7 +30,7 @@ export default function ScreeningsList({ screenings }: Props) {
     today.setHours(0, 0, 0, 0);
     tomorrow.setHours(0, 0, 0, 0);
 
-    if (screeningDate.getTime() === today.getTime()) return "IDAG";
+    if (screeningDate.getTime() === today.getTime()) return "";
     if (screeningDate.getTime() === tomorrow.getTime()) return "IMORGON";
 
     let str = screeningDate.toLocaleDateString('sv-SE', { weekday: 'short', day: 'numeric', month: 'short' });
@@ -124,7 +124,6 @@ export default function ScreeningsList({ screenings }: Props) {
 
                     {/* Tid */}
                     <div className="flex items-center gap-2 text-[#c0a060] font-black">
-                      <span className="text-[10px] uppercase tracking-[0.2em] opacity-50 font-bold">{getDisplayDate(s.startTime)}</span>
                       <Clock size={16} className="opacity-80" />
                       <span className="text-2xl tracking-tighter">KL. {formatTime(s.startTime)}</span>
                     </div>
