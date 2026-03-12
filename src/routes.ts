@@ -22,7 +22,6 @@ export default [
 
   AboutPage,
   VisitInfoLink,
-  NotFoundPage,
   ScreeningsPage,
   BookingPage,
   ConfirmationPage,
@@ -31,7 +30,8 @@ export default [
   StartPage,
   MovieInfo,
   Faq,
-  MyPage
+  MyPage,
+  NotFoundPage
 ]
   // map the route property of each page component to a Route
   .map(x => {
