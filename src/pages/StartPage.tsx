@@ -109,7 +109,7 @@ function StartPage() {
             <div key={movie.movieId} className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-black/30 p-6 rounded-2xl border border-white/5 hover:border-[#c0a060]/30 transition-colors">
               <div>
                 <h3 className="text-xl font-normal uppercase tracking-wider text-white">{movie.title}</h3>
-                <p className="text-xs text-[#c0a060]/60 uppercase mt-1 font-bold">Dagens visningar</p>
+
               </div>
 
               {/* Tids-knappar */}
