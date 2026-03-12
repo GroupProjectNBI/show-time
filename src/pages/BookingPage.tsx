@@ -14,7 +14,7 @@ import BookingSnackPanel from "../parts/BookingSnackPanel";
 import { isValidEmail, normalizeEmail } from "../utils/email";
 import * as signalR from '@microsoft/signalr';
 import { findBestSeats } from "../utils/seatFinder";
-
+import { calculateSeat } from "../utils/seatCalculator";
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
@@ -200,8 +200,15 @@ export default function BookingPage() {
                 ))}
             </div>
             <div className="mt-10 w-full max-w-[1200px] px-6">
-                <BookingSnackPanel movieTitle={screening.movieTitle} onBook={handleBook}
-                    seatsLabelLines={selectedSeats.map(s => `Stol ${s}`)} />
+                <BookingSnackPanel
+                    movieTitle={screening.movieTitle}
+                    onBook={handleBook}
+                    // Vi skapar de snygga raderna här innan vi skickar ner dem
+                    seatsLabelLines={selectedSeats.map(sId => {
+                        const layout = calculateSeat(sId);
+                        return layout.label; // t.ex. "Rad 2, Stol 5"
+                    })}
+                />
             </div>
         </div>
     );
