@@ -14,7 +14,7 @@ import MovieInfo from './pages/MovieInfo.tsx';
 import VisitInfoLink from './pages/VisitInfo.tsx';
 import MyPage from './pages/MyPage.tsx';
 import CancelBookingPage from './pages/CancelBookingPage.tsx';
-
+import AdminPage from './pages/AdminPage.tsx';
 
 
 
@@ -31,6 +31,7 @@ export default [
   MovieInfo,
   Faq,
   MyPage,
+  AdminPage,
   NotFoundPage
 ]
   // map the route property of each page component to a Route
