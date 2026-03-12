@@ -18,7 +18,7 @@ static class EmailService
         var configJson = File.ReadAllText(configPath);
         // Gör om den inlästa filen "db-config.json" till json-format
         var config = JSON.Parse(configJson);
-
+        Console.WriteLine(config);
         // Plockar ut konfigurationen från "db-config.json"
         string smtpServer = config.smtpServer;
         int smtpPort = Convert.ToInt32(config.smtpPort);

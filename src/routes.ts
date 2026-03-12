@@ -13,6 +13,8 @@ import StartPage from './pages/StartPage.tsx';
 import MovieInfo from './pages/MovieInfo.tsx';
 import VisitInfoLink from './pages/VisitInfo.tsx';
 import MyPage from './pages/MyPage.tsx';
+import CancelBookingPage from './pages/CancelBookingPage.tsx';
+
 
 
 
@@ -24,6 +26,7 @@ export default [
   ScreeningsPage,
   BookingPage,
   ConfirmationPage,
+  CancelBookingPage,
   WorkWithUs,
   StartPage,
   MovieInfo,
