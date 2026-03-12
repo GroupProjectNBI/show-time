@@ -32,6 +32,7 @@ public static class Server
         // Denna mplste ligga tidigt i pipelinen
         App.UseForwardedHeaders();
         Middleware();
+        PasswordResetHandler.Start();
         DebugLog.Start();
         Acl.Start();
         ErrorHandler.Start();
