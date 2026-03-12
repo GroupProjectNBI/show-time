@@ -61,7 +61,7 @@ export default function TicketSelector() {
       <div className="mt-8 flex flex-col items-end gap-1">
         <div className="flex justify-between w-full text-sm text-accent/50 uppercase tracking-tighter">
           <span>Antal: {totalTicketCount} / 10</span>
-          <span>{isMaxReached && "Maxgräns nådd"}</span>
+          <span>{isMaxReached && "Maxgräns nådd, Vänligen kontakta kundtjänst om ni behöver fler säten"}</span>
         </div>
         <div className="flex justify-between w-full text-2xl font-black text-[#C6A96A] pt-2 border-t border-white/10">
           <span>TOTALT:</span>
