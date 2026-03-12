@@ -31,7 +31,7 @@ export default function HistoricalBookingCard({
             src={`/images/posters/${movieId}.webp`}
             alt={title}
             loading="lazy"
-            className="h-44 w-full object-cover sm:h-full grayscale-[0.3] hover:grayscale-0 transition-all duration-500"
+            className="h-full w-full object-contain sm:h-full grayscale-[0.3] hover:grayscale-0 transition-all duration-500"
             onError={(e) => {
               e.currentTarget.style.display = "none";
               const next = e.currentTarget.nextElementSibling as HTMLElement | null;
