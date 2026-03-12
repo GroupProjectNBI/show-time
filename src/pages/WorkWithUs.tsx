@@ -1,3 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
+const navigate = useNavigate();
+
 WorkWithUs.route = {
   path: '/jobba-hos-oss',
   index: -1 // ska inte synas i headern
@@ -29,14 +33,16 @@ export default function WorkWithUs() {
 
 
             <button
+              onClick={() => navigate("/lediga-jobb")}
               className="
-            px-6 py-3 rounded-xl
-            bg-accent text-primary font-semibold
-            hover:bg-accent/90
-            transition"
+    px-6 py-3 rounded-xl
+    bg-accent text-primary font-semibold
+    hover:bg-accent/90
+    transition"
             >
               Lediga jobb
             </button>
+
           </div>
         </div>
       </section>

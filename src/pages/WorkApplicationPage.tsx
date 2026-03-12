@@ -1,3 +1,6 @@
+import JobCard from "../parts/JobCard";
+
+
 WorkApplication.route = {
   path: '/lediga-jobb',
   index: -1 // ska inte synas i headern
@@ -47,6 +50,24 @@ export default function WorkApplication() {
           </p>
         </div>
       </section>
+      {/* LEDIGA JOBB SEKTION */}
+      <section className="w-full max-w-6xl mx-auto px-6 pb-20">
+        <h2 className="text-3xl font-bold text-accent mb-8">
+          Lediga tjänster
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+          {/* Spontanansökan – ENDA ANNONSEN JUST NU */}
+          <JobCard
+            title="Spontanansökan"
+            description="Vi söker alltid engagerade personer som vill vara en del av vårt team. Skicka in en spontanansökan så hör vi av oss när en tjänst matchar din profil."
+            link="/spontanansokan"
+          />
+
+        </div>
+      </section>
+
     </div>
   );
 }
