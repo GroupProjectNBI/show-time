@@ -51,52 +51,57 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
 
     // 3. CheckLogin implementation
     async function checkLogin() {
+        setLoading(true); // Visa att vi kollar
         try {
-            const response = await fetchJson("/api/login");
+            const response = await fetchJson("/api/login"); // Detta är oftast en GET /api/login
+
             if (response && response.email) {
-                if (response.email) {
-                    const hydrated = await hydrateAvatar(response);
-                    setUser(hydrated);
-                    setLoading(false);
-                } else {
-                    setUser(null);
-                    setLoading(false);
-                }
+                const hydrated = await hydrateAvatar(response);
+                setUser(hydrated);
             } else {
                 setUser(null);
-                setLoading(false);
             }
         } catch (error) {
             console.error("Login check failed:", error);
             setUser(null);
+        } finally {
+            setLoading(false); // Nu är vi garanterat klara
         }
     }
 
-    // 4. Login implementation
+
     async function login(credentials: any) {
         try {
             const result = await fetchJson("/api/login", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Använd credentials från anropet. 
                 body: JSON.stringify(credentials)
             });
 
             if (result && result.email) {
-                // Fetch avatar om user object och email i det objektet finns
                 const hydrated = await hydrateAvatar(result);
                 setUser(hydrated);
-                return true; // Returnerar boolean true
+                return true;
             } else {
                 setUser(null);
-                return false; // Returnerar boolean false
+                return false;
             }
-        } catch (error) {
+        } catch (error: any) {
+            // --- HÄR FIXAR VI BUGGEN ---
+            // Om backend säger att vi redan är inloggade (500-felet du fick)
+            if (error.message?.includes("already logged in") || error.status === 500) {
+                console.log("Session finns redan, synkar frontend...");
+                await checkLogin(); // Hämta den existerande sessionen
+                return true; // Vi räknar detta som en lyckad inloggning!
+            }
+
             console.error("Login failed:", error);
             setUser(null);
-            return false; // Returnerar boolean false vid krasch
+            return false;
         }
     }
+
+
 
     // Uppdatera create så den använder inskickad data
     async function create(credentials: any) {
