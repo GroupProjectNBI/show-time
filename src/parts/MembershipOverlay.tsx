@@ -116,7 +116,7 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
           Bli medlem
         </h2>
 
-        {/* ⭐ AVATAR CAROUSEL ⭐ */}
+        {/*  AVATAR CAROUSEL  */}
         {avatars.length > 0 && (
           <div className="flex flex-col items-center mb-8">
 

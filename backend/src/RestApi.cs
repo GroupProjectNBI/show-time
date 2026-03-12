@@ -4,11 +4,11 @@ public static class RestApi
 {
     public static void Start()
     {
-         //1. Hämta alla visningar från vyn (för dropdown-menyn)
+        // 1. Hämta alla visningar från vyn (för dropdown-menyn)
         // App.MapGet("/api/v_screenings", (HttpContext context) =>
         // {
-        //  var sql = "SELECT * FROM v_screenings";
-        // return RestResult.Parse(context, SQLQuery(sql, null, context));
+        //     var sql = "SELECT * FROM v_screenings";
+        //     return RestResult.Parse(context, SQLQuery(sql, null, context));
         // });
 
         // // 2. Ta emot bokningen från formuläret och spara i tabellen Booking
@@ -28,34 +28,10 @@ public static class RestApi
         //     return RestResult.Parse(context, SQLQuery(sql, parameters, context));
         // });
 
-        // 1. Specifik route för att avboka en bokning via länk.
-        App.MapGet("/api/bookings/{bookingId}/cancel", (HttpContext context, int bookingId) =>
-        {
-            var booking = SQLQueryOne(
-                "SELECT id FROM Booking WHERE id = @bookingId",
-                new { bookingId },
-                context
-            );
+        // 1. Specifik route för att hämta bokningsvyn
 
-            if (booking == null || booking.HasKey("error") || booking.id == null)
-            {
-                return Results.Text("Bokningen hittades inte.");
-            }
 
-            SQLQueryOne(
-                "DELETE FROM Ticket WHERE bookingId = @bookingId",
-                new { bookingId },
-                context
-            );
 
-            SQLQueryOne(
-                "DELETE FROM Booking WHERE id = @bookingId",
-                new { bookingId },
-                context
-            );
-
-            return Results.Text("Din bokning är nu avbokad.");
-        });
 
         App.MapGet("/api/{table}/{id}", (
             HttpContext context, string table, string id
@@ -66,6 +42,7 @@ public static class RestApi
                 context
             ))
         );
+
 
         App.MapGet("/api/{table}", (
             HttpContext context, string table
@@ -82,124 +59,107 @@ public static class RestApi
 
         // POST-route för att spara ny data (t.ex. en ny bokning)
         App.MapPost("/api/{table}", (
-            HttpContext context, string table, JsonElement bodyJson
-        ) =>
-        {
-            var body = JSON.Parse(bodyJson.ToString());
-            // 1. FÅNGA UPP MAILADRESSEN SÄKERT FRÅN REQUESTEN (för gästbokning)
-            string email = "";
-            if (bodyJson.TryGetProperty("email", out var emailElement) &&
-                emailElement.ValueKind != JsonValueKind.Null)
-            {
-                email = emailElement.GetString();
-                Console.WriteLine($"💡 Fångade upp email: {email}");
-            }
+      HttpContext context, string table, JsonElement bodyJson
+  ) =>
+  {
+      var body = JSON.Parse(bodyJson.ToString());
 
-            body.Delete("id");
-            var parsed = ReqBodyParse(table, body);
-            if (parsed.HasKey("error"))
-            {
-                return RestResult.Parse(context, parsed);
-            }
-            var columns = parsed.insertColumns;
-            var values = parsed.insertValues;
-            var sql = $"INSERT INTO {table}({columns}) VALUES({values})";
-            var result = SQLQueryOne(sql, parsed.body, context);
-            // Om INSERT lyckades utan fel, hämta det nya id:t och lägg till i resultatet som skickas tillbaka
-            if (!result.HasKey("error"))
-            {
-                // Get the insert id and add to our result
-                result.insertId = SQLQueryOne(
-                    @$"SELECT id AS __insertId 
-                       FROM {table} ORDER BY id DESC LIMIT 1"
-                ).__insertId;
-            }
+      // 1. FÅNGA UPP MAILADRESSEN SÄKERT FRÅN REQUESTEN
+      string email = "";
+      if (bodyJson.TryGetProperty("email", out var emailElement) && emailElement.ValueKind != JsonValueKind.Null)
+      {
+          email = emailElement.GetString();
+          Console.WriteLine($"💡 Fångade upp email: {email}");
+      }
 
-            // --- LOGIK FÖR BOKNINGSBEKRÄFTELSE (MAIL) ---
-            if (table == "Booking")
-            {
-                Console.WriteLine("--- Försöker skicka bokningsmail ---"); // DEBUG-INFO
-                try
-                {
-                    // 1. Hämta användaren från sessionen
-                    var sessionUser = Session.Get(context, "user");
-                    string userEmail = sessionUser?.email ?? email;
-                    // Kolla i terminalen om emailen hittas
-                    Console.WriteLine("Mottagare för bokningsmail: " + (userEmail ?? "INGEN EMAIL HITTAD"));
+      body.Delete("id");
 
-                    if (!string.IsNullOrEmpty(userEmail))
-                    {
-                        string bookingRef = body.HasKey("bookingRef") ? body.bookingRef : "";
+      // Kör Nodehills inbyggda body-parser
+      var parsed = ReqBodyParse(table, body);
+      if (parsed.HasKey("error"))
+      {
+          return RestResult.Parse(context, parsed);
+      }
 
-                        var frontendBaseUrl =
-                        Environment.GetEnvironmentVariable("FRONTEND_BASE_URL")
-                        ?? "http://localhost:5173";
+      var columns = parsed.insertColumns;
+      var values = parsed.insertValues;
 
-                        //  cancelLink
-                        string cancelLink = !string.IsNullOrWhiteSpace(bookingRef)
-                            ? $"{frontendBaseUrl}/cancel-booking?bookingRef={bookingRef}"
-                            : "";
-                        Console.WriteLine("CANCEL LINK: " + cancelLink);
+      var sql = $"INSERT INTO {table}({columns}) VALUES({values})";
+      var result = SQLQueryOne(sql, parsed.body, context);
 
-                        // 2. Förbered HTML-mailet med Show-Time design
-                        string subject = "Din bokningsbekräftelse - Show-Time";
-                        string bodyHtml = $@"
-                                <div style='font-family: sans-serif; background-color: #121212; color: white; padding: 30px; border-radius: 10px;'>
-                                    <h1 style='color: #e50914; border-bottom: 2px solid #e50914; padding-bottom: 10px;'>Show-Time Malmö</h1>
-                                    <h2 style='color: #ffcc00;'>Tack för din bokning!</h2>
-                                    <p>Vi har nu tagit emot din bokning. Du hittar alla detaljer och din biljett under <strong>'Min sida'</strong> på webbplatsen.</p>
-                                    {(string.IsNullOrEmpty(cancelLink)
-                                    ? ""
-                                    : $@"<p style='margin-top: 18px;'>
-                                            Vill du avboka? Klicka här:
-                                            <a style='color:#ffcc00;' href='{cancelLink}'>Avboka bokning</a>
-                                        </p>")}
+      // Om INSERT lyckades utan fel, hämta det nya id:t
+      if (!result.HasKey("error"))
+      {
+          result.insertId = SQLQueryOne(
+              @$"SELECT id AS __insertId 
+               FROM {table} ORDER BY id DESC LIMIT 1"
+          ).__insertId;
 
-                                    <div style='background: #1a1a1a; padding: 20px; border: 1px dashed #444; margin-top: 20px;'>
-                                        <p style='margin: 0;'>Vi ser fram emot att träffa dig i biosalongen!</p>
-                                    </div>
-                                    <p style='font-size: 12px; color: #888; margin-top: 30px;'>Detta är ett automatiskt meddelande från Show-Time Biograf.</p>
-                                </div>";
-                        Console.WriteLine($"[Booking] Mail skickas till {userEmail}");
-                        // 3. Anropa EmailService
-                        EmailService.SendEmail(userEmail, subject, bodyHtml);
-                        Console.WriteLine($"[Booking] Bekräftelse skickad till {userEmail}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Kunde inte skicka mail: " + ex.Message);
-                }
-            }
+          // --- LOGIK FÖR BOKNINGSBEKRÄFTELSE (MAIL) ---
+          if (table == "Booking")
+          {
+              Console.WriteLine("--- Försöker skicka bokningsmail ---");
 
-            // 2. Om vi skapar en NY VISNING (Screening)
-            if (table == "Screening")
-            {
-                try
-                {
-                    // Här kan du skicka mail till admin eller användare om en ny visning lagts till
-                    var sessionUser = Session.Get(context, "user");
-                    string adminEmail = sessionUser?.email; // Skickar bekräftelse till den som skapade visningen
+              // Kolla FÖRST sessionen, om den är tom (gäst), använd email från body:n
+              var sessionUser = Session.Get(context, "user");
+              string userEmail = sessionUser?.email ?? email;
 
-                    if (!string.IsNullOrEmpty(adminEmail))
-                    {
-                        string subject = "Ny visning skapad - Show-Time Admin";
-                        string bodyHtml = $@"
-                        <div style='font-family: sans-serif; border: 2px solid #ffcc00; padding: 20px;'>
-                            <h1 style='color: #ffcc00;'>Systemmeddelande</h1>
-                            <p>En ny visning (Screening) har lagts till i systemet.</p>
-                            <p>Kontrollera visningsschemat för att säkerställa att allt ser korrekt ut.</p>
+              Console.WriteLine("Mottagare för bokningsmail: " + (userEmail ?? "INGEN EMAIL HITTAD"));
+
+              if (!string.IsNullOrEmpty(userEmail))
+              {
+                  try
+                  {
+                      string subject = "Din bokningsbekräftelse - Show-Time";
+                      string bodyHtml = $@"
+                        <div style='font-family: sans-serif; background-color: #121212; color: white; padding: 30px; border-radius: 10px;'>
+                            <h1 style='color: #e50914; border-bottom: 2px solid #e50914; padding-bottom: 10px;'>Show-Time Malmö</h1>
+                            <h2 style='color: #ffcc00;'>Tack för din bokning!</h2>
+                            <p>Vi har nu tagit emot din bokning. Du hittar alla detaljer och din biljett under <strong>'Min sida'</strong> på webbplatsen.</p>
+                            <div style='background: #1a1a1a; padding: 20px; border: 1px dashed #444; margin-top: 20px;'>
+                                <p style='margin: 0;'>Vi ser fram emot att träffa dig i biosalongen!</p>
+                            </div>
+                            <p style='font-size: 12px; color: #888; margin-top: 30px;'>Detta är ett automatiskt meddelande från Show-Time Biograf.</p>
                         </div>";
 
-                        EmailService.SendEmail(adminEmail, subject, bodyHtml);
-                        Console.WriteLine("[Screening] Admin-notis skickad.");
-                    }
-                }
-                catch (Exception ex) { Console.WriteLine("Mail-fel (Screening): " + ex.Message); }
-            }
+                      EmailService.SendEmail(userEmail, subject, bodyHtml);
+                      Console.WriteLine($"[Booking] Bekräftelse skickad till {userEmail}");
+                  }
+                  catch (Exception ex)
+                  {
+                      Console.WriteLine("Kunde inte skicka mail: " + ex.Message);
+                  }
+              }
+          }
 
-            return RestResult.Parse(context, result);
-        });
+          // --- LOGIK FÖR NY VISNING (Screening) ---
+          if (table == "Screening")
+          {
+              try
+              {
+                  var sessionUser = Session.Get(context, "user");
+                  string adminEmail = sessionUser?.email;
+
+                  if (!string.IsNullOrEmpty(adminEmail))
+                  {
+                      string subject = "Ny visning skapad - Show-Time Admin";
+                      string bodyHtml = $@"
+                    <div style='font-family: sans-serif; border: 2px solid #ffcc00; padding: 20px;'>
+                        <h1 style='color: #ffcc00;'>Systemmeddelande</h1>
+                        <p>En ny visning (Screening) har lagts till i systemet.</p>
+                        <p>Kontrollera visningsschemat för att säkerställa att allt ser korrekt ut.</p>
+                    </div>";
+
+                      EmailService.SendEmail(adminEmail, subject, bodyHtml);
+                      Console.WriteLine("[Screening] Admin-notis skickad.");
+                  }
+              }
+              catch (Exception ex) { Console.WriteLine("Mail-fel (Screening): " + ex.Message); }
+          }
+      }
+
+      return RestResult.Parse(context, result);
+  });
 
         // PUT-route för att uppdatera befintlig data (t.ex. ändra profil)
         App.MapPut("/api/{table}/{id}", (
