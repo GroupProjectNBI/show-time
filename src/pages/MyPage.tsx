@@ -11,7 +11,7 @@ import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
 import AccountActions from "../parts/AccountActions";
 import ProtectedRoute from "../parts/ProtectedRoute";
-
+import { formatSeatString } from "../utils/seatCalculator";
 interface AvatarItem {
   id: number;
   url: string;
@@ -174,7 +174,7 @@ export default function MyPage() {
               })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={booking.seats || "Information saknas"}
+              seatsLabel={formatSeatString(booking.seats)}
               onCancel={handleCancelBooking}
               cancelDisabled={false}
             />
@@ -208,7 +208,7 @@ export default function MyPage() {
               })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={booking.seats || "Information saknas"}
+              seatsLabel={formatSeatString(booking.seats)}
               seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
                 day: "numeric",
                 month: "long",
