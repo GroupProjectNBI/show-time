@@ -1,8 +1,3 @@
-// Vi sparar layouterna här centralt så slipper du skicka med dem varje gång
-const THEATER_CONFIG: Record<string, number[]> = {
-    "Stora": [8, 9, 10, 10, 10, 10, 11, 12],
-    "Lilla": [10, 10, 10, 10, 10]
-};
 
 /**
  * FUNKTION 1: För BookingPage (Hanterar en enskild siffra)
