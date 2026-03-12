@@ -1,9 +1,6 @@
 import type Route from './interfaces/Route.ts';
 import { createElement } from 'react';
 
-
-
-
 // page components
 import AboutPage from './pages/AboutPage.tsx';
 import NotFoundPage from './pages/NotFoundPage.tsx';
