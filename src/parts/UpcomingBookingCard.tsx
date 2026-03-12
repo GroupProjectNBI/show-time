@@ -48,7 +48,7 @@ export default function UpcomingBookingCard({
             src={`/images/posters/${movieId}.webp`} // NYTT
             alt={title}
             loading="lazy"
-            className="h-44 w-full object-cover sm:h-full"
+            className="h-full w-full object-contain sm:h-full"
 
             // fallback om bilden saknas
             onError={(e) => {

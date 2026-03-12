@@ -47,7 +47,7 @@ export default function HistoricalBookingCard({
             src={`/images/posters/${movieId}.webp`} // NYTT
             alt={title}
             loading="lazy"
-            className="h-44 w-full object-cover sm:h-full"
+            className="h-full w-full object-contain sm:h-full"
             onError={(e) => {
               e.currentTarget.style.display = "none";
               const next = e.currentTarget.nextElementSibling as HTMLElement | null;
