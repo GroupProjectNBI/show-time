@@ -12,7 +12,6 @@ static class EmailService
         var configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
         var configJson = File.ReadAllText(configPath);
         var config = JSON.Parse(configJson);
-        Console.WriteLine(config);
         // Plockar ut konfigurationen från "db-config.json"
         string smtpServer = config.smtpServer;
         int smtpPort = Convert.ToInt32(config.smtpPort);
