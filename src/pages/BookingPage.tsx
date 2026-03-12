@@ -31,6 +31,16 @@ export default function BookingPage() {
         ticketCount, selectedSnack, email, totalAmount, clearBooking, setSelectedSeats
     } = useBooking();
 
+
+    useEffect(() => {
+        // Den här koden körs när man kommer in på sidan
+
+        return () => {
+            // Den här "cleanup"-funktionen körs när man LÄMNAR sidan
+            clearBooking();
+        };
+    }, [clearBooking]); // Vi lyssnar på clearBooking
+
     // 1. Hämta statisk data (film, salong, redan sålda stolar)
     useEffect(() => {
         if (!id) return;
@@ -133,18 +143,29 @@ export default function BookingPage() {
     useEffect(() => {
         if (!seatArray || seatArray.length === 0 || !screening || ticketCount === 0) return;
 
+        // Vi kör bara auto-väljaren om vi har färre stolar än biljetter
         if (selectedSeats.length < ticketCount) {
             const theater = seatArray[0];
             const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
             const allUnavailable = [...occupiedSeats, ...realtimeLockedSeats];
 
-            const bestSeats = findBestSeats(ticketCount, theater.seatsPerRow, baseIdOffset, allUnavailable);
+            // NYTT: Vi tar den senast valda stolen som startpunkt
+            const lastSelected = selectedSeats.length > 0
+                ? selectedSeats[selectedSeats.length - 1]
+                : undefined;
+
+            const bestSeats = findBestSeats(
+                ticketCount,
+                theater.seatsPerRow,
+                baseIdOffset,
+                allUnavailable,
+                lastSelected // Skicka med ankaren!
+            );
 
             if (bestSeats.length > 0) {
                 setSelectedSeats(bestSeats);
             }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ticketCount, seatArray, screening, occupiedSeats, realtimeLockedSeats]);
 
     // 5. Genomför bokning
