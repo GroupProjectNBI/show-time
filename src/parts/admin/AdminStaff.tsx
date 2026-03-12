@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import fetchJson from "../../utils/fetchJson";
-import StaffModal from "./StaffModal";
-import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import StaffModal from "./StaffModal.tsx";
+import ConfirmDeleteModal from "./ConfirmDeleteModal.tsx";
 
 interface StaffMember {
   id: number;
