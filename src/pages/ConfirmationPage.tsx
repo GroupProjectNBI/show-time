@@ -188,10 +188,14 @@ export default function ConfirmationPage() {
               {/* STATISK TEXT (Tillbaka från gamla versionen) */}
               <p>
                 Vid eventuella frågor är du välkommen att kontakta oss via{" "}
-                <span className="text-accent underline underline-offset-4">
-                  (länk)
-                </span>.
+                <Link
+                  to="/faq#kontakt"
+                  className="text-accent underline underline-offset-4"
+                >
+                  vårt kontaktformulär
+                </Link>.
               </p>
+
 
               <p>
                 Betalning sker på plats när du hämtar ut dina biljetter, det går bra att hämta ut dina biljetter redan nu och fram till en timme innan filmens start.
