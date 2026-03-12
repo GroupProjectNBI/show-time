@@ -21,7 +21,7 @@ interface AvatarItem {
 
 export default function MyPage() {
   // Vi kombinerar de funktioner vi behöver från AuthContext
-  const { user, changePassword, changeUserName, logout, updateAvatar } = useAuth();
+  const { user, changeUserName, logout, updateAvatar } = useAuth();
 
   const [bookings, setBookings] = useState<any[]>([]);
   const [pastBookings, setPastBookings] = useState<any[]>([]);

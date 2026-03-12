@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import toast from "react-hot-toast"; // Valfritt: för att varna användaren
 
 type TicketProps = {
   label: string;
