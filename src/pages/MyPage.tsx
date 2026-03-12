@@ -12,6 +12,7 @@ import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
 import AccountActions from "../parts/AccountActions";
 import ProtectedRoute from "../parts/ProtectedRoute";
+import { formatSeatString } from "../utils/seatCalculator";
 
 interface AvatarItem {
   id: number;
@@ -19,7 +20,8 @@ interface AvatarItem {
 }
 
 export default function MyPage() {
-  const { user, logout, updateAvatar } = useAuth();
+  // Vi kombinerar de funktioner vi behöver från AuthContext
+  const { user, changePassword, changeUserName, logout, updateAvatar } = useAuth();
 
   const [bookings, setBookings] = useState<any[]>([]);
   const [pastBookings, setPastBookings] = useState<any[]>([]);
@@ -104,7 +106,7 @@ export default function MyPage() {
     }
   };
 
-  // Lösenordsåterställning (Anropas från ChangePasswordForm)
+  // Lösenordsåterställning
   const handlePasswordReset = async (code: string, newPassword: string) => {
     if (!user?.email) return;
 
@@ -119,10 +121,8 @@ export default function MyPage() {
     });
 
     if (result && result.success) {
-      // Vi kastar inget här, ChangePasswordForm sköter sin egen success-toast!
       return;
     } else {
-      // Vi kastar ett fel så att ChangePasswordForm kan fånga det och visa en error-toast
       throw new Error(result?.error || "Ogiltig kod eller tekniskt fel.");
     }
   };
@@ -131,22 +131,22 @@ export default function MyPage() {
 
   return (
     <div className="max-w-5xl mx-auto mt-16 px-4 pb-20 text-accent">
-      <h1 className="text-4xl font-bold mb-10 text-center">Min sida</h1>
+      <h1 className="text-4xl font-bold mb-10 text-center uppercase italic tracking-tighter">Min sida</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
         <div className="space-y-6">
           <UsernameField
             initialValue={user?.userName ?? ""}
-            onSave={(newName) => {
-              console.log("Namn uppdaterat:", newName);
-              toast.success("Användarnamn sparat!");
+            onSave={async (newName) => {
+              await changeUserName?.(newName, "name");
+              toast.success("Användarnamn uppdaterat!");
             }}
           />
 
           <EmailField
             initialValue={user?.email ?? ""}
             onSave={(newEmail) => {
-              console.log("Email uppdaterad:", newEmail);
+              console.log("Spara ny email:", newEmail);
               toast.success("E-postadress sparad!");
             }}
           />
@@ -170,12 +170,12 @@ export default function MyPage() {
         </div>
       </div>
 
-      <h2 className="text-2xl font-semibold mt-16 mb-6">Kommande bokningar</h2>
+      <h2 className="text-2xl font-bold mt-16 mb-6 uppercase italic">Kommande bokningar</h2>
 
       {loading ? (
-        <p className="text-accent/60 mb-6">Laddar dina bokningar...</p>
+        <p className="text-accent/60 mb-6 italic">Laddar dina bokningar...</p>
       ) : bookings.length === 0 ? (
-        <p className="text-accent/60 mb-6">Du har inga kommande bokningar</p>
+        <p className="text-accent/60 mb-6 italic">Du har inga kommande bokningar</p>
       ) : (
         <div className="flex flex-col gap-4 mb-10">
           {bookings.map((booking) => (
@@ -188,7 +188,7 @@ export default function MyPage() {
               timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={booking.seats || "Information saknas"}
+              seatsLabel={formatSeatString(booking.seats)}
               onCancel={handleCancelBooking}
               cancelDisabled={false}
             />
@@ -198,12 +198,12 @@ export default function MyPage() {
 
       <div className="my-10 h-px bg-white/10" />
 
-      <h2 className="text-2xl font-semibold mt-0 mb-4">Tidigare bokningar</h2>
+      <h2 className="text-2xl font-bold mt-0 mb-4 uppercase italic">Tidigare bokningar</h2>
 
       {loading ? (
-        <p className="text-accent/60">Laddar historik...</p>
+        <p className="text-accent/60 italic">Laddar historik...</p>
       ) : pastBookings.length === 0 ? (
-        <p className="text-accent/60 mb-6">Du har inga tidigare bokningar</p>
+        <p className="text-accent/60 mb-6 italic">Du har inga tidigare bokningar</p>
       ) : (
         <div className="flex flex-col gap-4 mb-10">
           {pastBookings.map((booking) => (
@@ -215,8 +215,12 @@ export default function MyPage() {
               timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={booking.seats || "Information saknas"}
-              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", { day: "numeric", month: "long", year: "numeric" })}`}
+              seatsLabel={formatSeatString(booking.seats)}
+              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}`}
             />
           ))}
         </div>

@@ -4,7 +4,7 @@ import fetchJson from "../utils/fetchJson";
 import { formatScreeningDate } from "../utils/formatTime";
 import { useOverlay } from "../context/OverlayContext";
 import { useAuth } from "../context/AuthContext";
-
+import { calculateSeat } from "../utils/seatCalculator";
 // Datatyper
 interface BookingData {
   id: number;
@@ -107,9 +107,27 @@ export default function ConfirmationPage() {
   // --- UI LOGIK ---
 
   const seatsText = useMemo(() => {
-    if (tickets.length === 0) return "-";
-    return tickets.map((t) => t.seatId).sort((a, b) => a - b).join(", ");
-  }, [tickets]);
+    if (!tickets || tickets.length === 0 || !screening) {
+      return "-";
+    }
+
+    try {
+      const sortedIds = [...tickets]
+        .map((t) => t.seatId)
+        .sort((a, b) => a - b);
+
+      return sortedIds
+        .map((id) => {
+          // Vi använder den smarta calculateSeat utan theaterName
+          const info = calculateSeat(id);
+          return info.label; // Returnerar "Rad X, Stol Y"
+        })
+        .join("; "); // Vi använder semikolon för att kunna splitta i JSX
+    } catch (err) {
+      console.error("Fel vid formatering av stolar:", err);
+      return "Fel vid laddning";
+    }
+  }, [tickets, screening]);
 
   const snackLabel = useMemo(() => {
     if (!booking || !booking.snack) return "Ingen meny";
@@ -244,41 +262,47 @@ export default function ConfirmationPage() {
                 </span>
               </div>
 
-              <div className="flex justify-between border-b border-white/5 pb-2">
-                <span className="text-accent/60">Biljetter</span>
-                <span className="font-semibold text-right">
-                  {tickets.length} st
-                </span>
+              <div className="space-y-4 text-sm">
+                <ReceiptRow label="Antal biljetter" value={`${tickets.length} st`} />
+
+                {/* PLATSER - Nu som vertikal lista i kvittot */}
+                <div className="flex justify-between border-b border-white/5 pb-3 items-start">
+                  <span className="text-accent/40 font-bold uppercase text-[10px] tracking-widest mt-1">Platser</span>
+                  <div className="flex flex-col items-end gap-1">
+                    {seatsText.split("; ").map((seat, i) => (
+                      <span key={i} className="font-bold text-white text-right">{seat}</span>
+                    ))}
+                  </div>
+                </div>
+
+                <ReceiptRow label="Snacks" value={snackLabel} />
+
+                <div className="pt-6 mt-6 border-t-2 border-dashed border-white/10 flex justify-between items-center">
+                  <span className="text-accent/40 font-black uppercase tracking-widest">Totalt att betala</span>
+                  <span className="text-3xl font-black text-white tabular-nums">
+                    {booking.totalAmount} kr
+                  </span>
+                </div>
               </div>
 
-              <div className="flex justify-between border-b border-white/5 pb-2">
-                <span className="text-accent/60">Platser</span>
-                <span className="font-semibold text-right">
-                  {seatsText}
-                </span>
-              </div>
-
-              <div className="flex justify-between border-b border-white/5 pb-2">
-                <span className="text-accent/60">Snacks</span>
-                <span className="font-semibold text-right">
-                  {snackLabel}
-                </span>
-              </div>
-
-              <div className="pt-4 mt-4 border-t border-white/10 flex justify-between items-center">
-                <span className="text-accent/70 font-bold">Totalt</span>
-                <span className="text-[18px] font-extrabold tabular-nums">
-                  {booking.totalAmount} kr
-                </span>
-              </div>
-
-              <div className="text-[12px] text-accent/50 pt-2">
-                Detta är en reservation. Betalning sker i samband med ankomst till biografen.
+              <div className="mt-8 pt-6 border-t border-white/5 text-[11px] text-accent/30 leading-relaxed text-center italic">
+                Vänligen visa upp bokningskoden i kassan. <br />
+                Välkommen till en magisk filmupplevelse!
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// En liten hjälp-komponent för kvittoraderna för att hålla koden ren
+function ReceiptRow({ label, value }: { label: string, value: string }) {
+  return (
+    <div className="flex justify-between border-b border-white/5 pb-3">
+      <span className="text-accent/40 font-bold uppercase text-[10px] tracking-widest">{label}</span>
+      <span className="font-bold text-white text-right">{value}</span>
     </div>
   );
 }
