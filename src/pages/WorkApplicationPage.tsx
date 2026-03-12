@@ -62,8 +62,10 @@ export default function WorkApplication() {
           <JobCard
             title="Spontanansökan"
             description="Vi söker alltid engagerade personer som vill vara en del av vårt team. Skicka in en spontanansökan så hör vi av oss när en tjänst matchar din profil."
-            link="/spontanansokan"
+            link="/faq#kontakt"
+            buttonLabel="Kontaktformulär"
           />
+
 
         </div>
       </section>

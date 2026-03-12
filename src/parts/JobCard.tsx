@@ -3,9 +3,11 @@ type JobCardProps = {
   location?: string;
   description: string;
   link?: string;
+  buttonLabel?: string;
 };
 
-export default function JobCard({ title, location, description, link }: JobCardProps) {
+
+export default function JobCard({ title, location, description, link, buttonLabel }: JobCardProps) {
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 shadow-lg hover:bg-white/10 transition">
       <h3 className="text-2xl font-semibold text-accent mb-2">{title}</h3>
@@ -23,9 +25,11 @@ export default function JobCard({ title, location, description, link }: JobCardP
           href={link}
           className="inline-block px-5 py-2 rounded-xl bg-accent text-primary font-semibold hover:bg-accent/90 transition"
         >
-          Läs mer & ansök
+          {buttonLabel || "Läs mer & ansök"}
         </a>
       )}
+
+
     </div>
   );
 }
