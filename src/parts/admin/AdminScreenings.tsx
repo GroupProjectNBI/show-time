@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import fetchJson from "../../utils/fetchJson";
-import ScreeningModal from "./ScreeningModal";
+import ScreeningModal from "./ScreeningModal.tsx";
 import ConfirmDeleteModal from "./ConfirmDeleteModal.tsx";
 
 interface Screening {
