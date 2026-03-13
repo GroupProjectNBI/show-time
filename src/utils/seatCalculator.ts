@@ -7,28 +7,30 @@
  * Den känner av salongen själv: 1 - 80(Stora), 81 - 130(Lilla)
     */
 
+/**
+ * Dynamisk seat calculator
+ * Fungerar för alla salonger eftersom den använder seatsPerRow från databasen.
+ *
+ * seatId      = globalt ID (1–80 för Stora, 81–130 för Lilla)
+ * seatsPerRow = array från databasen, t.ex. [8,9,10,10,10,10,11,12]
+ * baseOffset  = 0 för Stora, 81 för Lilla
+ */
 
-export function calculateSeat(seatId: number) {
-    // 1. Identifiera salong baserat på ID
-    // Stora Salongen (1-80), Lilla Salongen (81-130)
-    const isLilla = seatId > 80;
-
-    // Sätt offset och rader baserat på vilken salong det är
-    const offset = isLilla ? 80 : 0;
-    const rows = isLilla
-        ? [10, 10, 10, 10, 10] // Lilla: 5 rader med 10 stolar
-        : [8, 9, 10, 10, 10, 10, 11, 12]; // Stora: 8 rader med varierat antal
-
-    // 2. Räkna ut lokalt ID inom salongen
-    const localId = seatId - offset;
+export function calculateSeat(
+    seatId: number,
+    seatsPerRow: number[],
+    baseOffset: number = 0
+) {
+    // Gör seatId lokalt för salongen
+    const localId = seatId - baseOffset;
 
     let currentCount = 0;
 
-    // 3. Loopa igenom raderna för att hitta rätt position
-    for (let i = 0; i < rows.length; i++) {
-        const seatsInThisRow = rows[i];
-        const rowLimit = currentCount + seatsInThisRow;
+    for (let i = 0; i < seatsPerRow.length; i++) {
+        const seatsInRow = seatsPerRow[i];
+        const rowLimit = currentCount + seatsInRow;
 
+        // Om localId hamnar i denna rad
         if (localId <= rowLimit) {
             const rowNum = i + 1;
             const seatNum = localId - currentCount;
@@ -40,10 +42,11 @@ export function calculateSeat(seatId: number) {
                 shortLabel: `Rad ${rowNum}, Stol ${seatNum}`
             };
         }
+
         currentCount = rowLimit;
     }
 
-    // Fallback om något ID hamnar utanför våra rader
+    // Fallback om något är fel
     return {
         row: 0,
         seat: 0,
@@ -53,12 +56,13 @@ export function calculateSeat(seatId: number) {
 }
 
 /**
- * FUNKTION 2: 
- * Hanterar både strängar "109, 110", Arrayer [109, 110] och enskilda siffror 109.
- * Hjälpfunktion för att formatera strängar från databasen (t.ex. "81, 82")
-*/
-
-export function formatSeatString(seatInput: any): string {
+ * Formaterar en sträng eller array av seatIds till "Rad X, Stol Y"
+ */
+export function formatSeatString(
+    seatInput: any,
+    seatsPerRow: number[],
+    baseOffset: number = 0
+): string {
     if (!seatInput) return "Information saknas";
 
     let seatIds: number[] = [];
@@ -71,8 +75,8 @@ export function formatSeatString(seatInput: any): string {
         seatIds = [seatInput];
     }
 
-    // Vi använder calculateSeat här inne också!
     return seatIds
-        .map(id => calculateSeat(id).label) // Vi använder .label för "Rad X, Stol Y"
+        .map(id => calculateSeat(id, seatsPerRow, baseOffset).label)
         .join("; ");
 }
+

@@ -5,6 +5,8 @@ import { formatScreeningDate } from "../utils/formatTime";
 import { useOverlay } from "../context/OverlayContext";
 import { useAuth } from "../context/AuthContext";
 import { calculateSeat } from "../utils/seatCalculator";
+import type { Theater } from "../interfaces/Seats";
+
 // Datatyper
 interface BookingData {
   id: number;
@@ -40,6 +42,10 @@ export default function ConfirmationPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
+  const baseIdOffset = screening?.theaterName === "Lilla" ? 81 : 0;
+
+
 
 
 
@@ -92,6 +98,15 @@ export default function ConfirmationPage() {
           // Om listan är tom, dubbelkolla att tabellen/vyn faktiskt heter 'v_screenings'
           console.warn("Ingen visning hittades. Kolla API-anropet.");
         }
+        // Hämta salongens layout
+        if (screeningResult && screeningResult.length > 0) {
+          const theaterName = screeningResult[0].theaterName;
+          const tId = theaterName === "Stora" ? 1 : 2;
+
+          const theaterRes = await fetchJson(`/api/Theater?where=id=${tId}`);
+          setSeatArray(theaterRes);
+        }
+
 
       } catch (err) {
         console.error("Fel vid hämtning:", err);
@@ -107,7 +122,7 @@ export default function ConfirmationPage() {
   // --- UI LOGIK ---
 
   const seatsText = useMemo(() => {
-    if (!tickets || tickets.length === 0 || !screening) {
+    if (!tickets || tickets.length === 0 || !screening || !seatArray) {
       return "-";
     }
 
@@ -118,16 +133,20 @@ export default function ConfirmationPage() {
 
       return sortedIds
         .map((id) => {
-          // Vi använder den smarta calculateSeat utan theaterName
-          const info = calculateSeat(id);
-          return info.label; // Returnerar "Rad X, Stol Y"
+          const info = calculateSeat(
+            id,
+            seatArray[0].seatsPerRow,
+            baseIdOffset
+          );
+          return info.label;
         })
-        .join("; "); // Vi använder semikolon för att kunna splitta i JSX
+        .join("; ");
     } catch (err) {
       console.error("Fel vid formatering av stolar:", err);
       return "Fel vid laddning";
     }
-  }, [tickets, screening]);
+  }, [tickets, screening, seatArray]);
+
 
   const snackLabel = useMemo(() => {
     if (!booking || !booking.snack) return "Ingen meny";
