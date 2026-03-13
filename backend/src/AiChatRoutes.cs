@@ -1,5 +1,6 @@
 namespace WebApp;
 
+using System.Globalization;
 public static class AiChatRoutes
 {
     private static string aiAccessToken = "";
@@ -81,7 +82,8 @@ public static class AiChatRoutes
 
     private static string GetDynamicMovieContext(string filterDate = null)
     {
-        string sql = "SELECT movieTitle, theaterName, startTime, availableSeats, ageLimit FROM v_screenings WHERE startTime >= NOW()";
+        // 1. LÄGG TILL ID (eller movieId / screeningId beroende på hur er db ser ut)
+        string sql = "SELECT id, movieTitle, theaterName, startTime, availableSeats, ageLimit FROM v_screenings WHERE startTime >= NOW()";
 
         if (!string.IsNullOrEmpty(filterDate))
         {
@@ -98,12 +100,21 @@ public static class AiChatRoutes
         foreach (var s in screenings)
         {
             DateTime st = DateTime.Parse(s.startTime.ToString());
-            context += $"{st:MM-dd HH:mm} | {s.movieTitle} | {s.theaterName} | {s.availableSeats}st | {s.ageLimit}+\n";
+
+            // 2. LÄGG TILL URL:EN HÄR (Byt ut "/bokning/" mot den route ni använder i React!)
+            string bookingUrl = $"/bokning/{s.id}";
+
+            // Vi lägger till URL:en i informationen till AI:n
+            context += $"- {st:MM-dd HH:mm} | {s.movieTitle} | {s.theaterName} | {s.availableSeats} platser kvar | Bokningslänk: {bookingUrl}\n";
         }
 
-        context += $"\nSysteminfo: Serverklocka {DateTime.Now:yyyy-MM-dd HH:mm}.";
+        var culture = new CultureInfo("sv-SE");
+        string todaysDate = DateTime.Now.ToString("dddd den d MMMM yyyy 'kl' HH:mm", culture);
+        context += $"\nSysteminfo: Idag är det {todaysDate}. När du tipsar om en specifik visning, skicka ALLTID med bokningslänken formaterad som en Markdown-länk, till exempel: [Boka biljetter här](/url). Samt skriv också att de kan klicka på länkarna för att boka filmerna. ";
+
         return context;
     }
+
 
     private static void LoadConfig()
     {
