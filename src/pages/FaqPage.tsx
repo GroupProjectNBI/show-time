@@ -185,3 +185,8 @@ export default function FAQPage() {
     </div>
   );
 }
+FAQPage.route = {
+  path: "/faq",
+  menuLabel: "FAQ",
+  index: 5
+};
