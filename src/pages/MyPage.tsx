@@ -53,19 +53,16 @@ export default function MyPage() {
     const loadBookings = async () => {
       try {
         setLoading(true);
-        const result = await fetchJson("/api/v_user_bookings");
+        const result = await fetchJson(`/api/v_user_bookings?where=email=${user.email.toLowerCase()}`);
 
         if (result && !result.error) {
           const now = new Date();
-          const mine = result.filter(
-            (b: any) => b.email?.toLowerCase() === user.email.toLowerCase()
-          );
 
-          const myUpcoming = mine
+          const myUpcoming = result
             .filter((b: any) => new Date(b.startTime) >= now)
             .sort((a: any, b: any) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
-          const myPast = mine
+          const myPast = result
             .filter((b: any) => new Date(b.startTime) < now)
             .sort((a: any, b: any) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
 
@@ -188,7 +185,7 @@ export default function MyPage() {
               timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={formatSeatString(booking.seats)}
+              seatsLabel={formatSeatString(booking.seats, booking.theaterName)}
               onCancel={handleCancelBooking}
               cancelDisabled={false}
             />
@@ -215,7 +212,7 @@ export default function MyPage() {
               timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={formatSeatString(booking.seats)}
+              seatsLabel={formatSeatString(booking.seats, booking.theaterName)}
               seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
                 day: "numeric",
                 month: "long",
