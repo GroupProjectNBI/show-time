@@ -82,7 +82,6 @@ public static class AiChatRoutes
 
     private static string GetDynamicMovieContext(string filterDate = null)
     {
-        // 1. LÄGG TILL ID (eller movieId / screeningId beroende på hur er db ser ut)
         string sql = "SELECT id, movieTitle, theaterName, startTime, availableSeats, ageLimit FROM v_screenings WHERE startTime >= NOW()";
 
         if (!string.IsNullOrEmpty(filterDate))
@@ -101,20 +100,21 @@ public static class AiChatRoutes
         {
             DateTime st = DateTime.Parse(s.startTime.ToString());
 
-            // 2. LÄGG TILL URL:EN HÄR (Byt ut "/bokning/" mot den route ni använder i React!)
-            string bookingUrl = $"/bokning/{s.id}";
+            // Vi ger den bara den rena, relativa URL:en
+            string relativeUrl = $"/bokning/{s.id}";
 
-            // Vi lägger till URL:en i informationen till AI:n
-            context += $"- {st:MM-dd HH:mm} | {s.movieTitle} | {s.theaterName} | {s.availableSeats} platser kvar | Bokningslänk: {bookingUrl}\n";
+            // Tydligare uppspaltning av datan för AI:n
+            context += $"- Tid: {st:MM-dd HH:mm} | Film: {s.movieTitle} | Salong: {s.theaterName} | Lediga platser: {s.availableSeats} | Länk: {relativeUrl}\n";
         }
 
         var culture = new CultureInfo("sv-SE");
         string todaysDate = DateTime.Now.ToString("dddd den d MMMM yyyy 'kl' HH:mm", culture);
-        context += $"\nSysteminfo: Idag är det {todaysDate}. När du tipsar om en specifik visning, skicka ALLTID med bokningslänken formaterad som en Markdown-länk, till exempel: [Boka biljetter här](/url). Samt skriv också att de kan klicka på länkarna för att boka filmerna. ";
+
+        // Mycket rakare och enklare instruktion
+        context += $"\nSysteminfo: Idag är det {todaysDate}. VIKTIGT: När du rekommenderar en film måste du ALLTID skapa en klickbar länk till den. Använd formatet [Boka biljetter här](/film_info/ID) baserat på Länk-datan i listan. Inkludera aldrig domännamn eller https://, använd bara den relativa länken.";
 
         return context;
     }
-
 
     private static void LoadConfig()
     {
