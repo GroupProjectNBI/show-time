@@ -195,14 +195,13 @@ export default function MyPage() {
 
       <div className="my-10 h-px bg-white/10" />
 
-      <h2 className="text-2xl font-bold mt-0 mb-4 uppercase italic">Tidigare bokningar</h2>
-
       {loading ? (
         <p className="text-accent/60 italic">Laddar historik...</p>
       ) : pastBookings.length === 0 ? (
         <p className="text-accent/60 mb-6 italic">Du har inga tidigare bokningar</p>
       ) : (
         <div className="mb-10">
+          <h2 className="text-2xl font-bold mt-0 mb-4 uppercase italic">Tidigare bokningar</h2>
           <PastBookingCard
             bookings={pastBookings.map((booking) => ({
               id: booking.bookingId || booking.id,
