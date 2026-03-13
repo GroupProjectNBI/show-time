@@ -202,24 +202,28 @@ export default function MyPage() {
       ) : pastBookings.length === 0 ? (
         <p className="text-accent/60 mb-6 italic">Du har inga tidigare bokningar</p>
       ) : (
-        <div className="flex flex-col gap-4 mb-10">
-          {pastBookings.map((booking) => (
-            <PastBookingCard
-              key={booking.bookingId || booking.id}
-              movieId={booking.movieId}
-              title={booking.movieTitle}
-              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
-              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
-              theaterLabel={booking.theaterName + " salongen"}
-              ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={formatSeatString(booking.seats, booking.theaterName)}
-              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
+        <div className="mb-10">
+          <PastBookingCard
+            bookings={pastBookings.map((booking) => ({
+              id: booking.bookingId || booking.id,
+              title: booking.movieTitle,
+              dateLabel: booking.startTime
+                ? formatScreeningDate(booking.startTime)
+                : "Okänt datum",
+              timeLabel: new Date(booking.startTime).toLocaleTimeString("sv-SE", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+              theaterLabel: booking.theaterName + " salongen",
+              ticketsLabel: `${booking.ticketCount || 0} biljetter`,
+              seatsLabel: booking.seats || "Information saknas",
+              seenLabel: `Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
-              })}`}
-            />
-          ))}
+              })}`,
+            }))}
+          />
         </div>
       )}
 
