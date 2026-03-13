@@ -1,4 +1,5 @@
 namespace WebApp;
+
 public static class DebugLog
 {
     private static readonly Obj memory = new();
@@ -46,30 +47,49 @@ public static class DebugLog
     public static async void Write()
     {
         if (!Globals.debugOn) { return; }
+
         while (true)
         {
             memory.GetKeys().ForEach(key =>
             {
+                // 1. Kika så att nyckeln inte är null
+                if (key == null) return;
+
                 var item = memory[key];
-                if (
-                    item.RESPONSE_DONE != null ||
-                    item.timestamp + 5000 < Now
-                )
+
+                // 2. STOPP! Om item är null, gör ingenting (här skedde kraschen innan)
+                if (item == null) return;
+
+                try
                 {
-                    if (item.RESPONSE_DONE != null)
+                    // 3. Nu när vi vet att item finns, kan vi kolla datan säkert
+                    if (item.RESPONSE_DONE != null || item.timestamp + 5000 < Now)
                     {
-                        item.timeTakenMs =
-                            item.RESPONSE_DONE - item.timestamp;
-                        item.Delete("RESPONSE_DONE");
+                        if (item.RESPONSE_DONE != null)
+                        {
+                            item.timeTakenMs = item.RESPONSE_DONE - item.timestamp;
+                            item.Delete("RESPONSE_DONE");
+                        }
+                        else
+                        {
+                            item.Delete("timeTaken");
+                        }
+
+                        Log(item);
+                        memory.Delete(key);
                     }
-                    else
-                    {
-                        item.Delete("timeTaken");
-                    }
-                    Log(item);
+                }
+                catch (Exception ex)
+                {
+                    // Om det av någon anledning smäller på dynamic-bindningen igen,
+                    // fångar vi felet här så att servern INTE stänger ner sig!
+                    Console.WriteLine($"[DebugLog Varning] Kunde inte logga rad {key}: {ex.Message}");
+
+                    // Vi tar bort det trasiga objektet så vi inte fastnar i en evighetsloop
                     memory.Delete(key);
                 }
             });
+
             await Task.Delay(500);
         }
     }
