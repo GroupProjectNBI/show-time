@@ -33,7 +33,7 @@ export default function ScreeningsPage() {
   useEffect(() => {
     async function loadData() {
       // Vi hämtar allt. Filtreringen sköts blixtsnabbt i webbläsaren sen.
-      const url = `/api/v_screenings?orderby=startTime`;
+      const url = `/api/v_screenings?orderby=startTime`; //kan man ändra denna till svensk text?
       const data = await fetchJson(url);
 
       if (data && !data.error) {
@@ -282,7 +282,7 @@ export default function ScreeningsPage() {
 }
 
 ScreeningsPage.route = {
-  path: "/screenings",
+  path: "/ga-pa-bio",
   menuLabel: "Gå på bio",
   index: 2
 };

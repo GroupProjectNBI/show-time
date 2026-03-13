@@ -183,7 +183,7 @@ export default function BookingPage() {
             if (!res?.insertId) throw new Error("Bokning misslyckades");
 
             // TODO: När EmailService finns ska cancelLink byggas här och skickas med i bokningsmailet.
-            
+
             for (const sId of selectedSeats) {
                 await fetchJson("/api/Ticket", {
                     method: "POST", headers: { "Content-Type": "application/json" },
@@ -195,7 +195,7 @@ export default function BookingPage() {
                 await connection.invoke("ConfirmBooking", parseInt(id!, 10), selectedSeats);
             }
             clearBooking();
-            navigate(`/confirmation/${code}`);
+            navigate(`/bekraftelse/${code}`);
         } catch (e) { alert("Något gick fel vid bokningen!"); }
     };
 
@@ -222,19 +222,21 @@ export default function BookingPage() {
                     </section>
                 ))}
             </div>
-            <div className="mt-10 w-full max-w-[1200px] px-6">
-                <BookingSnackPanel
-                    movieTitle={screening.movieTitle}
-                    onBook={handleBook}
-                    // Vi skapar de snygga raderna här innan vi skickar ner dem
-                    seatsLabelLines={selectedSeats.map(sId => {
-                        const layout = calculateSeat(sId);
-                        return layout.label; // t.ex. "Rad 2, Stol 5"
-                    })}
-                />
-            </div>
+            <BookingSnackPanel
+                movieTitle={screening.movieTitle}
+                onBook={handleBook}
+                seatsLabelLines={selectedSeats.map(sId => {
+                    const layout = calculateSeat(
+                        sId,
+                        seatArray[0].seatsPerRow,
+                        baseIdOffset
+                    );
+                    return layout.label; // "Rad X, Stol Y"
+                })}
+            />
+
         </div>
     );
 }
 
-BookingPage.route = { path: "/booking/:id" };
+BookingPage.route = { path: "/bokning/:id" };
