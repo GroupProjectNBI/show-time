@@ -1,133 +1,141 @@
-import { Calendar, Clock, MapPin, Ticket, Armchair, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Ticket,
+  Armchair,
+  CheckCircle2,
+  ChevronDown,
+} from "lucide-react";
 
-type HistoricalBookingCardProps = {
+type PastBookingItem = {
+  id: number;
   title: string;
   dateLabel: string;
   timeLabel: string;
-  movieId: number;
   theaterLabel: string;
   seatsLabel?: string;
   ticketsLabel?: string;
   seenLabel: string;
 };
 
-export default function HistoricalBookingCard({
-  title,
-  dateLabel,
-  timeLabel,
-  movieId,
-  theaterLabel,
-  seatsLabel,
-  ticketsLabel,
-  seenLabel,
-}: HistoricalBookingCardProps) {
+type PastBookingCardProps = {
+  bookings: PastBookingItem[];
+};
+
+export default function PastBookingCard({ bookings }: PastBookingCardProps) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <article className="overflow-hidden rounded-2xl bg-white/[0.03] shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition hover:bg-white/[0.05]">
-      <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-[140px_1fr] sm:gap-6 sm:p-5">
-
-        {/* Poster */}
-        <div className="overflow-hidden rounded-xl bg-black/20">
-          <img
-            src={`/images/posters/${movieId}.webp`}
-            alt={title}
-            loading="lazy"
-            className="h-full w-full object-contain sm:h-full grayscale-[0.3] hover:grayscale-0 transition-all duration-500"
-            onError={(e) => {
-              e.currentTarget.style.display = "none";
-              const next = e.currentTarget.nextElementSibling as HTMLElement | null;
-              if (next) next.style.display = "flex";
-            }}
-          />
-          <div className="hidden h-44 w-full items-center justify-center text-sm text-white/40 sm:h-full">
-            Poster saknas
-          </div>
-        </div>
-
-        {/* Content */}
+    <section
+      className="
+        overflow-hidden rounded-2xl
+        bg-white/3
+        shadow-[0_20px_50px_rgba(0,0,0,0.35)]
+        transition
+      "
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        className="
+          flex w-full items-center justify-between gap-4
+          px-4 py-4 text-left
+          transition hover:bg-white/5
+          sm:px-5
+        "
+      >
         <div className="min-w-0">
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="truncate text-lg font-semibold text-accent/80 sm:text-xl">
-              {title}
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={18} className="shrink-0 text-accent/70" />
+            <h3 className="text-base font-semibold text-accent sm:text-lg">
+              Tidigare sedda filmer
             </h3>
-
-            {/* Status Badge */}
-            <span className="flex items-center gap-1 shrink-0 rounded-full bg-white/5 px-3 py-1 text-xs font-semibold text-accent/50 ring-1 ring-white/10">
-              Sedd
-              <CheckCircle2 size={12} />
-            </span>
           </div>
 
-          {/* Informations-grid - Nu helt synkad med UpcomingCard */}
-          <div className="mt-4 grid grid-cols-1 gap-y-4 gap-x-2 text-sm text-accent/70 sm:grid-cols-2 items-start">
-
-            {/* Status/Sedd info */}
-            <div className="flex items-start gap-2 sm:col-span-2 bg-white/[0.02] p-2 rounded-lg border border-white/5">
-              <CheckCircle2 size={16} className="text-accent/40 mt-1 shrink-0" />
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase font-bold text-accent/30 tracking-widest mb-0.5">Historik</span>
-                <span className="text-accent/60 italic">{seenLabel}</span>
-              </div>
-            </div>
-
-            {/* Datum */}
-            <div className="flex items-start gap-2">
-              <Calendar size={16} className="text-accent/40 mt-1 shrink-0" />
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase font-bold text-accent/30 tracking-widest mb-0.5">Datum</span>
-                <span className="truncate">{dateLabel}</span>
-              </div>
-            </div>
-
-            {/* Tid */}
-            <div className="flex items-start gap-2">
-              <Clock size={16} className="text-accent/40 mt-1 shrink-0" />
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase font-bold text-accent/30 tracking-widest mb-0.5">Tid</span>
-                <span className="truncate">{timeLabel}</span>
-              </div>
-            </div>
-
-            {/* Salong */}
-            <div className="flex items-start gap-2 sm:col-span-2 border-t border-white/5 pt-2">
-              <MapPin size={16} className="text-accent/40 mt-1 shrink-0" />
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase font-bold text-accent/30 tracking-widest mb-0.5">Salong</span>
-                <span className="truncate">{theaterLabel}</span>
-              </div>
-            </div>
-
-            {/* Biljetter */}
-            {ticketsLabel && (
-              <div className="flex items-start gap-2">
-                <Ticket size={16} className="text-accent/40 mt-1 shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold text-accent/30 tracking-widest mb-0.5">Biljetter</span>
-                  <span className="truncate">{ticketsLabel}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Platser */}
-            {seatsLabel && (
-              <div className="flex items-start gap-2">
-                <Armchair size={16} className="text-accent/40 mt-1 shrink-0" />
-                <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold text-accent/30 tracking-widest mb-0.5">Platser</span>
-                  <div className="flex flex-col gap-1">
-                    {seatsLabel.split("; ").map((seat, index) => (
-                      <span key={index} className="text-sm font-medium text-accent/60">
-                        {seat}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+          <p className="mt-1 text-sm text-accent/60">
+            {bookings.length} {bookings.length === 1 ? "film" : "filmer"}
+          </p>
         </div>
-      </div>
 
-      <div className="h-1 w-full bg-gradient-to-r from-transparent via-white/5 to-transparent" />
-    </article>
+        <ChevronDown
+          size={20}
+          className={`shrink-0 text-accent/70 transition-transform duration-200 ${open ? "rotate-180" : ""
+            }`}
+        />
+      </button>
+
+      {open && (
+        <div className="border-t border-white/10">
+          {bookings.map((booking, index) => (
+            <div key={booking.id}>
+              <article className="px-4 py-4 sm:px-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h4 className="truncate text-lg font-semibold text-accent sm:text-xl">
+                      {booking.title}
+                    </h4>
+
+                    <div className="mt-2 flex items-center gap-2 text-sm text-accent/70">
+                      <CheckCircle2 size={16} className="shrink-0 text-accent/60" />
+                      <span className="truncate">{booking.seenLabel}</span>
+                    </div>
+                  </div>
+
+                  <span
+                    className="
+                      shrink-0 rounded-full
+                      bg-white/10 px-3 py-1
+                      text-xs font-semibold text-accent/70
+                      ring-1 ring-white/15
+                    "
+                  >
+                    Sedd
+                  </span>
+                </div>
+
+                <div className="mt-3 grid grid-cols-1 gap-2 text-sm text-accent/80 sm:grid-cols-2">
+                  <div className="flex items-center gap-2">
+                    <Calendar size={16} className="shrink-0 text-accent/70" />
+                    <span className="truncate">{booking.dateLabel}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Clock size={16} className="shrink-0 text-accent/70" />
+                    <span className="truncate">{booking.timeLabel}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 sm:col-span-2">
+                    <MapPin size={16} className="shrink-0 text-accent/70" />
+                    <span className="truncate">{booking.theaterLabel}</span>
+                  </div>
+
+                  {booking.ticketsLabel && (
+                    <div className="flex items-center gap-2">
+                      <Ticket size={16} className="shrink-0 text-accent/70" />
+                      <span className="truncate">{booking.ticketsLabel}</span>
+                    </div>
+                  )}
+
+                  {booking.seatsLabel && (
+                    <div className="flex items-center gap-2">
+                      <Armchair size={16} className="shrink-0 text-accent/70" />
+                      <span className="truncate">Platser: {booking.seatsLabel}</span>
+                    </div>
+                  )}
+                </div>
+              </article>
+
+              {index < bookings.length - 1 && (
+                <div className="mx-4 h-px bg-white/10 sm:mx-5" />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="h-1 w-full bg-gradient-to-r from-transparent via-white/8 to-transparent" />
+    </section>
   );
 }
