@@ -27,10 +27,10 @@ static class EmailService
         using (var client = new SmtpClient())
         {
             // --- FIX 1: Använd StartTls för port 587 ---  SecureSocketOptions.Auto   SecureSocketOptions.StartTls
-            client.Connect(smtpServer, smtpPort, SecureSocketOptions.StartTls);
+            client.Connect(smtpServer, smtpPort, SecureSocketOptions.Auto);
 
             // --- FIX 2: Autentisera ---
-            client.Authenticate(emailUsername, emailPassword);
+           // client.Authenticate(emailUsername, emailPassword);
 
             client.Send(message);
             client.Disconnect(true);
