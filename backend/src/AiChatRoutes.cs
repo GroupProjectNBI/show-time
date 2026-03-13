@@ -1,5 +1,6 @@
 namespace WebApp;
 
+using System.Globalization;
 public static class AiChatRoutes
 {
     private static string aiAccessToken = "";
@@ -81,7 +82,7 @@ public static class AiChatRoutes
 
     private static string GetDynamicMovieContext(string filterDate = null)
     {
-        string sql = "SELECT movieTitle, theaterName, startTime, availableSeats, ageLimit FROM v_screenings WHERE startTime >= NOW()";
+        string sql = "SELECT id, movieTitle, theaterName, startTime, availableSeats, ageLimit FROM v_screenings WHERE startTime >= NOW()";
 
         if (!string.IsNullOrEmpty(filterDate))
         {
@@ -98,10 +99,20 @@ public static class AiChatRoutes
         foreach (var s in screenings)
         {
             DateTime st = DateTime.Parse(s.startTime.ToString());
-            context += $"{st:MM-dd HH:mm} | {s.movieTitle} | {s.theaterName} | {s.availableSeats}st | {s.ageLimit}+\n";
+
+            // Vi ger den bara den rena, relativa URL:en
+            string relativeUrl = $"/bokning/{s.id}";
+
+            // Tydligare uppspaltning av datan för AI:n
+            context += $"- Tid: {st:MM-dd HH:mm} | Film: {s.movieTitle} | Salong: {s.theaterName} | Lediga platser: {s.availableSeats} | Länk: {relativeUrl}\n";
         }
 
-        context += $"\nSysteminfo: Serverklocka {DateTime.Now:yyyy-MM-dd HH:mm}.";
+        var culture = new CultureInfo("sv-SE");
+        string todaysDate = DateTime.Now.ToString("dddd den d MMMM yyyy 'kl' HH:mm", culture);
+
+        // Mycket rakare och enklare instruktion
+        context += $"\nSysteminfo: Idag är det {todaysDate}. VIKTIGT: När du rekommenderar en film måste du ALLTID skapa en klickbar länk till den. Använd formatet [Boka biljetter här](/film_info/ID) baserat på Länk-datan i listan. Inkludera aldrig domännamn eller https://, använd bara den relativa länken.";
+
         return context;
     }
 
