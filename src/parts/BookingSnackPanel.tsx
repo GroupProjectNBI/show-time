@@ -175,14 +175,14 @@ export default function BookingSnackPanel({
                               {opt.title}
                             </div>
 
-                            {/* ⭐ Dynamisk beskrivning */}
+                            {/*  Dynamisk beskrivning */}
                             <div className="text-[12px] text-accent/70 leading-snug">
                               {getDynamicDesc(opt, ticketCount)}
                             </div>
                           </div>
 
                           <div className="sm:text-right">
-                            {/* ⭐ Dynamiskt pris */}
+                            {/*  Dynamiskt pris */}
                             <div className="text-[13px] font-semibold text-accent tabular-nums">
                               {(opt.pricePerPerson * ticketCount).toFixed(0)} kr
                             </div>
@@ -238,7 +238,7 @@ export default function BookingSnackPanel({
                 Totalt:
               </span>
 
-              {/* ⭐ totalAmount kommer direkt från BookingContext */}
+              {/*  totalAmount kommer direkt från BookingContext */}
               <span className="tabular-nums text-[20px] font-bold text-accent">
                 {Math.round(totalAmount)} kr
               </span>

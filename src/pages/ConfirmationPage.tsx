@@ -308,8 +308,8 @@ function ReceiptRow({ label, value }: { label: string, value: string; }) {
 }
 
 ConfirmationPage.route = {
-  path: "/confirmation/:bookingRef",
-  menuLabel: "Confirmation",
+  path: "/bekraftelse/:bookingRef",
+  menuLabel: "Bekräftelse",
   hideInMenu: true,
   index: -2,
 };
