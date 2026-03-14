@@ -5,7 +5,6 @@ import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
 import { formatDate } from "../utils/formatTime";
 import { Filter, ArrowUpDown, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function ScreeningsPage() {
