@@ -140,10 +140,10 @@ public static class AiChatRoutes
     {
         try
         {
-            // 1. Leta först i samma mapp (Docker / Produktion)
-            var promptPath = "system-prompt.md";
+            // 1. Leta i samma mapp som den kompilerade koden (Docker / Produktion)
+            var promptPath = Path.Combine(AppContext.BaseDirectory, "system-prompt.md");
 
-            // 2. Om den inte finns där, hoppa upp tre mappar (Lokalt / Utveckling)
+            // 2. Om den inte finns där, hoppa upp tre mappar (Lokal utveckling i VS/VS Code)
             if (!File.Exists(promptPath))
             {
                 promptPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "system-prompt.md");
@@ -153,6 +153,7 @@ public static class AiChatRoutes
             if (File.Exists(promptPath))
             {
                 systemPrompt = File.ReadAllText(promptPath);
+                Console.WriteLine("[AiChatRoutes] System prompt laddad framgångsrikt!");
             }
             else
             {

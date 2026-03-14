@@ -24,14 +24,16 @@ static class EmailService
                 var configJson = File.ReadAllText(configPath);
                 var config = JSON.Parse(configJson);
 
-                smtpServer = config.smtpServer;
-                smtpPortStr = config.smtpPort;
-                emailUsername = config.emailUsername;
-                emailPassword = config.emailPassword;
+                // FIX: Vi tvingar värdena till rätt datatyp för att undvika smyg-kraschar!
+                smtpServer = (string)config.smtpServer;
+                smtpPortStr = config.smtpPort?.ToString(); // Porten är ofta en siffra i JSON, konvertera till string
+                emailUsername = (string)config.emailUsername;
+                emailPassword = (string)config.emailPassword;
             }
-            catch
+            catch (Exception ex)
             {
-                Console.WriteLine("[EmailService] Varning: Saknar inställningar för SMTP!");
+                // FIX: Nu ser vi det VERKLIGA felet om det kraschar igen!
+                Console.WriteLine($"[EmailService] Varning: Saknar inställningar för SMTP! Fel: {ex.Message}");
                 return;
             }
         }

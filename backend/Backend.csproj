@@ -13,4 +13,10 @@
     <PackageReference Include="Dyndata" Version="1.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="system-prompt.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
