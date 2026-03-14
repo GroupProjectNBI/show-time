@@ -18,8 +18,14 @@ services:
       - DEBUG_ON=${DEBUG_ON}
       - SESSION_LIFETIME=${SESSION_LIFETIME}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      # LÄGG TILL DENNA om din C#-kod kräver CONNECTION_STRING:
       - CONNECTION_STRING=Server=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Uid=${DB_USER};Pwd=${DB_PASS};
+
+      # --- DESSA 5 RADER LADES TILL ---
+      - aiAccessToken=${aiAccessToken}
+      - smtpServer=${smtpServer}
+      - smtpPort=${smtpPort}
+      - emailUsername=${emailUsername}
+      - emailPassword=${emailPassword}
 
     labels:
       - "traefik.enable=true"
@@ -29,7 +35,7 @@ services:
 
       # 3. Porten inuti containern
       - "traefik.http.services.cinema.loadbalancer.server.port=${PORT}"
-      - "traefik.http.routers.cinema.priority=100" # Kan vara kvar för säkerhets skull, men krockar inte längre ändå!
+      - "traefik.http.routers.cinema.priority=100"
 
       # --- 🛡️ 1. Rate Limiting (Stoppar spam och överbelastning) ---
       - "traefik.http.middlewares.cinema-limit.ratelimit.average=100"
@@ -46,7 +52,7 @@ services:
       - "traefik.http.routers.cinema.middlewares=cinema-limit,cinema-headers"
 
     networks:
-      - traefik-net #
+      - traefik-net
 
 networks:
   traefik-net:
