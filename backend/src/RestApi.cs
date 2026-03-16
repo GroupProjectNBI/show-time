@@ -108,14 +108,18 @@ public static class RestApi
                             // NYTT: hämta bookingRef från body
                             string bookingRef = body?.bookingRef;
 
-                            var frontendBaseUrl =
-                                Environment.GetEnvironmentVariable("FRONTEND_BASE_URL")
-                                ?? "http://localhost:5173";
+                            // context.Request.Host vet automatiskt om vi är på localhost eller showtime.jarllindquist.com
+                            string currentHost = context.Request.Host.Value;
+                            string scheme = context.Request.Scheme; // Blir automatiskt "https" via vår Traefik-proxy!
 
+                            // Kör vi lokalt? Då vill vi till Vite's utvecklingsserver. Annars bygger vi live-länken.
+                            string frontendBaseUrl = currentHost.Contains("localhost")
+                                ? "http://localhost:5173"
+                                : $"{scheme}://{currentHost}";
                             // Om bookingRef saknas: vi visar ingen avbokningslänk
                             string cancelLink = !string.IsNullOrWhiteSpace(bookingRef)
-                                ? $"{frontendBaseUrl}/cancel-booking?bookingRef={bookingRef}"
-                                : "";
+                            ? $"{frontendBaseUrl}/avboka?bookingRef={bookingRef}" // Svenskt ord, men behåller query-parametern
+                            : "";
 
                             // 2. Förbered HTML-mailet med Show-Time design
                             string subject = "Din bokningsbekräftelse - Show-Time";

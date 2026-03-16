@@ -5,14 +5,12 @@ import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
 import { formatDate } from "../utils/formatTime";
 import { Filter, ArrowUpDown, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function ScreeningsPage() {
   // --- STATE ---
   const [allScreenings, setAllScreenings] = useState<Screening[]>([]);
   const [loading, setLoading] = useState(true);
-  const { create } = useAuth();
 
   // Datumstate - Börjar på dagens datum
   const [selectedDateISO, setSelectedDateISO] = useState<string>(formatDate(new Date()));
@@ -143,7 +141,7 @@ export default function ScreeningsPage() {
 
         {/* HEADER */}
         <div className="mb-8 border-b border-white/10 pb-6">
-          <h1 className="text-2xl font-semibold text-accent uppercase tracking-widest"><Link to="#" onClick={() => create({})} className="shrink-0">Bioprogram</Link></h1>
+          <h1 className="text-2xl font-semibold text-accent uppercase tracking-widest"><Link to="#" className="shrink-0">Bioprogram</Link></h1>
           <p className="mt-1 text-accent/70 max-w-3xl font-light">
             Hitta rätt film för kvällen. Filtrera på genre, salong eller välj ett specifikt datum.
           </p>

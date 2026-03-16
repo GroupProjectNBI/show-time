@@ -54,10 +54,6 @@ export default function FAQPage() {
     { q: "Är biografen tillgänglighetsanpassad?", a: "Ja, kontakta oss gärna i förväg om du har särskilda behov." }
   ];
 
-  const categories = [
-    "Biobiljetter", "Tillgänglighet", "Villkor och policies", "På biografen",
-    "Medlemskap", "Övriga frågor", "Program och filmfrågor", "Om Show-Time"
-  ];
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6 py-16 pb-2 text-accent">
@@ -104,17 +100,7 @@ export default function FAQPage() {
         </div>
       </div>
 
-      {/* CATEGORY BUTTONS */}
-      <div className="mb-16">
-        <h2 className="text-2xl font-semibold mb-6">Fler frågor och svar</h2>
-        <div className="flex flex-wrap gap-4">
-          {categories.map((cat, i) => (
-            <button key={i} className="px-5 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
+
 
       {/* --- CONTACT FORM (Uppdaterad med logik) --- */}
       <div id="kontakt" className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl relative overflow-hidden">

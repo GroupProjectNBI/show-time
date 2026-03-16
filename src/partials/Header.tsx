@@ -2,7 +2,10 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import routes from "../routes";
 import { useAuth } from "../context/AuthContext";
+import { useOverlay } from "../context/OverlayContext";
 
+
+// Header 
 type HeaderProps = {
   openMembership: () => void;
   openLogin: () => void;
@@ -12,6 +15,7 @@ type HeaderProps = {
 export default function Header({ openMembership, openLogin }: HeaderProps) {
   const [expanded, setExpanded] = useState(false);
   const { logout, user } = useAuth();
+  const { openAiChat } = useOverlay(); 
   const pathName = useLocation().pathname;
 
   // 1. HITTA AKTIV RUTT (För att veta vilken länk som ska lysa i guld)
@@ -230,6 +234,19 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
 
                   </>
                 )}
+                {/* --- NYTT: AI CHAT LÄNGST NER I MOBILMENYN --- */}
+                <div className="mt-4 border-t border-white/10 pt-4">
+                  <button
+                    onClick={() => { openAiChat(); closeMenu(); }}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-4 text-[13px] font-black uppercase tracking-[0.2em] text-[#c0a060] bg-white/5 hover:bg-white/10 transition"
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#c0a060] opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#c0a060]"></span>
+                    </span>
+                    Chatta med oss
+                  </button>
+                </div>
 
               </nav>
             </div>
@@ -237,6 +254,30 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
 
         </div>
       </div >
+      {/* --- NYTT: FLYTANDE CHATT-IKON --- */}
+      <button
+        onClick={openAiChat}
+        className="fixed bottom-8 right-8 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-accent text-primary shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all hover:scale-110 active:scale-95 group"
+        aria-label="Öppna AI Chat"
+      >
+        <span className="absolute -top-1 -right-1 flex h-4 w-4">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-white border-2 border-accent"></span>
+        </span>
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2.5" 
+          strokeLinecap="round" 
+          strokeLinejoin="round"
+        >
+          <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/>
+        </svg>
+      </button>
     </header >
   );
 }
