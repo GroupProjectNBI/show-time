@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import fetchJson from "../utils/fetchJson";
+import toast from "react-hot-toast";
 
 export default function JobDetailsPage() {
   const { jobId } = useParams();
@@ -71,7 +72,7 @@ export default function JobDetailsPage() {
       body: fd
     });
 
-    alert("Din ansökan har skickats!");
+    toast.success("Din ansökan har skickats!");
     setLoading(false);
   };
 
