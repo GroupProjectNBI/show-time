@@ -5,23 +5,24 @@ export default function JobDetailsPage() {
   const { jobId } = useParams();
 
   // Här kan du senare hämta från backend
-  const jobs = {
-    "biografvard": {
+  const jobs: Record<string, { title: string; location: string; description: string; }> = {
+    biografvard: {
       title: "Biografvärd",
       location: "Malmö",
       description: "Som biografvärd är du ansiktet utåt..."
     },
-    "kioskpersonal": {
+    kioskpersonal: {
       title: "Kioskpersonal",
       location: "Malmö",
       description: "Arbeta i vårt team och servera snacks..."
     },
-    "maskinist": {
+    maskinist: {
       title: "Maskinist / Tekniker",
       location: "Malmö",
       description: "Ansvarar för tekniken i salongerna..."
     }
   };
+
 
   const job = jobs[jobId!];
 
