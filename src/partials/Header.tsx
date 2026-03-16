@@ -112,10 +112,15 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                 {user && (
                   <>
                     <button
-                      onClick={logout}
-                      className="rounded-full border border-accent/30 px-6 py-1.5 text-[12px] font-bold uppercase tracking-[0.1em] text-accent/80 transition-all duration-300 hover:bg-accent hover:text-primary hover:border-accent"                    >
+                      onClick={() => {
+                        logout();
+                        window.location.href = "/";
+                      }}
+                      className="rounded-full border border-accent/30 px-6 py-1.5 text-[12px] font-bold uppercase tracking-[0.1em] text-accent/80 transition-all duration-300 hover:bg-accent hover:text-primary hover:border-accent"
+                    >
                       Logga ut
                     </button>
+
 
                     <img
                       src={user.avatar}
@@ -213,10 +218,16 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
                     </Link>
 
                     <button
-                      onClick={() => { logout(); closeMenu(); }}
-                      className="mt-2 block w-full text-center rounded-xl border border-accent/30 py-3 text-[13px] font-bold uppercase tracking-[0.2em] text-accent/70 transition"                    >
+                      onClick={() => {
+                        logout();
+                        closeMenu();
+                        window.location.href = "/";
+                      }}
+                      className="mt-2 block w-full text-center rounded-xl border border-accent/30 py-3 text-[13px] font-bold uppercase tracking-[0.2em] text-accent/70 transition"
+                    >
                       Logga ut
                     </button>
+
                   </>
                 )}
 
