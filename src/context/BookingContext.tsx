@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { createContext, useState, useContext, useMemo, useCallback, useEffect } from "react";
 import type { BookingContextType } from "../interfaces/Booking";
-
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
 const TICKET_PRICES = {
@@ -35,8 +34,14 @@ export function BookingProvider({ children }: { children: ReactNode }) {
 
     const toggleSeat = useCallback((seatId: number) => {
         setSelectedSeats((prev) => {
-            if (prev.includes(seatId)) return prev.filter(id => id !== seatId);
-            if (maxSelectableSeats === 0 || prev.length >= maxSelectableSeats) return prev;
+            if (prev.includes(seatId)) return prev.filter(id => id !== seatId); // Avklicka om redan vald
+            if (maxSelectableSeats === 0) return prev;
+
+            // FIFO: Om kvoten är full, kasta den äldsta (index 0) och lägg till den nya på slutet!
+            if (prev.length >= maxSelectableSeats) {
+                return [...prev.slice(1), seatId];
+            }
+
             return [...prev, seatId];
         });
     }, [maxSelectableSeats]);
@@ -65,8 +70,8 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         selectedSeats, occupiedSeats, tickets, selectedSnack, email,
         ticketCount, ticketTotal, snackTotal, totalAmount,
         toggleSeat, setOccupied, clearBooking,
-        setTickets, setSelectedSnack, setEmail,
-    }), [selectedSeats, occupiedSeats, toggleSeat, setOccupied, clearBooking, tickets, selectedSnack, email, ticketCount, ticketTotal, snackTotal, totalAmount]);
+        setTickets, setSelectedSnack, setEmail, setSelectedSeats
+    }), [selectedSeats, setSelectedSeats, occupiedSeats, toggleSeat, setOccupied, clearBooking, tickets, selectedSnack, email, ticketCount, ticketTotal, snackTotal, totalAmount]);
 
     return (
         <BookingContext.Provider value={value}>

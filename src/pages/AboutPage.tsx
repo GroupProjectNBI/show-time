@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function AboutPage() {
   const { hash } = useLocation();
+  const navigate = useNavigate();
 
   // Scrolla till hash när sidan laddas
   useEffect(() => {
@@ -89,8 +90,8 @@ function AboutPage() {
             <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl transition animate-fadeIn">
               <h3 className="text-xl font-semibold mb-4 text-accent">Innan filmen</h3>
               <p className="text-accent leading-relaxed">
-                Välkommen till vår biograf! Vi rekommenderar att du är på plats minst 15 minuter
-                före filmstart. Då hinner du ta plats i lugn och ro samt köpa popcorn och dryck i
+                Välkommen till vår biograf! Vi rekommenderar att du är på plats minst 1 timme
+                före filmens start för att hämta ut dina biljetter. Har du redan hämtat dina biljetter? Då räcker det med 15 minuter innan för att i lugn och ro ta plats och köpa popcorn
                 vår kiosk.
               </p>
             </div>
@@ -99,8 +100,7 @@ function AboutPage() {
             <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl transition animate-fadeIn delay-100">
               <h3 className="text-xl font-semibold mb-4 text-accent">Biljetter & betalning</h3>
               <p className="text-accent leading-relaxed">
-                Biljetter köps smidigast online via vår webbplats, men kan även köpas på plats i
-                kassan i mån av tillgång.
+                Biljetter reserveras smidigast här på vår hemsida men finns det biljetter kvar kan biljetter även köpas i kassan på plats. All betalning sker på plats, för att behålla era reserverade biljetter behöver ni hämta ut dom innan dess att det är 1 timme kvar innan filmstart.
               </p>
             </div>
 
@@ -109,14 +109,28 @@ function AboutPage() {
               <h3 className="text-xl font-semibold mb-4 text-accent">Regler & trivsel</h3>
               <p className="text-accent leading-relaxed">
                 Vår biograf följer Statens medieråds åldersgränser och att barn endast får se filmer som är godkända för deras ålder.
-                <p></p>Vi ber er stänga av mobilen under filmen. Fotografering och filmning är inte tillåtet.
+                Vi ber er stänga av mobilen under filmen. Fotografering och filmning är inte tillåtet.
                 Biografen är tillgänglighetsanpassad — kontakta oss gärna i förväg vid särskilda
                 behov. Slå dig ner och njut av filmen!
               </p>
             </div>
-
+{/* Card 4: KLICKBART FAQ  */}
+            <div 
+              onClick={() => navigate("/faq")}
+              className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl hover:bg-white/10 hover:border-accent/30 border border-transparent transition-all duration-300 animate-fadeIn delay-200 cursor-pointer group"
+            >
+              <h3 className="text-xl font-semibold mb-4 text-accent group-hover:text-white transition-colors">FAQ</h3>
+              <p className="text-accent leading-relaxed">
+                Välkommen till vår kundservice och FAQ! Här har vi samlat svar på de vanligaste frågorna som dyker upp inför, under och efter ditt biobesök. Vi vet att det kan finnas funderingar kring allt från biljetter till regler i salongen.
+              </p>
+              <div className="mt-4 text-[10px] uppercase tracking-widest text-accent/40 font-bold group-hover:text-accent transition-colors">
+                Klicka för att läsa mer →
+              </div>
+            </div>
           </div>
+          
         </div>
+        
       </section>
 
     </div>

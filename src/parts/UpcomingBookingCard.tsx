@@ -5,15 +5,20 @@ type UpcomingBookingCardProps = {
   dateLabel: string;
   timeLabel: string;
   id: number;
+
+  // NYTT: movieId behövs för att kunna visa rätt poster
+  movieId: number;
+
   theaterLabel: string;
   seatsLabel?: string;
   ticketsLabel?: string;
-  posterUrl?: string;
+
+  // posterUrl tas bort eftersom vi bygger poster-path från movieId
+  // posterUrl?: string;
 
   // Actions för senare kanske 
   onViewTicket?: () => void; // Öppna QR-kod 
   onCancel?: (id: number) => void; // Anropa cancelbooking(id()
-
 
   cancelDisabled?: boolean; // Låsa avbokning nära start
 };
@@ -21,12 +26,12 @@ type UpcomingBookingCardProps = {
 export default function UpcomingBookingCard({
   title,
   id,
+  movieId, // NYTT: tar emot movieId
   dateLabel,
   timeLabel,
   theaterLabel,
   seatsLabel,
   ticketsLabel,
-  posterUrl,
   onViewTicket,
   onCancel,
   cancelDisabled,
@@ -34,25 +39,35 @@ export default function UpcomingBookingCard({
   return ( //Kort-container med vårt tema
     <article className="overflow-hidden rounded-2xl bg-white/5 ring-1 ring-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition hover:bg-white/10 hover:ring-white/20">
       <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-[140px_1fr] sm:gap-6 sm:p-5">
-        {/* Poster: om posterUrl saknas visas placeholder,så UI inte “kraschar” visuellt */}
+
+        {/* Poster */}
+        {/* NYTT: Vi hämtar postern baserat på movieId istället för posterUrl */}
         <div className="overflow-hidden rounded-xl bg-black/20">
-          {posterUrl ? (
-            <img
-              src={posterUrl}
-              alt={title}
-              loading="lazy"
-              className="h-44 w-full object-cover sm:h-full"
-            />
-          ) : (
-            <div className="flex h-44 w-full items-center justify-center text-sm text-white/40 sm:h-full">
-              Poster saknas
-            </div>
-          )}
+
+          <img
+            src={`/images/posters/${movieId}.webp`} // NYTT
+            alt={title}
+            loading="lazy"
+            className="h-full w-full object-contain sm:h-full"
+
+            // fallback om bilden saknas
+            onError={(e) => {
+              e.currentTarget.style.display = "none";
+              const next = e.currentTarget.nextElementSibling as HTMLElement | null;
+              if (next) next.style.display = "flex";
+            }}
+          />
+
+          {/* placeholder visas om poster saknas */}
+          <div className="hidden h-44 w-full items-center justify-center text-sm text-white/40 sm:h-full">
+            Poster saknas
+          </div>
         </div>
 
         {/* Content */}
         <div className="min-w-0">
           <div className="flex items-start justify-between gap-3">
+
             {/* trunkering så långa titlar inte spränger layouten */}
             <h3 className="truncate text-lg font-semibold text-accent sm:text-xl">
               {title}
@@ -65,35 +80,61 @@ export default function UpcomingBookingCard({
           </div>
 
           {/* Information om bokningen - för att hålla spacing finare i mobil och desktop */}
-          <div className="mt-3 grid grid-cols-1 gap-2 text-sm text-accent/80 sm:grid-cols-2">
-            <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-accent/70" />
-              <span className="truncate">{dateLabel}</span>
+          {/* Information om bokningen */}
+          <div className="mt-3 grid grid-cols-1 gap-y-4 gap-x-2 text-sm text-accent/80 sm:grid-cols-2 items-start">
+
+            {/* Datum */}
+            <div className="flex items-start gap-2">
+              <Calendar size={16} className="text-accent/70 mt-1 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Datum</span>
+                <span className="truncate">{dateLabel}</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Clock size={16} className="text-accent/70" />
-              <span className="truncate">{timeLabel}</span>
+            {/* Tid */}
+            <div className="flex items-start gap-2">
+              <Clock size={16} className="text-accent/70 mt-1 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Tid</span>
+                <span className="truncate">{timeLabel}</span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:col-span-2">
-              <MapPin size={16} className="text-accent/70" />
-              <span className="truncate">{theaterLabel}</span>
+            {/* Salong (Full bredd) */}
+            <div className="flex items-start gap-2 sm:col-span-2 border-t border-white/5 pt-2">
+              <MapPin size={16} className="text-accent/70 mt-1 shrink-0" />
+              <div className="flex flex-col">
+                <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Salong</span>
+                <span className="truncate">{theaterLabel}</span>
+              </div>
             </div>
 
-            {/* Renderas bara om ticketsLabel finns, komponenten anpassar sig automatiskt */}
+            {/* Biljetter - NU MED SAMMA STRUKTUR SOM PLATSER */}
             {ticketsLabel && (
-              <div className="flex items-center gap-2">
-                <Ticket size={16} className="text-accent/70" />
-                <span className="truncate">{ticketsLabel}</span>
+              <div className="flex items-start gap-2">
+                <Ticket size={16} className="text-accent/70 mt-1 shrink-0" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Biljetter</span>
+                  <span className="truncate font-medium text-accent">{ticketsLabel}</span>
+                </div>
               </div>
             )}
 
-            {/* Renderas bara om seatsLabel finns */}
+            {/* Platser */}
             {seatsLabel && (
-              <div className="flex items-center gap-2">
-                <Armchair size={16} className="text-accent/70" />
-                <span className="truncate">Platser: {seatsLabel}</span>
+              <div className="flex items-start gap-2">
+                <Armchair size={16} className="text-accent/70 mt-1 shrink-0" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] uppercase font-bold text-accent/50 tracking-widest mb-0.5">Platser</span>
+                  <div className="flex flex-col gap-1">
+                    {seatsLabel.split("; ").map((seat, index) => (
+                      <span key={index} className="text-sm font-medium text-accent">
+                        {seat}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -101,6 +142,7 @@ export default function UpcomingBookingCard({
           {/* Actions */}
           {(onViewTicket || onCancel) && (
             <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+
               {onViewTicket && (
                 <button
                   type="button"

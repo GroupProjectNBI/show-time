@@ -2,16 +2,16 @@ interface ChairsProps {
     numberOfSeats: number;
     previousSeatsCount: number;
     visualOffset: number;
-    selectedSeats: number[];    // Lista på alla valda stolar (från context)
-    occupiedSeats: number[];    // Lista på upptagna stolar (från backend)
-    onToggle: (id: number) => void; // Funktion för att klicka
-    realtimeLockedSeats?: number[]; // Lista på stolar som NÅGON ANNAN har valt just nu
+    selectedSeats: number[];
+    occupiedSeats: number[];
+    onToggle: (id: number) => void;
+    realtimeLockedSeats?: number[];
 }
 
 export default function Chairs({
     numberOfSeats,
     previousSeatsCount,
-    realtimeLockedSeats = [], // VIKTIGT: Sätt till en tom array som standard så den inte kraschar
+    realtimeLockedSeats = [],
     selectedSeats,
     visualOffset,
     occupiedSeats,
@@ -26,12 +26,10 @@ export default function Chairs({
                 const seatId = previousSeatsCount + index + 1;
                 const displayNum = visualOffset + index + 1;
 
-                // --- NY LOGIK: Kolla alla tre tillstånden ---
-                const isOccupied = occupiedSeats.includes(seatId); // Såld i databasen
-                const isRealtimeLocked = realtimeLockedSeats.includes(seatId); // Reserverad av någon just nu
-                const isSelected = selectedSeats.includes(seatId); // Vald av mig
+                const isOccupied = occupiedSeats.includes(seatId);
+                const isRealtimeLocked = realtimeLockedSeats.includes(seatId);
+                const isSelected = selectedSeats.includes(seatId);
 
-                // Stolen är o-klickbar om den är SÅLD eller RESERVERAD
                 const isDisabled = isOccupied || isRealtimeLocked;
 
                 return (
@@ -40,23 +38,24 @@ export default function Chairs({
                         onClick={() => !isDisabled && onToggle(seatId)}
                         disabled={isDisabled}
                         className={`
-                            relative flex items-center justify-center font-bold transition-all duration-200 rounded-sm
-                            w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[8px] sm:text-[10px] md:text-xs
+                            relative flex items-center justify-center font-bold transition-all duration-200 rounded-sm shrink-0
+                            w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10
+                            text-[9px] sm:text-[10px] md:text-xs
                             ${isSelected
-                                ? 'bg-green-600 text-white scale-110 z-10 shadow-lg' // Min valda stol
+                                ? 'bg-green-600 text-white scale-110 z-10 shadow-lg'
                                 : isOccupied
-                                    ? 'bg-accent text-slate-900 cursor-not-allowed opacity-75' // Helt såld stol (får krysset nedan)
+                                    ? 'bg-accent text-slate-900 cursor-not-allowed opacity-75'
                                     : isRealtimeLocked
-                                        ? 'bg-slate-700 text-gray-400 opacity-60 cursor-not-allowed' // Någon annans val! Mörk och oklickbar
-                                        : 'bg-accent text-slate-900 hover:brightness-110 cursor-pointer' // Helt ledig stol
+                                        ? 'bg-slate-700 text-gray-400 opacity-60 cursor-not-allowed'
+                                        : 'bg-accent text-slate-900 hover:brightness-110 cursor-pointer'
                             }
                         `}
                     >
                         {displayNum}
-                        {/* Krysset ritas BARA ut om stolen är permanent såld i databasen */}
+
                         {isOccupied && (
                             <span className="absolute inset-0 flex items-center justify-center pointer-events-none overflow-hidden rounded-sm">
-                                <span className="w-[150%] h-[1.5px] sm:h-[2px] bg-primary -rotate-45 absolute shadow-sm"></span>
+                                <span className="w-[150%] h-[1px] sm:h-[2px] bg-primary -rotate-45 absolute shadow-sm"></span>
                             </span>
                         )}
                     </button>

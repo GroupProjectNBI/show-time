@@ -1,0 +1,134 @@
+name: Cinema Build and Deploy
+
+on:
+    push:
+        branches: ["feauture/deploy"]
+    pull_request:
+        branches: ["main"]
+        types: [closed]
+
+jobs:
+    build:
+        if: |
+            github.event_name == 'push' || 
+            (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Import Secrets from Vault
+              uses: hashicorp/vault-action@v3
+              with:
+                  url: https://vault.jarllindquist.com
+                  method: approle
+                  roleId: ${{ secrets.VAULT_ROLE_ID }}
+                  secretId: ${{ secrets.VAULT_SECRET_ID }}
+                  secrets: |
+                      kv/data/server-deploy DOCKER_USERNAME | DOCKER_USERNAME ;
+                      kv/data/server-deploy DOCKER_PASSWORD | DOCKER_PASSWORD
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v3
+              with:
+                  username: ${{ env.DOCKER_USERNAME }}
+                  password: ${{ env.DOCKER_PASSWORD }}
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  tags: |
+                      passwordnotsafe/cinema-app:latest
+                      passwordnotsafe/cinema-app:${{ github.sha }}
+
+    deploy:
+        needs: build
+        if: |
+            github.event_name == 'push' || 
+            (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Import Secrets from Vault
+              uses: hashicorp/vault-action@v3
+              with:
+                  url: https://vault.jarllindquist.com
+                  method: approle
+                  roleId: ${{ secrets.VAULT_ROLE_ID }}
+                  secretId: ${{ secrets.VAULT_SECRET_ID }}
+                  secrets: |
+                      kv/data/server-deploy SSH_HOST | SERVER_HOST ;
+                      kv/data/server-deploy SSH_USERNAME | SERVER_USER ;
+                      kv/data/server-deploy SERVER_PORT | SERVER_PORT ;
+                      kv/data/server-deploy SSH_PRIVATE_KEY | SERVER_PRIVATE_KEY ;
+                      kv/data/server-deploy DOCKER_USERNAME | DOCKER_USERNAME ;
+                      kv/data/server-deploy DOCKER_PASSWORD | DOCKER_PASSWORD ;
+                      kv/data/showtime as_production | ASPNETCORE_ENVIRONMENT ;
+                      kv/data/showtime db | DB_NAME ;
+                      kv/data/showtime db_create_tables | DB_CREATE_TABLES ;
+                      kv/data/showtime db_host | DB_HOST ;
+                      kv/data/showtime db_pass | DB_PASS ;
+                      kv/data/showtime db_port | DB_PORT ;
+                      kv/data/showtime db_seed_data | DB_SEED_DATA ;
+                      kv/data/showtime db_user | DB_USER ;
+                      kv/data/showtime debug_on | DEBUG_ON ;
+                      kv/data/showtime frontend_path | FRONTEND_PATH ;
+                      kv/data/showtime port | PORT ;
+                      kv/data/showtime session_lifetime | SESSION_LIFETIME ;
+                      kv/data/showtime aiAccessToken | AI_ACCESS_TOKEN ;
+                      kv/data/showtime smtpServer | SMTP_SERVER ;
+                      kv/data/showtime smtpPort | SMTP_PORT ;
+                      kv/data/showtime emailUsername | EMAIL_USERNAME ;
+                      kv/data/showtime emailPassword | EMAIL_PASSWORD
+
+            - name: Copy docker-compose files to VPS
+              uses: appleboy/scp-action@master
+              with:
+                  host: ${{ env.SERVER_HOST }}
+                  username: ${{ env.SERVER_USER }}
+                  key: ${{ env.SERVER_PRIVATE_KEY }}
+                  port: ${{ env.SERVER_PORT }}
+                  source: "docker-compose.yml,docker-compose.prod.yml"
+                  target: "/home/repos/showtime"
+
+            - name: Execute Deploy Commands
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ env.SERVER_HOST }}
+                  username: ${{ env.SERVER_USER }}
+                  key: ${{ env.SERVER_PRIVATE_KEY }}
+                  port: ${{ env.SERVER_PORT }}
+                  envs: DOCKER_USERNAME,DOCKER_PASSWORD,PORT,FRONTEND_PATH,DB_HOST,DB_PORT,DB_NAME,DB_USER,DB_PASS,DB_CREATE_TABLES,DB_SEED_DATA,DEBUG_ON,SESSION_LIFETIME,ASPNETCORE_ENVIRONMENT,AI_ACCESS_TOKEN,SMTP_SERVER,SMTP_PORT,EMAIL_USERNAME,EMAIL_PASSWORD
+                  script: |
+                      cd /home/repos/showtime
+
+                      echo "DOCKER_USERNAME=passwordnotsafe" > .env
+                      echo "PORT=${PORT}" >> .env
+                      echo "FRONTEND_PATH=${FRONTEND_PATH}" >> .env
+                      echo "DB_HOST=${DB_HOST}" >> .env
+                      echo "DB_PORT=${DB_PORT}" >> .env
+                      echo "DB_NAME=${DB_NAME}" >> .env
+                      echo "DB_USER=${DB_USER}" >> .env
+                      echo "DB_PASS=${DB_PASS}" >> .env
+                      echo "DB_CREATE_TABLES=${DB_CREATE_TABLES}" >> .env
+                      echo "DB_SEED_DATA=${DB_SEED_DATA}" >> .env
+                      echo "DEBUG_ON=${DEBUG_ON}" >> .env
+                      echo "SESSION_LIFETIME=${SESSION_LIFETIME}" >> .env
+                      echo "ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}" >> .env
+                      echo "CONNECTION_STRING=Server=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Uid=${DB_USER};Pwd=${DB_PASS};" >> .env
+
+                      echo "aiAccessToken=${AI_ACCESS_TOKEN}" >> .env
+                      echo "smtpServer=${SMTP_SERVER}" >> .env
+                      echo "smtpPort=${SMTP_PORT}" >> .env
+                      echo "emailUsername=${EMAIL_USERNAME}" >> .env
+                      echo "emailPassword=${EMAIL_PASSWORD}" >> .env
+
+                      echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+                      docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
+                      docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-recreate 
+                      docker image prune -f

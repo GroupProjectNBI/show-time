@@ -5,14 +5,12 @@ import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
 import { formatDate } from "../utils/formatTime";
 import { Filter, ArrowUpDown, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function ScreeningsPage() {
   // --- STATE ---
   const [allScreenings, setAllScreenings] = useState<Screening[]>([]);
   const [loading, setLoading] = useState(true);
-  const { create } = useAuth();
 
   // Datumstate - Börjar på dagens datum
   const [selectedDateISO, setSelectedDateISO] = useState<string>(formatDate(new Date()));
@@ -33,7 +31,7 @@ export default function ScreeningsPage() {
   useEffect(() => {
     async function loadData() {
       // Vi hämtar allt. Filtreringen sköts blixtsnabbt i webbläsaren sen.
-      const url = `/api/v_screenings?orderby=startTime`;
+      const url = `/api/v_screenings?orderby=startTime`; //kan man ändra denna till svensk text?
       const data = await fetchJson(url);
 
       if (data && !data.error) {
@@ -138,12 +136,12 @@ export default function ScreeningsPage() {
   const inputClass = "w-full bg-[#1a1a1a] text-white border border-white/10 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#c0a060] transition-colors appearance-none cursor-pointer";
 
   return (
-    <div className="min-h-screen pt-8 pb-20">
+    <div className="min-h-screen pt-8 pb-0">
       <div className="mx-auto w-[min(1200px,calc(100%-32px))]">
 
         {/* HEADER */}
         <div className="mb-8 border-b border-white/10 pb-6">
-          <h1 className="text-2xl font-semibold text-accent uppercase tracking-widest"><Link to="#" onClick={() => create({})} className="shrink-0">Bioprogram</Link></h1>
+          <h1 className="text-2xl font-semibold text-accent uppercase tracking-widest"><Link to="#" className="shrink-0">Bioprogram</Link></h1>
           <p className="mt-1 text-accent/70 max-w-3xl font-light">
             Hitta rätt film för kvällen. Filtrera på genre, salong eller välj ett specifikt datum.
           </p>
@@ -282,7 +280,7 @@ export default function ScreeningsPage() {
 }
 
 ScreeningsPage.route = {
-  path: "/screenings",
+  path: "/ga-pa-bio",
   menuLabel: "Gå på bio",
   index: 2
 };

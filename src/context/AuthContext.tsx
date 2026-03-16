@@ -21,6 +21,8 @@ interface AuthContextType {
     checkLogin: () => Promise<void>;
     updateAvatar: (avatarId: number) => Promise<boolean>;
     changePassword: (newPassword: string) => void;
+    changeUserName: (value: string, role: string) => void;
+    loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,7 +30,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Rättade stavfel: AutProvider -> AuthProvider
 export function AuthProvider({ children }: { children: ReactNode; }) {
     const [user, setUser] = useState<User | null>(null);
-
+    const [loading, setLoading] = useState(true); // Börja som true! för att hantera väntan på data inhämtning
     // hydrateAvatar "fyller på" användaren med rätt avatar-bild.
     // Användaren har bara ett avatarId sparat i databasen.
     // En extra API-förfrågan görs för att hämta själva bildens URL.
@@ -49,50 +51,57 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
 
     // 3. CheckLogin implementation
     async function checkLogin() {
+        setLoading(true); // Visa att vi kollar
         try {
-            const response = await fetchJson("/api/login");
-            if (response && response.email) {
-                if (response.email) {
-                    const hydrated = await hydrateAvatar(response);
-                    setUser(hydrated);
+            const response = await fetchJson("/api/login"); // Detta är oftast en GET /api/login
 
-                } else {
-                    setUser(null);
-                }
+            if (response && response.email) {
+                const hydrated = await hydrateAvatar(response);
+                setUser(hydrated);
             } else {
                 setUser(null);
             }
         } catch (error) {
             console.error("Login check failed:", error);
             setUser(null);
+        } finally {
+            setLoading(false); // Nu är vi garanterat klara
         }
     }
 
-    // 4. Login implementation
+
     async function login(credentials: any) {
         try {
             const result = await fetchJson("/api/login", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // Använd credentials från anropet. 
                 body: JSON.stringify(credentials)
             });
 
             if (result && result.email) {
-                // Fetch avatar om user object och email i det objektet finns
                 const hydrated = await hydrateAvatar(result);
                 setUser(hydrated);
-                return true; // Returnerar boolean true
+                return true;
             } else {
                 setUser(null);
-                return false; // Returnerar boolean false
+                return false;
             }
-        } catch (error) {
+        } catch (error: any) {
+            // --- HÄR FIXAR VI BUGGEN ---
+            // Om backend säger att vi redan är inloggade (500-felet du fick)
+            if (error.message?.includes("already logged in") || error.status === 500) {
+                console.log("Session finns redan, synkar frontend...");
+                await checkLogin(); // Hämta den existerande sessionen
+                return true; // Vi räknar detta som en lyckad inloggning!
+            }
+
             console.error("Login failed:", error);
             setUser(null);
-            return false; // Returnerar boolean false vid krasch
+            return false;
         }
     }
+
+
 
     // Uppdatera create så den använder inskickad data
     async function create(credentials: any) {
@@ -147,13 +156,27 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         checkLogin();
     }, []);
 
-    //Change password
+    //Change password. denna kan vi ta bort. 
     function changePassword(newPassword: string) {
         console.log("Byter lösenord till:", newPassword);
         //TODO: implementera riktig API-logik
         //exempelvis 
         //await fetchJson("/api/cange-password", {
         // method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({password: newPasswprd})});
+    }
+
+
+    //Change password
+    async function changeUserName(value: string, role: string) {
+        if (!user) return false;
+        console.log("Byter lösenord till:", value);
+        let changeValue;
+        if (role == "name") changeValue = JSON.stringify({ userName: value });
+        else changeValue = JSON.stringify({ email: value });
+
+        await fetchJson(`/api/User/${user.id}`, {
+            method: "PUT", headers: { "Content-Type": "application/json" }, body: changeValue
+        });
     }
 
     const value = {
@@ -163,7 +186,9 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         create,
         checkLogin,
         updateAvatar,
-        changePassword
+        changePassword,
+        changeUserName,
+        loading
     };
 
     // 7. Return flyttad till roten av komponenten!

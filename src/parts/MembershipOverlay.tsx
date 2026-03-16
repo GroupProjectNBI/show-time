@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import fetchJson from "../utils/fetchJson";
-import AvatarSelector from "../parts/AvatarSelector";
+
 type MembershipOverlayProps = {
   onClose: () => void;
 };
@@ -14,6 +14,8 @@ interface Avatar {
 export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
   const { create } = useAuth();
   const [avatars, setAvatars] = useState<Avatar[]>([]);
+  const [avatarIndex, setAvatarIndex] = useState(0);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     userName: "",
@@ -21,38 +23,57 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
     email: "",
     password: "",
     confirmPassword: "",
-    avatarUrl: 3 // Default till tredje avataren för att det blir snyggare design.
+    avatarUrl: 3
   });
+
   const [error, setError] = useState("");
 
-  //Hämta alla avatarer från APIet. 
+  // Hämta avatarer
   useEffect(() => {
     async function getAvatars() {
       try {
-        const data = await fetchJson("/api/Avatar?limit=5");
+        const data = await fetchJson("/api/Avatar?limit=20");
+
         if (Array.isArray(data) && data.length > 0) {
           setAvatars(data);
 
-          // Hitta mitten-indexet dynamiskt baserat på vad vi faktiskt fick hem
           const middleIndex = Math.floor(data.length / 2);
-          setFormData(prev => ({ ...prev, avatarUrl: data[middleIndex].id }));
-        } else if (data.length > 0) {
-          setAvatars(data);
-          setFormData(prev => ({ ...prev, avatarUrl: data[0].id }));
-        }
+          setAvatarIndex(middleIndex);
 
+          setFormData(prev => ({
+            ...prev,
+            avatarUrl: data[middleIndex].id
+          }));
+        }
       } catch (err) {
-        console.error("Kunde inte hänta avatarer", err);
+        console.error("Kunde inte hämta avatarer", err);
       }
     }
     getAvatars();
   }, []);
 
+  // Carousel-funktioner
+  const nextAvatar = () => {
+    if (avatars.length === 0) return;
+    const newIndex = (avatarIndex + 1) % avatars.length;
+    setAvatarIndex(newIndex);
+    setFormData(prev => ({ ...prev, avatarUrl: avatars[newIndex].id }));
+  };
+
+  const prevAvatar = () => {
+    if (avatars.length === 0) return;
+    const newIndex = (avatarIndex - 1 + avatars.length) % avatars.length;
+    setAvatarIndex(newIndex);
+    setFormData(prev => ({ ...prev, avatarUrl: avatars[newIndex].id }));
+  };
+
+  // Form-inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -61,21 +82,18 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
       return;
     }
 
-    setIsSubmitting(true); // Starta loading
+    setIsSubmitting(true);
     setError("");
 
     try {
-      // HÄR ÄR FIXEN: Vi separerar confirmPassword från resten av datan
       const { confirmPassword, ...dataToSubmit } = formData;
-
-      // Vi skickar in det rena "dataToSubmit"-objektet till create-funktionen
       const success = await create(dataToSubmit);
 
       if (success) onClose();
     } catch (err: any) {
       setError(err.message || "Kunde inte skapa konto.");
     } finally {
-      setIsSubmitting(false); // Stoppa loading
+      setIsSubmitting(false);
     }
   };
 
@@ -85,29 +103,71 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
         onSubmit={handleSubmit}
         className="relative w-[90%] max-w-md bg-primary/90 rounded-3xl p-8 shadow-2xl border border-white/10"
       >
-        <button type="button" onClick={onClose} className="absolute top-6 right-6 text-accent text-4xl font-light hover:text-accent/80 transition">
+        {/* Stäng-knapp */}
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-6 right-6 text-accent text-4xl font-light hover:text-accent/80 transition"
+        >
           ×
         </button>
 
-        <h2 className="text-accent text-xl font-bold mb-4 text-center uppercase tracking-widest">Bli medlem</h2>
+        <h2 className="text-accent text-xl font-bold mb-6 text-center uppercase tracking-widest">
+          Bli medlem
+        </h2>
 
-        {/* HÄR ANVÄNDER VI DEN NYA KOMPONENTEN */}
-        <AvatarSelector
-          avatars={avatars}
-          selectedId={formData.avatarUrl}
-          onSelect={(id) => setFormData(prev => ({ ...prev, avatarUrl: id }))}
-        />
+        {/*  AVATAR CAROUSEL  */}
+        {avatars.length > 0 && (
+          <div className="flex flex-col items-center mb-8">
 
+            <div className="flex items-center gap-6">
+
+              {/* Vänster pil */}
+              <button
+                type="button"
+                onClick={prevAvatar}
+                className="text-accent text-4xl font-light hover:text-accent/70 transition"
+              >
+                ‹
+              </button>
+
+              {/* Avatar-bild */}
+              <img
+                src={avatars[avatarIndex]?.url}
+                alt="Vald avatar"
+                className="w-24 h-24 rounded-full border border-white/20 shadow-lg"
+              />
+
+              {/* Höger pil */}
+              <button
+                type="button"
+                onClick={nextAvatar}
+                className="text-accent text-4xl font-light hover:text-accent/70 transition"
+              >
+                ›
+              </button>
+
+            </div>
+
+            <p className="text-accent/60 text-xs mt-2 tracking-wide">
+              Avatar {avatarIndex + 1} av {avatars.length}
+            </p>
+          </div>
+        )}
+
+        {/* Error */}
         {error && (
           <p className="text-red-200 bg-red-500/20 border border-red-500/50 p-2 rounded-lg text-xs text-center mb-4 italic">
             {error}
           </p>
         )}
 
-        {/* INPUTS */}
+        {/* Inputs */}
         <div className="space-y-4">
           <div>
-            <label className="block text-accent text-[10px] mb-1 font-semibold uppercase tracking-widest opacity-70">Användarnamn</label>
+            <label className="block text-accent text-[10px] mb-1 font-semibold uppercase tracking-widest opacity-70">
+              Användarnamn
+            </label>
             <input
               name="userName"
               value={formData.userName}
@@ -120,7 +180,9 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
           </div>
 
           <div>
-            <label className="block text-accent text-[10px] mb-1 font-semibold uppercase tracking-widest opacity-70">E-post</label>
+            <label className="block text-accent text-[10px] mb-1 font-semibold uppercase tracking-widest opacity-70">
+              E-post
+            </label>
             <input
               name="email"
               value={formData.email}
@@ -154,6 +216,7 @@ export default function MembershipOverlay({ onClose }: MembershipOverlayProps) {
           </div>
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
           disabled={isSubmitting}

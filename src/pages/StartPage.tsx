@@ -54,7 +54,7 @@ function StartPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-[#1a1a1a] text-white pb-40 pt-6 relative overflow-x-hidden">
+    <div className="min-h-screen flex flex-col items-center bg-[#1a1a1a] text-white pt-6 relative overflow-x-hidden">
 
       {/* --- BAKGRUNDS-EFFEKT --- */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#680909]/30 via-[#1a1a1a]/80 to-[#1a1a1a] pointer-events-none z-0" />
@@ -83,7 +83,7 @@ function StartPage() {
       </section> */}
 
       {/* KARUSELL-SEKTION */}
-      <section className={`${standardWidth} mx-auto mb-16 z-10`}>
+      <section className={`${standardWidth} mx-auto mb-8 z-10`}>
         {/* 3D Karusell - Visas endast på Desktop (medium skärm och uppåt) */}
         <div className="hidden md:block">
           <MovieCarousel3D popularMovie={popularData} />
@@ -96,7 +96,7 @@ function StartPage() {
       </section>
 
       {/* --- INTERAKTIVT SCHEMA (Sammanslagen design) --- */}
-      <div className={`${standardWidth} mx-auto bg-white/[0.03] backdrop-blur-md rounded-[40px] p-8 md:p-12 shadow-2xl mb-16 border border-white/5 z-10 relative overflow-hidden`}>
+      <div className={`${standardWidth} mx-auto bg-white/[0.03] backdrop-blur-md rounded-[40px] p-8 md:p-12 shadow-2xl mb-8 border border-white/5 z-10 relative overflow-hidden`}>
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#c0a060]/5 to-transparent pointer-events-none" />
 
         <h2 className="text-[#c0a060] text-2xl font-light tracking-[0.2em] mb-10 uppercase border-b border-white/10 pb-4 relative z-20">
@@ -109,7 +109,7 @@ function StartPage() {
             <div key={movie.movieId} className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-black/30 p-6 rounded-2xl border border-white/5 hover:border-[#c0a060]/30 transition-colors">
               <div>
                 <h3 className="text-xl font-normal uppercase tracking-wider text-white">{movie.title}</h3>
-                <p className="text-xs text-[#c0a060]/60 uppercase mt-1 font-bold">Dagens visningar</p>
+
               </div>
 
               {/* Tids-knappar */}
@@ -153,7 +153,7 @@ function StartPage() {
       </div>
 
       {/* ERBJUDANDEN */}
-      <div className={`${standardWidth} mx-auto mb-10 z-10 transition-transform hover:scale-[1.01] duration-500`}>
+      <div className={`${standardWidth} mx-auto mb-2 z-10 transition-transform hover:scale-[1.01] duration-500`}>
         <OfferBanner />
       </div>
     </div>

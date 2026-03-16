@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import fetchJson from "../utils/fetchJson";
 import { formatScreeningDate } from "../utils/formatTime";
+import toast from "react-hot-toast";
 
 import ChangePasswordForm from "../parts/ChangePasswordForm";
 import UpcomingBookingCard from "../parts/UpcomingBookingCard";
@@ -11,6 +12,7 @@ import UsernameField from "../parts/UsernameField";
 import EmailField from "../parts/EmailField";
 import AccountActions from "../parts/AccountActions";
 import ProtectedRoute from "../parts/ProtectedRoute";
+import { formatSeatString } from "../utils/seatCalculator";
 
 interface AvatarItem {
   id: number;
@@ -18,15 +20,15 @@ interface AvatarItem {
 }
 
 export default function MyPage() {
-  const { user, changePassword, logout, updateAvatar } = useAuth();
+  // Vi kombinerar de funktioner vi behöver från AuthContext
+  const { user, changeUserName, logout, updateAvatar } = useAuth();
 
-  // --- STATES ---
-  const [bookings, setBookings] = useState<any[]>([]); // Kommande
-  const [pastBookings, setPastBookings] = useState<any[]>([]); // Historik
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [pastBookings, setPastBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [avatarList, setAvatarList] = useState<AvatarItem[]>([]);
 
-  // 1. --- HÄMTA AVATARER ---
+  // Hämta tillgängliga avatarer
   useEffect(() => {
     async function loadAvatars() {
       try {
@@ -38,48 +40,37 @@ export default function MyPage() {
           setAvatarList(mapped);
         }
       } catch (err) {
-        console.error("Kunde inte hämta avatars:", err);
+        toast.error("Kunde inte ladda profilbilder.");
       }
     }
     loadAvatars();
   }, []);
 
-  // 2. --- HÄMTA OCH FILTRERA BOKNINGAR ---
+  // Hämta användarens bokningar
   useEffect(() => {
     if (!user?.email) return;
 
     const loadBookings = async () => {
       try {
         setLoading(true);
-        const result = await fetchJson(`/api/v_user_bookings`);
+        const result = await fetchJson(`/api/v_user_bookings?where=email=${user.email.toLowerCase()}`);
 
         if (result && !result.error) {
           const now = new Date();
 
-          // 1. Filtrera på användarens e-post
-          const mine = result.filter(
-            (b: any) => b.email?.toLowerCase() === user.email.toLowerCase()
-          );
-
-          // 2. Filtrera fram kommande bokningar (startTime >= nu) och sortera ASC
-          const myUpcoming = mine
+          const myUpcoming = result
             .filter((b: any) => new Date(b.startTime) >= now)
-            .sort((a: any, b: any) =>
-              new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
-            );
+            .sort((a: any, b: any) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
-          // 3. Filtrera fram tidigare bokningar (startTime < nu) och sortera DESC
-          const myPast = mine
+          const myPast = result
             .filter((b: any) => new Date(b.startTime) < now)
-            .sort((a: any, b: any) =>
-              new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
-            );
+            .sort((a: any, b: any) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
 
           setBookings(myUpcoming);
           setPastBookings(myPast);
         }
       } catch (error) {
-        console.error("Kunde inte hämta bokningar:", error);
+        toast.error("Kunde inte hämta dina bokningar.");
       } finally {
         setLoading(false);
       }
@@ -88,13 +79,13 @@ export default function MyPage() {
     loadBookings();
   }, [user?.email]);
 
-  // 3. --- AVBOKA FUNKTION ---
+  // Avboka film
   const handleCancelBooking = async (id: number) => {
     const confirmCancel = window.confirm("Är du säker på att du vill avboka denna film?");
     if (!confirmCancel) return;
 
+    const toastId = toast.loading("Avbokar...");
     try {
-      // Radera biljetter först pga Foreign Key constraints
       const ticketsData = await fetchJson(`/api/Ticket?where=BookingId=${id}`);
 
       if (ticketsData && ticketsData.length > 0) {
@@ -103,74 +94,98 @@ export default function MyPage() {
         }
       }
 
-      // Radera bokningen
       await fetchJson(`/api/Booking/${id}`, { method: "DELETE" });
 
-      // Uppdatera UI: Ta bort från kommande bokningar
       setBookings((prev) => prev.filter((b) => (b.bookingId || b.id) !== id));
-      alert("Bokningen är nu avbokad.");
+      toast.success("Bokningen är nu avbokad.", { id: toastId });
     } catch (error) {
-      console.error("Fel vid avbokning:", error);
-      alert("Kunde inte avboka. Vänligen försök igen.");
+      toast.error("Kunde inte avboka. Vänligen försök igen.", { id: toastId });
+    }
+  };
+
+  // Lösenordsåterställning
+  const handlePasswordReset = async (code: string, newPassword: string) => {
+    if (!user?.email) return;
+
+    const result = await fetchJson("/api/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: user.email,
+        code: code,
+        newPassword: newPassword
+      })
+    });
+
+    if (result && result.success) {
+      return;
+    } else {
+      throw new Error(result?.error || "Ogiltig kod eller tekniskt fel.");
     }
   };
 
   const safeAvatarList: AvatarItem[] = avatarList.length > 0 ? avatarList : [];
 
   return (
-    <div className="max-w-5xl mx-auto mt-32 px-4 pb-20 text-accent">
-      <h1 className="text-4xl font-bold mb-10 text-center">Min sida</h1>
+    <div className="max-w-5xl mx-auto mt-16 px-4 pb-20 text-accent">
+      <h1 className="text-4xl font-bold mb-10 text-center uppercase italic tracking-tighter">Min sida</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        {/* -------- VÄNSTER KOLUMN (Profilinställningar) -------- */}
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+        <div className="space-y-6">
           <UsernameField
             initialValue={user?.userName ?? ""}
-            onSave={(newName) => console.log("Spara nytt namn:", newName)}
+            onSave={async (newName) => {
+              await changeUserName?.(newName, "name");
+              toast.success("Användarnamn uppdaterat!");
+            }}
           />
+
           <EmailField
             initialValue={user?.email ?? ""}
-            onSave={(newEmail) => console.log("Spara ny email:", newEmail)}
+            onSave={(newEmail) => {
+              console.log("Spara ny email:", newEmail);
+              toast.success("E-postadress sparad!");
+            }}
           />
-          <div className="mt-6">
-            <ChangePasswordForm onSubmit={changePassword} />
+
+          <div className="mt-8">
+            <ChangePasswordForm onSubmit={handlePasswordReset} />
           </div>
         </div>
 
-        {/* -------- HÖGER KOLUMN (Avatar) -------- */}
-        <div className="flex justify-center md:justify-end">
+        <div className="flex justify-center md:justify-end md:translate-x-40">
           <AvatarSection
             currentAvatarId={user?.avatarUrl ?? 1}
             avatars={safeAvatarList}
             onChange={async (newId) => {
-              if (updateAvatar) await updateAvatar(newId);
+              if (updateAvatar) {
+                await updateAvatar(newId);
+                toast.success("Profilbild uppdaterad!", { icon: '📸' });
+              }
             }}
           />
         </div>
       </div>
 
-      {/* ---------------- KOMMANDE BOKNINGAR ---------------- */}
-      <h2 className="text-2xl font-semibold mt-16 mb-6">Kommande bokningar</h2>
+      <h2 className="text-2xl font-bold mt-16 mb-6 uppercase italic">Kommande bokningar</h2>
 
       {loading ? (
-        <p className="text-accent/60 mb-6">Laddar dina bokningar...</p>
+        <p className="text-accent/60 mb-6 italic">Laddar dina bokningar...</p>
       ) : bookings.length === 0 ? (
-        <p className="text-accent/60 mb-6">Du har inga kommande bokningar</p>
+        <p className="text-accent/60 mb-6 italic">Du har inga kommande bokningar</p>
       ) : (
         <div className="flex flex-col gap-4 mb-10">
           {bookings.map((booking) => (
             <UpcomingBookingCard
               key={booking.bookingId || booking.id}
               id={booking.bookingId || booking.id}
+              movieId={booking.movieId}
               title={booking.movieTitle}
               dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
-              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={booking.seats || "Information saknas"}
+              seatsLabel={formatSeatString(booking.seats, booking.theaterName)}
               onCancel={handleCancelBooking}
               cancelDisabled={false}
             />
@@ -178,48 +193,44 @@ export default function MyPage() {
         </div>
       )}
 
-      {/* -------- DIVIDER -------- */}
       <div className="my-10 h-px bg-white/10" />
 
-      {/* ---------------- HISTORISKA BOKNINGAR ---------------- */}
-      <h2 className="text-2xl font-semibold mt-0 mb-4">Tidigare bokningar</h2>
-
       {loading ? (
-        <p className="text-accent/60">Laddar historik...</p>
+        <p className="text-accent/60 italic">Laddar historik...</p>
       ) : pastBookings.length === 0 ? (
-        <p className="text-accent/60 mb-6">Du har inga tidigare bokningar</p>
+        <p className="text-accent/60 mb-6 italic">Du har inga tidigare bokningar</p>
       ) : (
-        <div className="flex flex-col gap-4 mb-10">
-          {pastBookings.map((booking) => (
-            <PastBookingCard
-              key={booking.bookingId || booking.id}
-              title={booking.movieTitle}
-              // dateLabel={new Date(booking.startTime).toLocaleDateString("sv-SE", {
-              //   weekday: "short",
-              //   day: "numeric",
-              //   month: "long",
-              //   year: "numeric",
-              // })}
-              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
-              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", {
+        <div className="mb-10">
+          <h2 className="text-2xl font-bold mt-0 mb-4 uppercase italic">Tidigare bokningar</h2>
+          <PastBookingCard
+            bookings={pastBookings.map((booking) => ({
+              id: booking.bookingId || booking.id,
+              title: booking.movieTitle,
+              dateLabel: booking.startTime
+                ? formatScreeningDate(booking.startTime)
+                : "Okänt datum",
+              timeLabel: new Date(booking.startTime).toLocaleTimeString("sv-SE", {
                 hour: "2-digit",
                 minute: "2-digit",
-              })}
-              theaterLabel={booking.theaterName + " salongen"}
-              ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={booking.seats || "Information saknas"}
-              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
+              }),
+              theaterLabel: booking.theaterName + " salongen",
+              ticketsLabel: `${booking.ticketCount || 0} biljetter`,
+              seatsLabel: booking.seats || "Information saknas",
+              seenLabel: `Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
-              })}`}
-            />
-          ))}
+              })}`,
+            }))}
+          />
         </div>
       )}
 
       <div className="mt-12">
-        <AccountActions onLogout={() => void logout()} />
+        <AccountActions onLogout={() => {
+          logout?.();
+          toast("Utloggad. Välkommen åter!", { icon: '👋' });
+        }} />
       </div>
     </div>
   );
