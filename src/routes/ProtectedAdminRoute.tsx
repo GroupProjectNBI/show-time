@@ -1,0 +1,24 @@
+import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
+export default function ProtectedAdminRoute({ children }: { children: JSX.Element; }) {
+  const { user, loading } = useAuth();
+
+  // Vänta tills AuthContext är färdigladdat
+  if (loading) {
+    return null; // eller en spinner om du vill
+  }
+
+  // Inte inloggad → skicka till login
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Inloggad men inte admin → skicka till startsidan
+  if (user.role !== "admin") {
+    return <Navigate to="/" replace />;
+  }
+
+  // Admin → släpp igenom
+  return children;
+}
