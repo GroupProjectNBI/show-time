@@ -63,6 +63,7 @@ export function formatSeatString(
     seatsPerRow: number[],
     baseOffset: number = 0
 ): string {
+
     if (!seatInput) return "Information saknas";
 
     let seatIds: number[] = [];

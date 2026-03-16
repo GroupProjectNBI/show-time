@@ -13,7 +13,8 @@ import EmailField from "../parts/EmailField";
 import AccountActions from "../parts/AccountActions";
 import ProtectedRoute from "../parts/ProtectedRoute";
 import { formatSeatString } from "../utils/seatCalculator";
-
+const STORA_SALONGEN_SEATS = [8, 9, 10, 10, 10, 10, 11, 12];
+const LILLA_SALONGEN_SEATS = [6, 7, 8, 9, 10, 10];
 interface AvatarItem {
   id: number;
   url: string;
@@ -233,7 +234,11 @@ export default function MyPage() {
               timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
               theaterLabel={booking.theaterName + " salongen"}
               ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={formatSeatString(booking.seats, booking.theaterName)}
+              seatsLabel={formatSeatString(
+                booking.seats,
+                booking.theaterName === "Stora" ? STORA_SALONGEN_SEATS : LILLA_SALONGEN_SEATS,
+                booking.theaterName === "Stora" ? 0 : 80
+              )}
               onCancel={handleCancelBooking}
               cancelDisabled={false}
             />
@@ -251,12 +256,12 @@ export default function MyPage() {
         <div className="mb-10">
           <h2 className="text-2xl font-bold mt-0 mb-4 uppercase italic">Tidigare bokningar</h2>
           <PastBookingCard
-            onRateMovie={handleRateMovie} // <-- Länka in funktionen här!
+            onRateMovie={handleRateMovie}
             bookings={pastBookings.map((booking) => ({
               id: booking.bookingId || booking.id,
-              movieId: booking.movieId, // <-- Skicka med movieId!
+              movieId: booking.movieId,
               title: booking.movieTitle,
-              userRating: booking.userRating, // <-- Om ni hämtar betyg från DB, skicka med det här
+              userRating: booking.userRating,
               dateLabel: booking.startTime
                 ? formatScreeningDate(booking.startTime)
                 : "Okänt datum",
@@ -266,7 +271,15 @@ export default function MyPage() {
               }),
               theaterLabel: booking.theaterName + " salongen",
               ticketsLabel: `${booking.ticketCount || 0} biljetter`,
-              seatsLabel: booking.seats || "Information saknas",
+              seatsLabel: booking.seats
+                ? formatSeatString(
+                  booking.seats,
+                  booking.theaterName === "Stora" ? STORA_SALONGEN_SEATS : LILLA_SALONGEN_SEATS,
+                  booking.theaterName === "Stora" ? 0 : 80
+                )
+                : "Information saknas",
+              // ---------------------------------
+
               seenLabel: `Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
                 day: "numeric",
                 month: "long",
