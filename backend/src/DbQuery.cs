@@ -254,7 +254,6 @@ public static class DbQuery
     }
 
     // Run a query - rows are returned as an array of objects
-    // --- 2. METODEN (Den du använder i din kod) ---
     public static Arr SQLQuery(string sql, object parameters = null, HttpContext context = null)
     {
         var paras = parameters == null ? Obj() : Obj(parameters);
@@ -263,7 +262,6 @@ public static class DbQuery
 
         try
         {
-            // FLYTTA IN OPEN HÄR - extremt viktigt för att undvika Unhandled Exception!
             db.Open();
 
             var command = db.CreateCommand();
@@ -271,7 +269,6 @@ public static class DbQuery
             var entries = (Arr)paras.GetEntries();
             entries.ForEach(x => command.Parameters.AddWithValue("@" + x[0], x[1]));
 
-            // ... (din logik för SELECT vs INSERT/UPDATE/DELETE) ...
             if (sql.TrimStart().StartsWith("SELECT ", StringComparison.OrdinalIgnoreCase))
             {
                 using var reader = command.ExecuteReader();
@@ -288,7 +285,6 @@ public static class DbQuery
         }
         catch (Exception err)
         {
-            // Om MySQL-timeout händer, fångas det här och returneras som ett objekt istället för krasch
             Console.WriteLine("SQL ERROR: " + err.Message);
             rows.Push(new { error = err.Message });
         }

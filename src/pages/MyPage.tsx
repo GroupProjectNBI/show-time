@@ -126,6 +126,54 @@ export default function MyPage() {
 
   const safeAvatarList: AvatarItem[] = avatarList.length > 0 ? avatarList : [];
 
+  // Hantera när användaren betygsätter en tidigare sedd film
+  const handleRateMovie = async (bookingId: number, movieId: number, rating: number, description: string) => {    // 1. (Optimistisk uppdatering) Fyll i stjärnorna direkt i gränssnittet
+    // 1. (Optimistisk uppdatering) Fyll i stjärnorna
+    setPastBookings((prev) =>
+      prev.map((b) =>
+        (b.bookingId || b.id) === bookingId ? { ...b, userRating: rating } : b
+      )
+    );
+
+
+
+
+    // 3. TODO: Skicka till din backend när databasen har stöd för det!
+    try {
+      // 2. Skicka datan till databasen
+      const result = await fetchJson("/api/Review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gradingOfStars: rating,
+          // Om användaren inte skrev något, spara null eller en tom sträng
+          description: description.trim() !== "" ? description : "Ingen kommentar",
+          author: user?.userName || user?.email || "Anonym",
+          movieId: movieId
+        })
+      });
+
+      if (result && !result.error) {
+        toast.success(`Du gav filmen ${rating} av 5 stjärnor! 🌟`);
+      } else {
+        throw new Error(result?.error || "Något gick fel vid sparningen.");
+      }
+
+    } catch (error) {
+      console.error("Fel vid sparande av betyg:", error);
+      toast.error("Kunde inte spara betyget.");
+
+      // Ta bort stjärnorna igen om det misslyckades
+      setPastBookings((prev) =>
+        prev.map((b) =>
+          (b.bookingId || b.id) === bookingId ? { ...b, userRating: undefined } : b
+        )
+      );
+    }
+  };
+
+
+
   return (
     <div className="max-w-5xl mx-auto mt-16 px-4 pb-20 text-accent">
       <h1 className="text-4xl font-bold mb-10 text-center uppercase italic tracking-tighter">Min sida</h1>
@@ -195,31 +243,37 @@ export default function MyPage() {
 
       <div className="my-10 h-px bg-white/10" />
 
-      <h2 className="text-2xl font-bold mt-0 mb-4 uppercase italic">Tidigare bokningar</h2>
-
       {loading ? (
         <p className="text-accent/60 italic">Laddar historik...</p>
       ) : pastBookings.length === 0 ? (
         <p className="text-accent/60 mb-6 italic">Du har inga tidigare bokningar</p>
       ) : (
-        <div className="flex flex-col gap-4 mb-10">
-          {pastBookings.map((booking) => (
-            <PastBookingCard
-              key={booking.bookingId || booking.id}
-              movieId={booking.movieId}
-              title={booking.movieTitle}
-              dateLabel={booking.startTime ? formatScreeningDate(booking.startTime) : "Okänt datum"}
-              timeLabel={new Date(booking.startTime).toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
-              theaterLabel={booking.theaterName + " salongen"}
-              ticketsLabel={`${booking.ticketCount || 0} biljetter`}
-              seatsLabel={formatSeatString(booking.seats, booking.theaterName)}
-              seenLabel={`Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
+        <div className="mb-10">
+          <h2 className="text-2xl font-bold mt-0 mb-4 uppercase italic">Tidigare bokningar</h2>
+          <PastBookingCard
+            onRateMovie={handleRateMovie} // <-- Länka in funktionen här!
+            bookings={pastBookings.map((booking) => ({
+              id: booking.bookingId || booking.id,
+              movieId: booking.movieId, // <-- Skicka med movieId!
+              title: booking.movieTitle,
+              userRating: booking.userRating, // <-- Om ni hämtar betyg från DB, skicka med det här
+              dateLabel: booking.startTime
+                ? formatScreeningDate(booking.startTime)
+                : "Okänt datum",
+              timeLabel: new Date(booking.startTime).toLocaleTimeString("sv-SE", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+              theaterLabel: booking.theaterName + " salongen",
+              ticketsLabel: `${booking.ticketCount || 0} biljetter`,
+              seatsLabel: booking.seats || "Information saknas",
+              seenLabel: `Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
-              })}`}
-            />
-          ))}
+              })}`,
+            }))}
+          />
         </div>
       )}
 

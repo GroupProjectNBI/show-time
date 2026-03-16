@@ -39,7 +39,6 @@ jobs:
               with:
                   context: .
                   push: true
-                  # Här använder vi din korrekta image-tag
                   tags: |
                       passwordnotsafe/cinema-app:latest
                       passwordnotsafe/cinema-app:${{ github.sha }}
@@ -79,7 +78,12 @@ jobs:
                       kv/data/showtime debug_on | DEBUG_ON ;
                       kv/data/showtime frontend_path | FRONTEND_PATH ;
                       kv/data/showtime port | PORT ;
-                      kv/data/showtime session_lifetime | SESSION_LIFETIME
+                      kv/data/showtime session_lifetime | SESSION_LIFETIME ;
+                      kv/data/showtime aiAccessToken | AI_ACCESS_TOKEN ;
+                      kv/data/showtime smtpServer | SMTP_SERVER ;
+                      kv/data/showtime smtpPort | SMTP_PORT ;
+                      kv/data/showtime emailUsername | EMAIL_USERNAME ;
+                      kv/data/showtime emailPassword | EMAIL_PASSWORD
 
             - name: Copy docker-compose files to VPS
               uses: appleboy/scp-action@master
@@ -98,12 +102,10 @@ jobs:
                   username: ${{ env.SERVER_USER }}
                   key: ${{ env.SERVER_PRIVATE_KEY }}
                   port: ${{ env.SERVER_PORT }}
-                  # Vi skickar med alla variabler till SSH-sessionen
-                  envs: DOCKER_USERNAME,DOCKER_PASSWORD,PORT,FRONTEND_PATH,DB_HOST,DB_PORT,DB_NAME,DB_USER,DB_PASS,DB_CREATE_TABLES,DB_SEED_DATA,DEBUG_ON,SESSION_LIFETIME,ASPNETCORE_ENVIRONMENT
+                  envs: DOCKER_USERNAME,DOCKER_PASSWORD,PORT,FRONTEND_PATH,DB_HOST,DB_PORT,DB_NAME,DB_USER,DB_PASS,DB_CREATE_TABLES,DB_SEED_DATA,DEBUG_ON,SESSION_LIFETIME,ASPNETCORE_ENVIRONMENT,AI_ACCESS_TOKEN,SMTP_SERVER,SMTP_PORT,EMAIL_USERNAME,EMAIL_PASSWORD
                   script: |
                       cd /home/repos/showtime
 
-                      # Skapa .env-fil så docker-compose har alla värden
                       echo "DOCKER_USERNAME=passwordnotsafe" > .env
                       echo "PORT=${PORT}" >> .env
                       echo "FRONTEND_PATH=${FRONTEND_PATH}" >> .env
@@ -117,16 +119,16 @@ jobs:
                       echo "DEBUG_ON=${DEBUG_ON}" >> .env
                       echo "SESSION_LIFETIME=${SESSION_LIFETIME}" >> .env
                       echo "ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}" >> .env
-                      # LÄGG TILL DENNA RAD:
                       echo "CONNECTION_STRING=Server=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};Uid=${DB_USER};Pwd=${DB_PASS};" >> .env
 
-                      # Logga in och kör
+                      echo "aiAccessToken=${AI_ACCESS_TOKEN}" >> .env
+                      echo "smtpServer=${SMTP_SERVER}" >> .env
+                      echo "smtpPort=${SMTP_PORT}" >> .env
+                      echo "emailUsername=${EMAIL_USERNAME}" >> .env
+                      echo "emailPassword=${EMAIL_PASSWORD}" >> .env
+
                       echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-                      # 1. Hämta den senaste imagen från Docker Hub
                       docker compose -f docker-compose.yml -f docker-compose.prod.yml pull
-
-                      # 2. Tvinga Docker att bygga om containern med de nya filerna
                       docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-recreate 
-
                       docker image prune -f

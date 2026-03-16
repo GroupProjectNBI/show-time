@@ -1,5 +1,5 @@
 using MailKit.Net.Smtp;
-using MailKit.Security; // Glöm inte denna för SecureSocketOptions!
+using MailKit.Security;
 using MimeKit;
 
 namespace WebApp;
@@ -8,15 +8,37 @@ static class EmailService
 {
     public static void SendEmail(string to, string subject, string body)
     {
-        // 1. Hitta filen (Vi behåller din logik men dubbelkolla path!)
-        var configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
-        var configJson = File.ReadAllText(configPath);
-        var config = JSON.Parse(configJson);
-        // Plockar ut konfigurationen från "db-config.json"
-        string smtpServer = config.smtpServer;
-        int smtpPort = Convert.ToInt32(config.smtpPort);
-        string emailUsername = config.emailUsername;
-        string emailPassword = config.emailPassword;
+        // 1. Försök hämta från miljövariabler (Docker/Vault) först
+        string smtpServer = Environment.GetEnvironmentVariable("smtpServer");
+        string smtpPortStr = Environment.GetEnvironmentVariable("smtpPort");
+        string emailUsername = Environment.GetEnvironmentVariable("emailUsername");
+        string emailPassword = Environment.GetEnvironmentVariable("emailPassword");
+
+        // 2. Om de är tomma (lokalt), läs från db-config.json
+        if (string.IsNullOrEmpty(smtpServer) || string.IsNullOrEmpty(emailUsername))
+        {
+            try
+            {
+                var configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
+                if (!File.Exists(configPath)) configPath = "db-config.json";
+                var configJson = File.ReadAllText(configPath);
+                var config = JSON.Parse(configJson);
+
+                // FIX: Vi tvingar värdena till rätt datatyp för att undvika smyg-kraschar!
+                smtpServer = (string)config.smtpServer;
+                smtpPortStr = config.smtpPort?.ToString(); // Porten är ofta en siffra i JSON, konvertera till string
+                emailUsername = (string)config.emailUsername;
+                emailPassword = (string)config.emailPassword;
+            }
+            catch (Exception ex)
+            {
+                // FIX: Nu ser vi det VERKLIGA felet om det kraschar igen!
+                Console.WriteLine($"[EmailService] Varning: Saknar inställningar för SMTP! Fel: {ex.Message}");
+                return;
+            }
+        }
+
+        int smtpPort = Convert.ToInt32(smtpPortStr ?? "587");
 
         var message = new MimeMessage();
         message.From.Add(MailboxAddress.Parse(emailUsername));
@@ -26,12 +48,8 @@ static class EmailService
 
         using (var client = new SmtpClient())
         {
-            // --- FIX 1: Använd StartTls för port 587 ---  SecureSocketOptions.Auto   SecureSocketOptions.StartTls
             client.Connect(smtpServer, smtpPort, SecureSocketOptions.StartTls);
-
-            // --- FIX 2: Autentisera ---
             client.Authenticate(emailUsername, emailPassword);
-
             client.Send(message);
             client.Disconnect(true);
         }
