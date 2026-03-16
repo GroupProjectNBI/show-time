@@ -54,10 +54,6 @@ export default function FAQPage() {
     { q: "Är biografen tillgänglighetsanpassad?", a: "Ja, kontakta oss gärna i förväg om du har särskilda behov." }
   ];
 
-  const categories = [
-    "Biobiljetter", "Tillgänglighet", "Villkor och policies", "På biografen",
-    "Medlemskap", "Övriga frågor", "Program och filmfrågor", "Om Show-Time"
-  ];
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6 py-16 pb-2 text-accent">
