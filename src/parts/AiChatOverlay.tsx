@@ -92,7 +92,7 @@ export default function AiChatOverlay({ onClose }: AiChatOverlayProps) {
 
     const cleanText = textToRead
       .replace(/([*_~`])/g, '')
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '') // Klipper bort Markdown-länkar helt!
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Behåller filmtiteln, men kastar URL:en! // Klipper bort Markdown-länkar helt!
       .replace(/boka biljetter här/gi, '') // Tar specifikt bort denna fras (case insensitive)
       .replace(/klicka här/gi, '') // Tar bort "klicka här"
       .replace(/#/g, '')
