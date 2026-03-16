@@ -1,8 +1,9 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 function AboutPage() {
   const { hash } = useLocation();
+  const navigate = useNavigate();
 
   // Scrolla till hash när sidan laddas
   useEffect(() => {
@@ -113,15 +114,23 @@ function AboutPage() {
                 behov. Slå dig ner och njut av filmen!
               </p>
             </div>
-            {/* Card 3 */}
-            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl transition animate-fadeIn delay-200">
-              <h3 className="text-xl font-semibold mb-4 text-accent">FAQ</h3>
+{/* Card 4: KLICKBART FAQ  */}
+            <div 
+              onClick={() => navigate("/faq")}
+              className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl hover:bg-white/10 hover:border-accent/30 border border-transparent transition-all duration-300 animate-fadeIn delay-200 cursor-pointer group"
+            >
+              <h3 className="text-xl font-semibold mb-4 text-accent group-hover:text-white transition-colors">FAQ</h3>
               <p className="text-accent leading-relaxed">
-                "Välkommen till vår kundservice och FAQ! Här har vi samlat svar på de vanligaste frågorna som dyker upp inför, under och efter ditt biobesök. Vi vet att det kan finnas funderingar kring allt från hur du hämtar ut dina digitala biljetter till vilka regler som gäller för snacks i salongen eller hur våra åldersgränser fungerar.</p>
+                Välkommen till vår kundservice och FAQ! Här har vi samlat svar på de vanligaste frågorna som dyker upp inför, under och efter ditt biobesök. Vi vet att det kan finnas funderingar kring allt från biljetter till regler i salongen.
+              </p>
+              <div className="mt-4 text-[10px] uppercase tracking-widest text-accent/40 font-bold group-hover:text-accent transition-colors">
+                Klicka för att läsa mer →
+              </div>
             </div>
-
           </div>
+          
         </div>
+        
       </section>
 
     </div>

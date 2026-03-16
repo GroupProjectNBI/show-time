@@ -104,17 +104,7 @@ export default function FAQPage() {
         </div>
       </div>
 
-      {/* CATEGORY BUTTONS */}
-      <div className="mb-16">
-        <h2 className="text-2xl font-semibold mb-6">Fler frågor och svar</h2>
-        <div className="flex flex-wrap gap-4">
-          {categories.map((cat, i) => (
-            <button key={i} className="px-5 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition">
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
+
 
       {/* --- CONTACT FORM (Uppdaterad med logik) --- */}
       <div id="kontakt" className="bg-white/5 border border-white/10 rounded-3xl p-8 shadow-xl relative overflow-hidden">
