@@ -36,7 +36,6 @@ public static partial class Session
                         DATE_SUB(NOW(), INTERVAL {hours} HOUR) > modified"
                 );
                 // Om vi vill logga att det lyckades:
-                
             }
             catch (Exception ex)
             {

@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from "react";
 import fetchJson from "../utils/fetchJson";
 
-
 export interface User {
     id: string;
     userName: string;
@@ -11,7 +10,6 @@ export interface User {
     role: string;
     avatar?: string;
 }
-
 
 interface AuthContextType {
     user: User | null;
@@ -31,7 +29,6 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true); 
     
-
     async function hydrateAvatar(u: User): Promise<User> {
         if (!u?.avatarUrl) return u;
         try {
