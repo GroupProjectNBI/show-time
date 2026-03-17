@@ -86,7 +86,7 @@ export default function BookingSnackPanel({
 
             {/* HEADER */}
             <div className="flex items-center justify-between border-b border-white/5 pb-2">
-              <span className="text-[11px] font-extrabold uppercase tracking-widest text-accent/50">
+              <span className="text-[11px] font-extrabold uppercase tracking-widest text-accent">
                 Biljetter
               </span>
               <span className="text-[12px] font-bold text-[#C6A96A]">
