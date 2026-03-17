@@ -15,6 +15,7 @@ import { isValidEmail, normalizeEmail } from "../utils/email";
 import * as signalR from '@microsoft/signalr';
 import { findBestSeats } from "../utils/seatFinder";
 import { calculateSeat } from "../utils/seatCalculator";
+
 export default function BookingPage() {
     const [seatArray, setSeatArray] = useState<Theater[] | null>(null);
     const [screening, setScreening] = useState<Screening | null>(null);
@@ -31,17 +32,12 @@ export default function BookingPage() {
         ticketCount, selectedSnack, email, totalAmount, clearBooking, setSelectedSeats
     } = useBooking();
 
-
     useEffect(() => {
-        // Den här koden körs när man kommer in på sidan
-
         return () => {
-            // Den här "cleanup"-funktionen körs när man LÄMNAR sidan
             clearBooking();
         };
-    }, [clearBooking]); // Vi lyssnar på clearBooking
+    }, [clearBooking]);
 
-    // 1. Hämta statisk data (film, salong, redan sålda stolar)
     useEffect(() => {
         if (!id) return;
         (async () => {
@@ -61,7 +57,6 @@ export default function BookingPage() {
         })();
     }, [id, setOccupied]);
 
-    // 2. SignalR-hantering
     useEffect(() => {
         if (!id) return;
         const numericId = parseInt(id, 10);
@@ -72,7 +67,6 @@ export default function BookingPage() {
             .withAutomaticReconnect()
             .build();
 
-        // Lyssnare (Behåll dessa!)
         newConn.on("SeatLocked", (sid: number) => setRealtimeLockedSeats(p => [...p, sid]));
         newConn.on("SeatUnlocked", (sid: number) => setRealtimeLockedSeats(p => p.filter(s => s !== sid)));
         newConn.on("InitialLocks", (ids: number[]) => {
@@ -95,7 +89,6 @@ export default function BookingPage() {
                     setConnection(newConn);
                 }
             } catch (err: any) {
-                // HÄR TYSTNAR VI REACTS DUBBEL-RENDERING FEL:
                 const isAbort = err.name === 'AbortError' || err.message?.includes('stopped during negotiation');
                 if (!isAbort && isMounted) {
                     console.error("[SignalR] Faktiskt anslutningsfel:", err);
@@ -107,49 +100,39 @@ export default function BookingPage() {
 
         return () => {
             isMounted = false;
-            // Vi kollar state innan vi stoppar för att undvika onödiga loggar
             if (newConn.state !== signalR.HubConnectionState.Disconnected) {
                 newConn.stop();
             }
         };
     }, [id, setOccupied]);
 
-    // 3. Auto-synkning av stolar med servern (Lås & Lås upp)
     useEffect(() => {
         if (connection?.state === signalR.HubConnectionState.Connected && id) {
             const numericId = parseInt(id, 10);
 
-            // Vilka stolar har FÖRSVUNNIT från vår markering? -> Lås upp på servern!
             const removed = prevSelectedSeatsRef.current.filter(sid => !selectedSeats.includes(sid));
             removed.forEach(sid => connection.invoke("UnlockSeat", numericId, sid).catch(console.error));
 
-            // Vilka stolar har TILLKOMMIT i vår markering? -> Lås på servern!
             const added = selectedSeats.filter(sid => !prevSelectedSeatsRef.current.includes(sid));
             added.forEach(sid => connection.invoke("LockSeat", numericId, sid).catch(console.error));
         }
 
-        // Spara den nya listan så vi kan jämföra nästa gång
         prevSelectedSeatsRef.current = selectedSeats;
     }, [selectedSeats, connection, id]);
 
-    // 4. Hantera klick på stol
     const handleRealtimeToggleSeat = (seatId: number) => {
         if (realtimeLockedSeats.includes(seatId)) return alert("Platsen är upptagen!");
-        // Skicka klicket direkt till Context, så sköter vår FIFO-magi resten!
         toggleSeat(seatId);
     };
 
-    // Auto-markera de bästa platserna när antalet biljetter ändras
     useEffect(() => {
         if (!seatArray || seatArray.length === 0 || !screening || ticketCount === 0) return;
 
-        // Vi kör bara auto-väljaren om vi har färre stolar än biljetter
         if (selectedSeats.length < ticketCount) {
             const theater = seatArray[0];
             const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
             const allUnavailable = [...occupiedSeats, ...realtimeLockedSeats];
 
-            // NYTT: Vi tar den senast valda stolen som startpunkt
             const lastSelected = selectedSeats.length > 0
                 ? selectedSeats[selectedSeats.length - 1]
                 : undefined;
@@ -159,7 +142,7 @@ export default function BookingPage() {
                 theater.seatsPerRow,
                 baseIdOffset,
                 allUnavailable,
-                lastSelected // Skicka med ankaren!
+                lastSelected
             );
 
             if (bestSeats.length > 0) {
@@ -168,7 +151,6 @@ export default function BookingPage() {
         }
     }, [ticketCount, seatArray, screening, occupiedSeats, realtimeLockedSeats]);
 
-    // 5. Genomför bokning
     const handleBook = async () => {
         if (ticketCount === 0 || selectedSeats.length !== ticketCount) return alert("Välj rätt antal platser!");
         const cleanedEmail = normalizeEmail(email);
@@ -177,51 +159,89 @@ export default function BookingPage() {
         try {
             const code = generate();
             const res = await fetchJson("/api/Booking", {
-                method: "POST", headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ screeningId: screening?.id, email: cleanedEmail, snack: selectedSnack, bookingRef: code, totalAmount, status: 1 })
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    screeningId: screening?.id,
+                    email: cleanedEmail,
+                    snack: selectedSnack,
+                    bookingRef: code,
+                    totalAmount,
+                    status: 1
+                })
             });
-            if (!res?.insertId) throw new Error("Bokning misslyckades");
 
-            // TODO: När EmailService finns ska cancelLink byggas här och skickas med i bokningsmailet.
+            if (!res?.insertId) throw new Error("Bokning misslyckades");
 
             for (const sId of selectedSeats) {
                 await fetchJson("/api/Ticket", {
-                    method: "POST", headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ bookingId: res.insertId, screeningId: screening?.id, SeatId: sId, TicketType: 1, price: 140 })
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        bookingId: res.insertId,
+                        screeningId: screening?.id,
+                        SeatId: sId,
+                        TicketType: 1,
+                        price: 140
+                    })
                 });
             }
+
+            await fetchJson("/api/send-booking-confirmation", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ bookingId: res.insertId })
+            });
 
             if (connection?.state === signalR.HubConnectionState.Connected) {
                 await connection.invoke("ConfirmBooking", parseInt(id!, 10), selectedSeats);
             }
+
             clearBooking();
             navigate(`/bekraftelse/${code}`);
-        } catch (e) { alert("Något gick fel vid bokningen!"); }
+        } catch (e) {
+            alert("Något gick fel vid bokningen!");
+        }
     };
 
     if (!seatArray || !screening || !movie) return <div className="text-white p-10">Laddar...</div>;
 
     const baseIdOffset = screening.theaterName === "Lilla" ? 81 : 0;
-    // const currentTheater = seatArray[0];
 
     return (
         <div className="min-h-screen bg-[#1a1a1a] p-8 flex flex-col items-center pb-2">
-            <MovieCard title={screening.movieTitle} genre={movie.categories} ageLimit={movie.ageLimit + " +"}
-                dateTimeLabel={formatScreeningDate(screening.startTime)} theaterLabel={screening.theaterName + " Salongen"}
-                posterUrl={`/images/posters/${screening.movieId}.webp`} />
-            <div className="w-full max-w-4xl my-10"><TicketSelector /></div>
+            <MovieCard
+                title={screening.movieTitle}
+                genre={movie.categories}
+                ageLimit={movie.ageLimit + " +"}
+                dateTimeLabel={formatScreeningDate(screening.startTime)}
+                theaterLabel={screening.theaterName + " Salongen"}
+                posterUrl={`/images/posters/${screening.movieId}.webp`}
+            />
+
+            <div className="w-full max-w-4xl my-10">
+                <TicketSelector />
+            </div>
+
             <div className="flex flex-col gap-1 w-full max-w-4xl">
                 {seatArray.map(theater => (
                     <section key={theater.id} className="w-full">
                         {theater.seatsPerRow.map((count, i) => (
-                            <Chairs key={i} numberOfSeats={count} realtimeLockedSeats={realtimeLockedSeats}
+                            <Chairs
+                                key={i}
+                                numberOfSeats={count}
+                                realtimeLockedSeats={realtimeLockedSeats}
                                 previousSeatsCount={theater.seatsPerRow.slice(0, i).reduce((a, b) => a + b, 0) + baseIdOffset}
                                 visualOffset={theater.seatsPerRow.slice(0, i).reduce((a, b) => a + b, 0)}
-                                selectedSeats={selectedSeats} occupiedSeats={occupiedSeats} onToggle={handleRealtimeToggleSeat} />
+                                selectedSeats={selectedSeats}
+                                occupiedSeats={occupiedSeats}
+                                onToggle={handleRealtimeToggleSeat}
+                            />
                         ))}
                     </section>
                 ))}
             </div>
+
             <div className="w-full max-w-4xl my-10">
                 <BookingSnackPanel
                     movieTitle={screening.movieTitle}
@@ -234,11 +254,10 @@ export default function BookingPage() {
                                 seatArray[0].seatsPerRow,
                                 baseIdOffset
                             );
-                            return layout.label; // "Rad X, Stol Y"
+                            return layout.label;
                         })}
                 />
             </div>
-
         </div>
     );
 }
