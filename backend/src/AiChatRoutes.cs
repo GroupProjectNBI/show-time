@@ -1,6 +1,5 @@
 namespace WebApp;
 
-using System.Globalization;
 public static class AiChatRoutes
 {
     private static string aiAccessToken = "";
@@ -79,7 +78,7 @@ public static class AiChatRoutes
 
     private static string GetDynamicMovieContext(string filterDate = null)
     {
-        string sql = "SELECT id, movieTitle, theaterName, startTime, availableSeats, ageLimit FROM v_screenings WHERE startTime >= NOW()";
+        string sql = "SELECT movieTitle, theaterName, startTime, availableSeats, ageLimit FROM v_screenings WHERE startTime >= NOW()";
 
         if (!string.IsNullOrEmpty(filterDate))
         {

@@ -4,30 +4,6 @@ public static class RestApi
 {
     public static void Start()
     {
-        // 1. Hämta alla visningar från vyn (för dropdown-menyn)
-        // App.MapGet("/api/v_screenings", (HttpContext context) =>
-        // {
-        //     var sql = "SELECT * FROM v_screenings";
-        //     return RestResult.Parse(context, SQLQuery(sql, null, context));
-        // });
-
-        // // 2. Ta emot bokningen från formuläret och spara i tabellen Booking
-        // App.MapPost("/api/Booking", (HttpContext context, JsonElement body) =>
-        // {
-        //     // Skapa ett unikt bokningsnummer som krävs i uppgiften
-        //     string bookingNumber = Guid.NewGuid().ToString().Substring(0, 8).ToUpper();
-
-        //     var sql = @"INSERT INTO Booking (bookingNumber, screeningId, userId) 
-        //                 VALUES (@bookingNumber, @screeningId, (SELECT id FROM User LIMIT 1))";
-
-        //     var parameters = new {
-        //         bookingNumber = bookingNumber,
-        //         screeningId = body.GetProperty("screeningId").GetInt32()
-        //     };
-
-        //     return RestResult.Parse(context, SQLQuery(sql, parameters, context));
-        // });
-
         App.MapGet("/api/{table}/{id}", (
             HttpContext context, string table, string id
         ) =>
@@ -57,20 +33,47 @@ public static class RestApi
         {
             try
             {
+                // 1. Hämta bookingId som skickades från handleBook i frontend
                 int bookingId = bodyJson.GetProperty("bookingId").GetInt32();
 
+                // 2. Hämta huvudinfo om bokningen (Film, Tid, E-post)
                 var bookingDetails = SQLQueryOne(@"
                     SELECT *
                     FROM v_user_bookings
                     WHERE id = @id
-                ", new { id = bookingId }, context);
+        ", new { id = bookingId }, context);
 
                 if (bookingDetails == null || bookingDetails.HasKey("error"))
                 {
-                    return RestResult.Parse(context, Obj(new { error = "Bokning hittades inte." }));
+                    return RestResult.Parse(context, Obj(new { error = "Bokningen hittades inte." }));
                 }
 
-                string userEmail = bookingDetails?.email?.ToString() ?? "";
+                // 3. HÄR FIXAR VI STOLARNA: 
+                // Vi hämtar RowNumber och SeatNumber för alla biljetter som tillhör denna bokning
+                var seats = SQLQuery(@"
+                    SELECT s.row AS rowNumber, s.number AS seatNumber 
+                    FROM Ticket t 
+                    JOIN Seat s ON t.seatId = s.id 
+                    WHERE t.bookingId = @id
+                    ORDER BY s.row, s.number
+                ", new { id = bookingId }, context);
+
+                // Formatera listan till en snygg sträng: "Rad 2: Plats 5, 6 | Rad 3: Plats 1"
+                // Vi lägger till (IEnumerable<dynamic>) framför seats
+                var formattedList = ((IEnumerable<dynamic>)seats)
+                .GroupBy(s => s.rowNumber.ToString())
+                .Select(group => $"Rad {group.Key}: Plats {string.Join(", ", group.Select(s => s.seatNumber))}");
+
+                string seatsText = string.Join(" | ", formattedList);
+                // 1. Hämta rådata
+                string rawEmail = bookingDetails?.email?.ToString() ?? "";
+
+                // 2. Tvätta adressen ordentligt (tar bort radbrytningar, tabbar och mellanslag)
+                string userEmail = rawEmail
+                    .Replace("\r", "")
+                    .Replace("\n", "")
+                    .Trim();
+
                 if (string.IsNullOrWhiteSpace(userEmail))
                 {
                     return RestResult.Parse(context, Obj(new { error = "Ingen e-post hittades." }));
@@ -99,11 +102,27 @@ public static class RestApi
                     else snackLabel = bookingDetails.snack.ToString();
                 }
 
-                string seatsText = bookingDetails?.seats?.ToString() ?? "-";
+                // string seatsText = bookingDetails?.seats?.ToString() ?? "-";
                 string ticketCount = bookingDetails?.ticketCount?.ToString() ?? "0";
                 string movieTitle = bookingDetails?.movieTitle?.ToString() ?? "Okänd film";
                 string theaterName = bookingDetails?.theaterName?.ToString() ?? "Okänd salong";
-                string startTime = bookingDetails?.startTime?.ToString() ?? "Okänd tid";
+                // 1. Hämta rådatan från bokningen
+                string rawStartTime = bookingDetails?.startTime?.ToString() ?? "";
+
+                // 2. Omvandla till ett snyggt svenskt format
+                string formattedTime = "Okänd tid";
+                if (!string.IsNullOrEmpty(rawStartTime))
+                {
+                    // Vi parsar strängen till ett DateTime-objekt
+                    DateTime dt = DateTime.Parse(rawStartTime);
+
+                    // Vi formaterar det på svenska: "tisdag 17 mars kl. 21:30"
+                    var culture = new System.Globalization.CultureInfo("sv-SE");
+                    formattedTime = dt.ToString("dddd d MMMM 'kl.' HH:mm", culture);
+
+                    // Gör första bokstaven stor (Tisdag istället för tisdag)
+                    formattedTime = char.ToUpper(formattedTime[0]) + formattedTime.Substring(1);
+                }
                 string totalAmount = bookingDetails?.totalAmount?.ToString() ?? "0";
 
                 string subject = "Din bokningsbekräftelse - Show-Time";
@@ -118,7 +137,7 @@ public static class RestApi
                         <div style='background: #1a1a1a; padding: 20px; border: 1px solid #333; margin-top: 20px; border-radius: 8px;'>
                             <p><strong>Bokningskod:</strong> {bookingRef}</p>
                             <p><strong>Film:</strong> {movieTitle}</p>
-                            <p><strong>Tid:</strong> {startTime}</p>
+                            <p><strong>Tid:</strong> {formattedTime}</p>
                             <p><strong>Salong:</strong> {theaterName}</p>
                             <p><strong>E-post:</strong> {userEmail}</p>
                             <p><strong>Antal biljetter:</strong> {ticketCount} st</p>
@@ -141,7 +160,7 @@ public static class RestApi
                         <p style='font-size: 12px; color: #888; margin-top: 30px;'>Detta är ett automatiskt meddelande från Show-Time Biograf.</p>
                     </div>";
 
-                EmailService.SendEmail(userEmail, subject, bodyHtml);
+                EmailService.SendEmail(subject, bodyHtml, userEmail);
                 Console.WriteLine($"[Booking] Bekräftelse skickad till {userEmail}");
 
                 return RestResult.Parse(context, Obj(new { success = true }));
