@@ -18,35 +18,14 @@ export default function JobsPage() {
     const getJobs = async () => {
       try {
         const result = await fetchJson(`/api/JobPosting`);
-        console.log(result);
         setJobs(result);
       }
       catch (error) {
-        console.error("Kunde inte hämta film:", error);
+        console.error("Kunde inte hämta några jobb:", error);
       }
     };
     getJobs();
   }, []);
-  // const jobs = [
-  //   {
-  //     id: "biografvard",
-  //     title: "Biografvärd",
-  //     location: "Malmö",
-  //     description: "Som biografvärd är du ansiktet utåt...",
-  //   },
-  //   {
-  //     id: "kioskpersonal",
-  //     title: "Kioskpersonal",
-  //     location: "Malmö",
-  //     description: "Arbeta i vårt team och servera snacks...",
-  //   },
-  //   {
-  //     id: "maskinist",
-  //     title: "Maskinist / Tekniker",
-  //     location: "Malmö",
-  //     description: "Ansvarar för tekniken i salongerna...",
-  //   }
-  // ];
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6 py-16 text-accent">

@@ -3,92 +3,92 @@ namespace WebApp;
 public static class DebugLog
 {
     private static readonly Obj memory = new();
+    // 1. Skapa lås-objektet
+    private static readonly object _lock = new();
 
     public static void Start()
     {
         Write();
     }
 
-    // Get the id of a request/context
     private static string GetId(HttpContext context)
     {
-        return context.Items
-            .TryGetValue("id", out object value) ? value + "" : null;
+        return context.Items.TryGetValue("id", out object value) ? value + "" : null;
     }
 
-    // Register a request/context and basic info about it
     public static void Register(HttpContext context)
     {
         if (!Globals.debugOn) { return; }
-        // Mark the request/context with a unique id
         var id = Guid.NewGuid().ToString();
         context.Items["id"] = id;
-        // Add it to memory
-        memory[id] = new
+
+        // 2. Lås när vi skriver till minnet
+        lock (_lock)
         {
-            time = DateTime.Now.ToString("yyyy-MM-dd HH\\:mm\\:ss"),
-            timestamp = Now,
-            timeTakenMs = 0,
-            route = context.Request.Method + " " + context.Request.Path.Value
-        };
+            memory[id] = new
+            {
+                time = DateTime.Now.ToString("yyyy-MM-dd HH\\:mm\\:ss"),
+                timestamp = Now,
+                timeTakenMs = 0,
+                route = context.Request.Method + " " + context.Request.Path.Value
+            };
+        }
     }
 
-    // Allow other classes/middleware to add more info
     public static void Add(HttpContext context, object info)
     {
         if (!Globals.debugOn) { return; }
         var id = GetId(context);
-        if (id == null || memory[id] == null) { return; }
-        memory[id] = Obj(new { ___ = memory[id], ___2 = info });
+
+        // 3. Lås när vi ändrar i minnet
+        lock (_lock)
+        {
+            if (id == null || memory[id] == null) { return; }
+            memory[id] = Obj(new { ___ = memory[id], ___2 = info });
+        }
     }
 
-    // Write to console and clear from memory, when the response
-    // is flagged as done (or after 5000 ms so that memory always clears)
     public static async void Write()
     {
         if (!Globals.debugOn) { return; }
 
         while (true)
         {
-            memory.GetKeys().ForEach(key =>
+            // 4. Lås hela loopen som går igenom nycklarna
+            // Vi gör detta för att ingen ska kunna lägga till/ta bort under tiden vi läser
+            lock (_lock)
             {
-                // 1. Kika så att nyckeln inte är null
-                if (key == null) return;
-
-                var item = memory[key];
-
-                // 2. STOPP! Om item är null, gör ingenting (här skedde kraschen innan)
-                if (item == null) return;
-
-                try
+                memory.GetKeys().ForEach(key =>
                 {
-                    // 3. Nu när vi vet att item finns, kan vi kolla datan säkert
-                    if (item.RESPONSE_DONE != null || item.timestamp + 5000 < Now)
-                    {
-                        if (item.RESPONSE_DONE != null)
-                        {
-                            item.timeTakenMs = item.RESPONSE_DONE - item.timestamp;
-                            item.Delete("RESPONSE_DONE");
-                        }
-                        else
-                        {
-                            item.Delete("timeTaken");
-                        }
+                    if (key == null) return;
+                    var item = memory[key];
+                    if (item == null) return;
 
-                        Log(item);
+                    try
+                    {
+                        if (item.RESPONSE_DONE != null || item.timestamp + 5000 < Now)
+                        {
+                            if (item.RESPONSE_DONE != null)
+                            {
+                                item.timeTakenMs = item.RESPONSE_DONE - item.timestamp;
+                                item.Delete("RESPONSE_DONE");
+                            }
+                            else
+                            {
+                                item.Delete("timeTaken");
+                            }
+
+                            Log(item);
+                            memory.Delete(key);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"[DebugLog Varning] Kunde inte logga rad {key}: {ex.Message}");
                         memory.Delete(key);
                     }
-                }
-                catch (Exception ex)
-                {
-                    // Om det av någon anledning smäller på dynamic-bindningen igen,
-                    // fångar vi felet här så att servern INTE stänger ner sig!
-                    Console.WriteLine($"[DebugLog Varning] Kunde inte logga rad {key}: {ex.Message}");
-
-                    // Vi tar bort det trasiga objektet så vi inte fastnar i en evighetsloop
-                    memory.Delete(key);
-                }
-            });
+                });
+            } // Här släpps låset så att requests kan komma in igen
 
             await Task.Delay(500);
         }
