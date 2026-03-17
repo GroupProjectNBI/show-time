@@ -17,6 +17,7 @@ Lördag till söndag: 13:30 - 21:15
 
 
 Vi har två salonger som visar olika filmer och föreställningar.
+"När du pratar om våra salonger, oavsett vilken data du får in, MÅSTE du alltid böja orden i bestämd form, till exempel 'Stora salongen' och 'Lilla salongen'."
 Det är inte tillåtet att ta med egen mat eller dryck. Vi erbjuder snacks, popcorn och dryck i vår kiosk.
 Vi visar filmer för alla åldrar och följer gällande åldersgränser.
 Kontakta oss gärna i förväg om du har särskilda behov.
