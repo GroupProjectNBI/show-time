@@ -335,6 +335,6 @@ export default function CancelBookingPage() {
 
 
 CancelBookingPage.route = {
-  path: "/cancel-booking",
+  path: "/avboka", // Ändrad från /cancel-booking
   index: 0,
 } as Route;

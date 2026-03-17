@@ -3,11 +3,24 @@ import { useLocation } from "react-router-dom";
 import { useOverlay } from "../context/OverlayContext";
 import fetchJson from "../utils/fetchJson";
 
+type ContactFormData = {
+  name: string;
+  email: string;
+  message: string;
+};
+
+const MAX_LENGTH = {
+  name: 50,
+  email: 100,
+  message: 500,
+} as const;
+
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   // --- NYTT: State för formuläret ---
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formData, setFormData] = useState<ContactFormData>({ name: "", email: "", message: "" });
+  const [errors, setErrors] = useState<Partial<Record<keyof ContactFormData, string>>>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   const { openAiChat } = useOverlay();
@@ -22,9 +35,46 @@ export default function FAQPage() {
     }, 100);
   }, [location.hash]);
 
+  function validate() {
+    const newErrors: Partial<Record<keyof ContactFormData, string>> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required.";
+    } else if (formData.name.length > MAX_LENGTH.name) {
+      newErrors.name = `Name can be max ${MAX_LENGTH.name} characters.`;
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (!formData.email.includes("@")) {
+      newErrors.email = "Enter a valid email address.";
+    } else if (formData.email.length > MAX_LENGTH.email) {
+      newErrors.email = `Email can be max ${MAX_LENGTH.email} characters.`;
+    }
+
+    if (!formData.message.trim()) {
+      newErrors.message = "Message is required.";
+    } else if (formData.message.length > MAX_LENGTH.message) {
+      newErrors.message = `Message can be max ${MAX_LENGTH.message} characters.`;
+    }
+
+    return newErrors;
+  }
+
+
+
+
   // --- NYTT: Hantera skicka-knappen ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      return;
+    }
+
     setStatus("loading");
 
     try {
@@ -35,6 +85,7 @@ export default function FAQPage() {
       });
       setStatus("success");
       setFormData({ name: "", email: "", message: "" }); // Rensa efteråt
+      setErrors({});
     } catch (err) {
       console.error("Kunde inte skicka meddelande:", err);
       setStatus("error");
@@ -54,10 +105,6 @@ export default function FAQPage() {
     { q: "Är biografen tillgänglighetsanpassad?", a: "Ja, kontakta oss gärna i förväg om du har särskilda behov." }
   ];
 
-  const categories = [
-    "Biobiljetter", "Tillgänglighet", "Villkor och policies", "På biografen",
-    "Medlemskap", "Övriga frågor", "Program och filmfrågor", "Om Show-Time"
-  ];
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6 py-16 pb-2 text-accent">
@@ -131,10 +178,16 @@ export default function FAQPage() {
                   required
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData((prev) => ({ ...prev, name: value }));
+                    setErrors((prev) => ({ ...prev, name: "" }));
+                  }}
+                  maxLength={MAX_LENGTH.name}
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-accent focus:outline-none focus:border-accent/50 transition-colors"
                   placeholder="Ditt fullständiga namn"
                 />
+                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
               <div>
                 <label className="block text-accent/60 text-xs uppercase font-bold tracking-widest mb-2 ml-1">Email</label>
@@ -142,10 +195,16 @@ export default function FAQPage() {
                   required
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFormData((prev) => ({ ...prev, email: value }));
+                    setErrors((prev) => ({ ...prev, email: "" }));
+                  }}
+                  maxLength={MAX_LENGTH.email}
                   className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-accent focus:outline-none focus:border-accent/50 transition-colors"
                   placeholder="din.mail@exempel.se"
                 />
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
             </div>
 
@@ -155,10 +214,16 @@ export default function FAQPage() {
                 required
                 rows={4}
                 value={formData.message}
-                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setFormData((prev) => ({ ...prev, message: value }));
+                  setErrors((prev) => ({ ...prev, message: "" }));
+                }}
+                maxLength={MAX_LENGTH.message}
                 className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-accent focus:outline-none focus:border-accent/50 transition-colors resize-none"
                 placeholder="Vad kan vi hjälpa dig med?"
-              ></textarea>
+              />
+              {errors.message && <p className="text-red-500 text-sm mt-1">{errors.message}</p>}
             </div>
 
             {status === "error" && (

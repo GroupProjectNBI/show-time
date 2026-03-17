@@ -5,14 +5,12 @@ import DateDropdown from "../parts/DateDropdown";
 import type { Screening } from "../interfaces/Screenings";
 import { formatDate } from "../utils/formatTime";
 import { Filter, ArrowUpDown, X } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
 export default function ScreeningsPage() {
   // --- STATE ---
   const [allScreenings, setAllScreenings] = useState<Screening[]>([]);
   const [loading, setLoading] = useState(true);
-  const { create } = useAuth();
 
   // Datumstate - Börjar på dagens datum
   const [selectedDateISO, setSelectedDateISO] = useState<string>(formatDate(new Date()));
@@ -32,13 +30,25 @@ export default function ScreeningsPage() {
   // --- HÄMTA DATA (Körs en gång) ---
   useEffect(() => {
     async function loadData() {
-      // Vi hämtar allt. Filtreringen sköts blixtsnabbt i webbläsaren sen.
-      const url = `/api/v_screenings?orderby=startTime`; //kan man ändra denna till svensk text?
+      // Vi hämtar ALLA visningar från databasen, struntar i tidsfiltret i URL:en
+      const url = `/api/v_screenings?orderby=startTime`;
       const data = await fetchJson(url);
 
       if (data && !data.error) {
-        setAllScreenings(data);
+        // Hämta vad klockan är just exakt nu
+        const now = new Date();
+
+        // Sila bort alla visningar som redan har startat!
+        const upcomingScreenings = data.filter((screening: Screening) => {
+          // new Date() här förstår databasens format perfekt
+          const screeningTime = new Date(screening.startTime);
+          return screeningTime > now;
+        });
+
+        // Spara BARA de framtida visningarna i vårt state
+        setAllScreenings(upcomingScreenings);
       }
+
       setLoading(false);
     }
     loadData();
@@ -143,7 +153,7 @@ export default function ScreeningsPage() {
 
         {/* HEADER */}
         <div className="mb-8 border-b border-white/10 pb-6">
-          <h1 className="text-2xl font-semibold text-accent uppercase tracking-widest"><Link to="#" onClick={() => create({})} className="shrink-0">Bioprogram</Link></h1>
+          <h1 className="text-2xl font-semibold text-accent uppercase tracking-widest"><Link to="#" className="shrink-0">Bioprogram</Link></h1>
           <p className="mt-1 text-accent/70 max-w-3xl font-light">
             Hitta rätt film för kvällen. Filtrera på genre, salong eller välj ett specifikt datum.
           </p>
