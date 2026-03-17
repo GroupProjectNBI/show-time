@@ -246,10 +246,7 @@ export default function Header({ openMembership, openLogin }: HeaderProps) {
         className="fixed bottom-8 right-8 z-[60] flex h-14 w-14 items-center justify-center rounded-full bg-accent text-primary shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all hover:scale-110 active:scale-95 group"
         aria-label="Öppna AI Chat"
       >
-        <span className="absolute -top-1 -right-1 flex h-4 w-4">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-white border-2 border-accent"></span>
-        </span>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
