@@ -21,6 +21,7 @@ export default function AdminJobOverlay({ job, onClose, onSaved }: AdminJobOverl
 
     await fetchJson(url, {
       method,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form)
     });
 

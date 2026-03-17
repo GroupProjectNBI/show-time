@@ -80,10 +80,11 @@ export default function JobDetailsPage() {
 
   return (
     <div className="w-full max-w-4xl mx-auto px-6 py-16 text-accent">
-      <h1 className="text-4xl font-bold mb-4">{job.title}</h1>
-      <p className="text-accent/70 mb-6">{job.location}</p>
+      <h1 className="text-4xl font-bold mb-4">{job.Title}</h1>
+      <p className="text-accent/70 mb-6">{job.Location}</p>
 
-      <p className="text-accent/80 mb-10 leading-relaxed">{job.description}</p>
+      <p className="text-accent/80 mb-10 leading-relaxed">{job.Description}</p>
+
 
       <h2 className="text-2xl font-semibold mb-4">Ansök till tjänsten</h2>
 
