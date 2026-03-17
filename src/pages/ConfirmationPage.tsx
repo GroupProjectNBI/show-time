@@ -7,7 +7,6 @@ import { useAuth } from "../context/AuthContext";
 import { calculateSeat } from "../utils/seatCalculator";
 import type { Theater } from "../interfaces/Seats";
 
-
 interface BookingData {
   id: number;
   bookingRef: string;
@@ -83,13 +82,11 @@ export default function ConfirmationPage() {
         setTickets(ticketsResult || []);
 
         
-
         if (screeningResult && screeningResult.length > 0) {
           setScreening(screeningResult[0]);
         } else {
           
         }
-        
         if (screeningResult && screeningResult.length > 0) {
           const theaterName = screeningResult[0].theaterName;
           const tId = theaterName === "Stora" ? 1 : 2;

@@ -20,7 +20,6 @@ export default function AdminDashboard() {
   useEffect(() => {
     const loadStats = async () => {
       // Här kan du senare ersätta med riktiga API-anrop:
-      
 
       setStats({
         totalBookings: 128,
