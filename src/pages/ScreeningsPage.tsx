@@ -30,13 +30,25 @@ export default function ScreeningsPage() {
   // --- HÄMTA DATA (Körs en gång) ---
   useEffect(() => {
     async function loadData() {
-      // Vi hämtar allt. Filtreringen sköts blixtsnabbt i webbläsaren sen.
-      const url = `/api/v_screenings?orderby=startTime`; //kan man ändra denna till svensk text?
+      // Vi hämtar ALLA visningar från databasen, struntar i tidsfiltret i URL:en
+      const url = `/api/v_screenings?orderby=startTime`;
       const data = await fetchJson(url);
 
       if (data && !data.error) {
-        setAllScreenings(data);
+        // Hämta vad klockan är just exakt nu
+        const now = new Date();
+
+        // Sila bort alla visningar som redan har startat!
+        const upcomingScreenings = data.filter((screening: Screening) => {
+          // new Date() här förstår databasens format perfekt
+          const screeningTime = new Date(screening.startTime);
+          return screeningTime > now;
+        });
+
+        // Spara BARA de framtida visningarna i vårt state
+        setAllScreenings(upcomingScreenings);
       }
+
       setLoading(false);
     }
     loadData();
