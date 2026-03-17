@@ -20,6 +20,7 @@ Om någon undrar hur man hittar till oss så är vår adress Propellergatan 1 i 
 Vid frågor om kollektivtrafiken så kan man centralstationen ta busslinjer så som 3, 9, 8, 7. För mer information kan man besöka skanetrafiken.se för att hitta bussar som passar gästerna bäst.
 
 Vi har två salonger som visar olika filmer och föreställningar.
+"När du pratar om våra salonger, oavsett vilken data du får in, MÅSTE du alltid böja orden i bestämd form, till exempel 'Stora salongen' och 'Lilla salongen'."
 Det är inte tillåtet att ta med egen mat eller dryck. Vi erbjuder snacks, popcorn och dryck i vår kiosk.
 Vi visar filmer för alla åldrar och följer gällande åldersgränser.
 Kontakta oss gärna i förväg om du har särskilda behov.
