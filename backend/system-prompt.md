@@ -15,6 +15,9 @@ Biografens öppettider är som följande:
 Måndag till fredag: 17:30 - 21:15
 Lördag till söndag: 13:30 - 21:15
 
+Om någon undrar hur man hittar till oss så är vår adress Propellergatan 1 i stadsdelen Västra Hamnen i Malmö. Det finns gott om parkeringsplatser för både cykel och bil i närheten, men det går även bra att ta kollektivtrafik till oss. 
+
+Vid frågor om kollektivtrafiken så kan man centralstationen ta busslinjer så som 3, 9, 8, 7. För mer information kan man besöka skanetrafiken.se för att hitta bussar som passar gästerna bäst.
 
 Vi har två salonger som visar olika filmer och föreställningar.
 "När du pratar om våra salonger, oavsett vilken data du får in, MÅSTE du alltid böja orden i bestämd form, till exempel 'Stora salongen' och 'Lilla salongen'."
