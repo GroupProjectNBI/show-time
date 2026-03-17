@@ -95,7 +95,6 @@ public static class RestApi
                 {
                     Console.WriteLine("--- Försöker skicka bokningsmail ---");
 
-                    // Kolla FÖRST sessionen (inloggad), om den är tom (gäst), använd email från body:n
                     var sessionUser = Session.Get(context, "user");
                     string userEmail = sessionUser?.email ?? email;
 
@@ -105,42 +104,77 @@ public static class RestApi
                     {
                         try
                         {
-                            // NYTT: hämta bookingRef från body
-                            string bookingRef = body?.bookingRef;
-
-                            // context.Request.Host vet automatiskt om vi är på localhost eller showtime.jarllindquist.com
                             string currentHost = context.Request.Host.Value;
-                            string scheme = context.Request.Scheme; // Blir automatiskt "https" via vår Traefik-proxy!
+                            string scheme = context.Request.Scheme;
 
-                            // Kör vi lokalt? Då vill vi till Vite's utvecklingsserver. Annars bygger vi live-länken.
                             string frontendBaseUrl = currentHost.Contains("localhost")
                                 ? "http://localhost:5173"
                                 : $"{scheme}://{currentHost}";
-                            // Om bookingRef saknas: vi visar ingen avbokningslänk
-                            string cancelLink = !string.IsNullOrWhiteSpace(bookingRef)
-                            ? $"{frontendBaseUrl}/avboka?bookingRef={bookingRef}" // Svenskt ord, men behåller query-parametern
-                            : "";
 
-                            // 2. Förbered HTML-mailet med Show-Time design
+                            var bookingDetails = SQLQueryOne(@"
+                SELECT *
+                FROM v_user_bookings
+                WHERE id = @id
+            ", new { id = (int)result.insertId }, context);
+
+                            string bookingRef = bookingDetails?.bookingRef?.ToString() ?? "";
+
+                            string cancelLink = !string.IsNullOrWhiteSpace(bookingRef)
+                                ? $"{frontendBaseUrl}/avboka?bookingRef={bookingRef}"
+                                : "";
+
+                            string snackLabel = "Ingen meny";
+                            if (bookingDetails?.snack != null)
+                            {
+                                string snack = bookingDetails.snack.ToString().ToLower();
+                                if (snack == "small") snackLabel = "Lilla menyn";
+                                else if (snack == "medium") snackLabel = "Mellan menyn";
+                                else if (snack == "large") snackLabel = "Stora menyn";
+                                else snackLabel = bookingDetails.snack.ToString();
+                            }
+
+                            string seatsText = bookingDetails?.seats?.ToString() ?? "-";
+                            string ticketCount = bookingDetails?.ticketCount?.ToString() ?? "0";
+                            string movieTitle = bookingDetails?.movieTitle?.ToString() ?? "Okänd film";
+                            string theaterName = bookingDetails?.theaterName?.ToString() ?? "Okänd salong";
+                            string startTime = bookingDetails?.startTime?.ToString() ?? "Okänd tid";
+                            string totalAmount = bookingDetails?.totalAmount?.ToString() ?? "0";
+
                             string subject = "Din bokningsbekräftelse - Show-Time";
+
                             string bodyHtml = $@"
-                                <div style='font-family: sans-serif; background-color: #121212; color: white; padding: 30px; border-radius: 10px;'>
-                                    <h1 style='color: #e50914; border-bottom: 2px solid #e50914; padding-bottom: 10px;'>Show-Time Malmö</h1>
-                                    <h2 style='color: #ffcc00;'>Tack för din bokning!</h2>
-                                    <p>Vi har nu tagit emot din bokning. Du hittar alla detaljer och din biljett under <strong>'Min sida'</strong> på webbplatsen.</p>
-                                    {(string.IsNullOrEmpty(cancelLink)
+                <div style='font-family: sans-serif; background-color: #121212; color: white; padding: 30px; border-radius: 10px;'>
+                    <h1 style='color: #e50914; border-bottom: 2px solid #e50914; padding-bottom: 10px;'>Show-Time Malmö</h1>
+                    <h2 style='color: #ffcc00;'>Tack för din bokning!</h2>
+
+                    <p>Vi har nu tagit emot din bokning. Här är dina bokningsdetaljer:</p>
+
+                    <div style='background: #1a1a1a; padding: 20px; border: 1px solid #333; margin-top: 20px; border-radius: 8px;'>
+                        <p><strong>Bokningskod:</strong> {bookingRef}</p>
+                        <p><strong>Film:</strong> {movieTitle}</p>
+                        <p><strong>Tid:</strong> {startTime}</p>
+                        <p><strong>Salong:</strong> {theaterName}</p>
+                        <p><strong>E-post:</strong> {userEmail}</p>
+                        <p><strong>Antal biljetter:</strong> {ticketCount} st</p>
+                        <p><strong>Platser:</strong> {seatsText}</p>
+                        <p><strong>Snacks:</strong> {snackLabel}</p>
+                        <p><strong>Totalt att betala:</strong> {totalAmount} kr</p>
+                    </div>
+
+                    {(string.IsNullOrEmpty(cancelLink)
                                         ? ""
                                         : $@"<p style='margin-top: 18px;'>
-                                                Vill du avboka? Klicka här:
-                                                <a style='color:#ffcc00;' href='{cancelLink}'>Avboka bokning</a>
-                                             </p>")}
-                                    <div style='background: #1a1a1a; padding: 20px; border: 1px dashed #444; margin-top: 20px;'>
-                                        <p style='margin: 0;'>Vi ser fram emot att träffa dig i biosalongen!</p>
-                                    </div>
-                                    <p style='font-size: 12px; color: #888; margin-top: 30px;'>Detta är ett automatiskt meddelande från Show-Time Biograf.</p>
-                                </div>";
+                                Vill du avboka? Klicka här:
+                                <a style='color:#ffcc00;' href='{cancelLink}'>Avboka bokning</a>
+                             </p>")}
 
-                            // 3. Anropa EmailService
+                    <div style='background: #1a1a1a; padding: 20px; border: 1px dashed #444; margin-top: 20px;'>
+                        <p style='margin: 0;'>Vänligen visa upp bokningskoden i kassan. Välkommen till en magisk filmupplevelse!</p>
+                    </div>
+
+                    <p style='font-size: 12px; color: #888; margin-top: 30px;'>Detta är ett automatiskt meddelande från Show-Time Biograf.</p>
+                </div>";
+
                             EmailService.SendEmail(userEmail, subject, bodyHtml);
                             Console.WriteLine($"[Booking] Bekräftelse skickad till {userEmail}");
                         }
