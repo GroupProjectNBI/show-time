@@ -222,18 +222,22 @@ export default function BookingPage() {
                     </section>
                 ))}
             </div>
-            <BookingSnackPanel
-                movieTitle={screening.movieTitle}
-                onBook={handleBook}
-                seatsLabelLines={selectedSeats.map(sId => {
-                    const layout = calculateSeat(
-                        sId,
-                        seatArray[0].seatsPerRow,
-                        baseIdOffset
-                    );
-                    return layout.label; // "Rad X, Stol Y"
-                })}
-            />
+            <div className="w-full max-w-4xl my-10">
+                <BookingSnackPanel
+                    movieTitle={screening.movieTitle}
+                    onBook={handleBook}
+                    seatsLabelLines={[...selectedSeats]
+                        .sort((a, b) => a - b)
+                        .map(sId => {
+                            const layout = calculateSeat(
+                                sId,
+                                seatArray[0].seatsPerRow,
+                                baseIdOffset
+                            );
+                            return layout.label; // "Rad X, Stol Y"
+                        })}
+                />
+            </div>
 
         </div>
     );
