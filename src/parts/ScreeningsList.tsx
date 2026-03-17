@@ -93,8 +93,8 @@ export default function ScreeningsList({ screenings }: Props) {
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={(e) => goToBooking(e, s.id)} className="flex-1 bg-primary py-3 rounded-xl text-xs font-black uppercase text-white">Boka</button>
                       <button onClick={(e) => { e.stopPropagation(); goToMoreInfo(s.movieId); }} className="flex-1 bg-white/5 py-3 rounded-xl text-xs font-bold text-white/70 uppercase tracking-widest">Info</button>
+                      <button onClick={(e) => goToBooking(e, s.id)} className="flex-1 bg-primary py-3 rounded-xl text-xs font-black uppercase text-white">Boka</button>
                     </div>
                   </div>
 
