@@ -51,20 +51,114 @@ public static class RestApi
             return RestResult.Parse(context, SQLQuery(sql, query.parameters, context));
         });
 
+        App.MapPost("/api/send-booking-confirmation", (
+            HttpContext context, JsonElement bodyJson
+        ) =>
+        {
+            try
+            {
+                int bookingId = bodyJson.GetProperty("bookingId").GetInt32();
+
+                var bookingDetails = SQLQueryOne(@"
+                    SELECT *
+                    FROM v_user_bookings
+                    WHERE id = @id
+                ", new { id = bookingId }, context);
+
+                if (bookingDetails == null || bookingDetails.HasKey("error"))
+                {
+                    return RestResult.Parse(context, Obj(new { error = "Bokning hittades inte." }));
+                }
+
+                string userEmail = bookingDetails?.email?.ToString() ?? "";
+                if (string.IsNullOrWhiteSpace(userEmail))
+                {
+                    return RestResult.Parse(context, Obj(new { error = "Ingen e-post hittades." }));
+                }
+
+                string currentHost = context.Request.Host.Value;
+                string scheme = context.Request.Scheme;
+
+                string frontendBaseUrl = currentHost.Contains("localhost")
+                    ? "http://localhost:5173"
+                    : $"{scheme}://{currentHost}";
+
+                string bookingRef = bookingDetails?.bookingRef?.ToString() ?? "";
+
+                string cancelLink = !string.IsNullOrWhiteSpace(bookingRef)
+                    ? $"{frontendBaseUrl}/avboka?bookingRef={bookingRef}"
+                    : "";
+
+                string snackLabel = "Ingen meny";
+                if (bookingDetails?.snack != null)
+                {
+                    string snack = bookingDetails.snack.ToString().ToLower();
+                    if (snack == "small") snackLabel = "Lilla menyn";
+                    else if (snack == "medium") snackLabel = "Mellan menyn";
+                    else if (snack == "large") snackLabel = "Stora menyn";
+                    else snackLabel = bookingDetails.snack.ToString();
+                }
+
+                string seatsText = bookingDetails?.seats?.ToString() ?? "-";
+                string ticketCount = bookingDetails?.ticketCount?.ToString() ?? "0";
+                string movieTitle = bookingDetails?.movieTitle?.ToString() ?? "Okänd film";
+                string theaterName = bookingDetails?.theaterName?.ToString() ?? "Okänd salong";
+                string startTime = bookingDetails?.startTime?.ToString() ?? "Okänd tid";
+                string totalAmount = bookingDetails?.totalAmount?.ToString() ?? "0";
+
+                string subject = "Din bokningsbekräftelse - Show-Time";
+
+                string bodyHtml = $@"
+                    <div style='font-family: sans-serif; background-color: #121212; color: white; padding: 30px; border-radius: 10px;'>
+                        <h1 style='color: #e50914; border-bottom: 2px solid #e50914; padding-bottom: 10px;'>Show-Time Malmö</h1>
+                        <h2 style='color: #ffcc00;'>Tack för din bokning!</h2>
+
+                        <p>Vi har nu tagit emot din bokning. Här är dina bokningsdetaljer:</p>
+
+                        <div style='background: #1a1a1a; padding: 20px; border: 1px solid #333; margin-top: 20px; border-radius: 8px;'>
+                            <p><strong>Bokningskod:</strong> {bookingRef}</p>
+                            <p><strong>Film:</strong> {movieTitle}</p>
+                            <p><strong>Tid:</strong> {startTime}</p>
+                            <p><strong>Salong:</strong> {theaterName}</p>
+                            <p><strong>E-post:</strong> {userEmail}</p>
+                            <p><strong>Antal biljetter:</strong> {ticketCount} st</p>
+                            <p><strong>Platser:</strong> {seatsText}</p>
+                            <p><strong>Snacks:</strong> {snackLabel}</p>
+                            <p><strong>Totalt att betala:</strong> {totalAmount} kr</p>
+                        </div>
+
+                        {(string.IsNullOrEmpty(cancelLink)
+                            ? ""
+                            : $@"<p style='margin-top: 18px;'>
+                                    Vill du avboka? Klicka här:
+                                    <a style='color:#ffcc00;' href='{cancelLink}'>Avboka bokning</a>
+                                 </p>")}
+
+                        <div style='background: #1a1a1a; padding: 20px; border: 1px dashed #444; margin-top: 20px;'>
+                            <p style='margin: 0;'>Vänligen visa upp bokningskoden i kassan. Välkommen till en magisk filmupplevelse!</p>
+                        </div>
+
+                        <p style='font-size: 12px; color: #888; margin-top: 30px;'>Detta är ett automatiskt meddelande från Show-Time Biograf.</p>
+                    </div>";
+
+                EmailService.SendEmail(userEmail, subject, bodyHtml);
+                Console.WriteLine($"[Booking] Bekräftelse skickad till {userEmail}");
+
+                return RestResult.Parse(context, Obj(new { success = true }));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Kunde inte skicka bokningsmail: " + ex.Message);
+                return RestResult.Parse(context, Obj(new { error = ex.Message }));
+            }
+        });
+
         // POST-route för att spara ny data (t.ex. en ny bokning)
         App.MapPost("/api/{table}", (
             HttpContext context, string table, JsonElement bodyJson
         ) =>
         {
             var body = JSON.Parse(bodyJson.ToString());
-
-            // 1. FÅNGA UPP MAILADRESSEN SÄKERT FRÅN REQUESTEN (för gästbokning)
-            string email = "";
-            if (bodyJson.TryGetProperty("email", out var emailElement) && emailElement.ValueKind != JsonValueKind.Null)
-            {
-                email = emailElement.GetString();
-                Console.WriteLine($"💡 Fångade upp email: {email}");
-            }
 
             body.Delete("id");
 
@@ -89,101 +183,6 @@ public static class RestApi
                     @$"SELECT id AS __insertId 
                        FROM {table} ORDER BY id DESC LIMIT 1"
                 ).__insertId;
-
-                // --- LOGIK FÖR BOKNINGSBEKRÄFTELSE (MAIL) ---
-                if (table == "Booking")
-                {
-                    Console.WriteLine("--- Försöker skicka bokningsmail ---");
-
-                    var sessionUser = Session.Get(context, "user");
-                    string userEmail = sessionUser?.email ?? email;
-
-                    Console.WriteLine("Mottagare för bokningsmail: " + (userEmail ?? "INGEN EMAIL HITTAD"));
-
-                    if (!string.IsNullOrEmpty(userEmail))
-                    {
-                        try
-                        {
-                            string currentHost = context.Request.Host.Value;
-                            string scheme = context.Request.Scheme;
-
-                            string frontendBaseUrl = currentHost.Contains("localhost")
-                                ? "http://localhost:5173"
-                                : $"{scheme}://{currentHost}";
-
-                            var bookingDetails = SQLQueryOne(@"
-                SELECT *
-                FROM v_user_bookings
-                WHERE id = @id
-            ", new { id = (int)result.insertId }, context);
-
-                            string bookingRef = bookingDetails?.bookingRef?.ToString() ?? "";
-
-                            string cancelLink = !string.IsNullOrWhiteSpace(bookingRef)
-                                ? $"{frontendBaseUrl}/avboka?bookingRef={bookingRef}"
-                                : "";
-
-                            string snackLabel = "Ingen meny";
-                            if (bookingDetails?.snack != null)
-                            {
-                                string snack = bookingDetails.snack.ToString().ToLower();
-                                if (snack == "small") snackLabel = "Lilla menyn";
-                                else if (snack == "medium") snackLabel = "Mellan menyn";
-                                else if (snack == "large") snackLabel = "Stora menyn";
-                                else snackLabel = bookingDetails.snack.ToString();
-                            }
-
-                            string seatsText = bookingDetails?.seats?.ToString() ?? "-";
-                            string ticketCount = bookingDetails?.ticketCount?.ToString() ?? "0";
-                            string movieTitle = bookingDetails?.movieTitle?.ToString() ?? "Okänd film";
-                            string theaterName = bookingDetails?.theaterName?.ToString() ?? "Okänd salong";
-                            string startTime = bookingDetails?.startTime?.ToString() ?? "Okänd tid";
-                            string totalAmount = bookingDetails?.totalAmount?.ToString() ?? "0";
-
-                            string subject = "Din bokningsbekräftelse - Show-Time";
-
-                            string bodyHtml = $@"
-                <div style='font-family: sans-serif; background-color: #121212; color: white; padding: 30px; border-radius: 10px;'>
-                    <h1 style='color: #e50914; border-bottom: 2px solid #e50914; padding-bottom: 10px;'>Show-Time Malmö</h1>
-                    <h2 style='color: #ffcc00;'>Tack för din bokning!</h2>
-
-                    <p>Vi har nu tagit emot din bokning. Här är dina bokningsdetaljer:</p>
-
-                    <div style='background: #1a1a1a; padding: 20px; border: 1px solid #333; margin-top: 20px; border-radius: 8px;'>
-                        <p><strong>Bokningskod:</strong> {bookingRef}</p>
-                        <p><strong>Film:</strong> {movieTitle}</p>
-                        <p><strong>Tid:</strong> {startTime}</p>
-                        <p><strong>Salong:</strong> {theaterName}</p>
-                        <p><strong>E-post:</strong> {userEmail}</p>
-                        <p><strong>Antal biljetter:</strong> {ticketCount} st</p>
-                        <p><strong>Platser:</strong> {seatsText}</p>
-                        <p><strong>Snacks:</strong> {snackLabel}</p>
-                        <p><strong>Totalt att betala:</strong> {totalAmount} kr</p>
-                    </div>
-
-                    {(string.IsNullOrEmpty(cancelLink)
-                                        ? ""
-                                        : $@"<p style='margin-top: 18px;'>
-                                Vill du avboka? Klicka här:
-                                <a style='color:#ffcc00;' href='{cancelLink}'>Avboka bokning</a>
-                             </p>")}
-
-                    <div style='background: #1a1a1a; padding: 20px; border: 1px dashed #444; margin-top: 20px;'>
-                        <p style='margin: 0;'>Vänligen visa upp bokningskoden i kassan. Välkommen till en magisk filmupplevelse!</p>
-                    </div>
-
-                    <p style='font-size: 12px; color: #888; margin-top: 30px;'>Detta är ett automatiskt meddelande från Show-Time Biograf.</p>
-                </div>";
-
-                            EmailService.SendEmail(userEmail, subject, bodyHtml);
-                            Console.WriteLine($"[Booking] Bekräftelse skickad till {userEmail}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine("Kunde inte skicka mail: " + ex.Message);
-                        }
-                    }
-                }
 
                 // --- LOGIK FÖR NY VISNING (Screening) ---
                 if (table == "Screening")
