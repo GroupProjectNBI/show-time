@@ -15,6 +15,8 @@ import VisitInfoLink from './pages/VisitInfo.tsx';
 import MyPage from './pages/MyPage.tsx';
 import CancelBookingPage from './pages/CancelBookingPage.tsx';
 import AdminPage from './pages/AdminPage.tsx';
+import JobsPage from './pages/JobsPage.tsx';
+import JobDetailsPage from './pages/JobDetailsPage.tsx';
 
 
 
@@ -27,6 +29,8 @@ export default [
   ConfirmationPage,
   CancelBookingPage,
   WorkWithUs,
+  JobsPage,
+  JobDetailsPage,
   StartPage,
   MovieInfo,
   Faq,

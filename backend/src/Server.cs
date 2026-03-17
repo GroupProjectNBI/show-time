@@ -34,6 +34,7 @@ public static class Server
         Middleware();
         PasswordResetHandler.Start();
         DebugLog.Start();
+        Jobbchangelater.Start();
         Acl.Start();
         ErrorHandler.Start();
         FileServer.Start();

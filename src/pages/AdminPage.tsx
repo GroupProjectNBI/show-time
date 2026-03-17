@@ -7,7 +7,7 @@ import AdminUsers from "../parts/admin/AdminUsers";
 import AdminSettings from "../parts/admin/AdminSettings";
 import AdminStaff from "../parts/admin/AdminStaff";
 import AdminSnackMenu from "../parts/admin/AdminSnackMenu";
-
+import AdminJobs from "../parts/admin/AdminJobs";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -42,6 +42,7 @@ export default function AdminPage() {
         <AdminBookings />
         <AdminScreenings />
         <AdminTheaters />
+        <AdminJobs />
         <AdminUsers />
         <AdminSettings />
         <AdminStaff />

@@ -54,4 +54,64 @@ static class EmailService
             client.Disconnect(true);
         }
     }
+    public static void SendEmailWithAttachments(
+    string to,
+    string subject,
+    string body,
+    List<(string FileName, byte[] Data)> attachments
+)
+    {
+        string smtpServer = Environment.GetEnvironmentVariable("smtpServer");
+        string smtpPortStr = Environment.GetEnvironmentVariable("smtpPort");
+        string emailUsername = Environment.GetEnvironmentVariable("emailUsername");
+        string emailPassword = Environment.GetEnvironmentVariable("emailPassword");
+
+        if (string.IsNullOrEmpty(smtpServer) || string.IsNullOrEmpty(emailUsername))
+        {
+            try
+            {
+                var configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
+                if (!File.Exists(configPath)) configPath = "db-config.json";
+                var configJson = File.ReadAllText(configPath);
+                var config = JSON.Parse(configJson);
+
+                smtpServer = (string)config.smtpServer;
+                smtpPortStr = config.smtpPort?.ToString();
+                emailUsername = (string)config.emailUsername;
+                emailPassword = (string)config.emailPassword;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[EmailService] SMTP config error: {ex.Message}");
+                return;
+            }
+        }
+
+        int smtpPort = Convert.ToInt32(smtpPortStr ?? "587");
+
+        var message = new MimeMessage();
+        message.From.Add(MailboxAddress.Parse(emailUsername));
+        message.To.Add(MailboxAddress.Parse(to));
+        message.Subject = subject;
+
+        var builder = new BodyBuilder
+        {
+            HtmlBody = body
+        };
+
+        // Lägg till bilagor
+        foreach (var att in attachments)
+        {
+            builder.Attachments.Add(att.FileName, att.Data);
+        }
+
+        message.Body = builder.ToMessageBody();
+
+        using var client = new SmtpClient();
+        client.Connect(smtpServer, smtpPort, SecureSocketOptions.Auto);
+        // client.Authenticate(emailUsername, emailPassword);
+        client.Send(message);
+        client.Disconnect(true);
+    }
+
 }
