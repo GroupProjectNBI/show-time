@@ -141,7 +141,7 @@ public static class RestApi
                         <p style='font-size: 12px; color: #888; margin-top: 30px;'>Detta är ett automatiskt meddelande från Show-Time Biograf.</p>
                     </div>";
 
-                EmailService.SendEmail(userEmail, subject, bodyHtml);
+                EmailService.SendEmail(subject, bodyHtml, userEmail);
                 Console.WriteLine($"[Booking] Bekräftelse skickad till {userEmail}");
 
                 return RestResult.Parse(context, Obj(new { success = true }));
