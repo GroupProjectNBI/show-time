@@ -27,13 +27,16 @@ export default function JobsPage() {
     getJobs();
   }, []);
 
+
+  
+
+
   return (
     <div className="w-full max-w-6xl mx-auto px-6 py-16 text-accent">
       <h1 className="text-4xl font-bold mb-10">Lediga jobb</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-        {/* Visa laddning om Jobs är null */}
         {!Jobs ? (
           <div className="text-white p-10">Laddar...</div>
         ) : (

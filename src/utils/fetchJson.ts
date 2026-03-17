@@ -58,6 +58,4 @@ export default async function fetchJson(url: string, options = {}) {
 
     // Wait for the browser to unpack/de-serialize the json
     // in the resposne to data we can work with
-    // let data = await response.json();
-
-    // return data;
+    

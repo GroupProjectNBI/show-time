@@ -191,7 +191,6 @@ export default function MyPage() {
           <EmailField
             initialValue={user?.email ?? ""}
             onSave={(newEmail) => {
-              console.log("Spara ny email:", newEmail);
               toast.success("E-postadress sparad!");
             }}
           />

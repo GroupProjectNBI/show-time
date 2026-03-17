@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from "react";
 import fetchJson from "../utils/fetchJson";
 
-// 1. Definiera typer
+
 export interface User {
     id: string;
     userName: string;
@@ -12,7 +12,7 @@ export interface User {
     avatar?: string;
 }
 
-// 2. Definiera Context-innehåll
+
 interface AuthContextType {
     user: User | null;
     login: (credentials: any) => Promise<boolean>;
@@ -27,14 +27,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Rättade stavfel: AutProvider -> AuthProvider
 export function AuthProvider({ children }: { children: ReactNode; }) {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true); // Börja som true! för att hantera väntan på data inhämtning
-    // hydrateAvatar "fyller på" användaren med rätt avatar-bild.
-    // Användaren har bara ett avatarId sparat i databasen.
-    // En extra API-förfrågan görs för att hämta själva bildens URL.
-    // Sedan läggs den in på user-objektet så UI kan visa bilden direkt.
+    const [loading, setLoading] = useState(true); 
+    
 
     async function hydrateAvatar(u: User): Promise<User> {
         if (!u?.avatarUrl) return u;
@@ -49,7 +45,6 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         return u;
     }
 
-    // 3. CheckLogin implementation
     async function checkLogin() {
         setLoading(true); // Visa att vi kollar
         try {
@@ -90,7 +85,6 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
             // --- HÄR FIXAR VI BUGGEN ---
             // Om backend säger att vi redan är inloggade (500-felet du fick)
             if (error.message?.includes("already logged in") || error.status === 500) {
-                console.log("Session finns redan, synkar frontend...");
                 await checkLogin(); // Hämta den existerande sessionen
                 return true; // Vi räknar detta som en lyckad inloggning!
             }
@@ -103,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
 
 
 
-    // Uppdatera create så den använder inskickad data
+    
     async function create(credentials: any) {
         try {
             await fetchJson("/api/User", {
@@ -119,17 +113,13 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         }
     }
 
-    // 5. Placeholder för Logout (Måste finnas för att matcha Interface)
+    
     async function logout() {
-        console.log("Logout inte implementerat än");
         fetchJson("/api/login", { method: 'DELETE' });
         setUser(null);
     }
 
-    // updateAvatar används när användaren byter profilbild.
-    // 1. Nytt avatarId till backend så det sparas i databasen.
-    // 2. När backend är klar uppdaterars det i user Context.
-    // 3. När user ändras renderas hela appen om automatiskt, profilbilden byts direkt utan refresh.
+    
     async function updateAvatar(avatarId: number): Promise<boolean> {
         if (!user) return false;
         try {
@@ -151,25 +141,18 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         }
     }
 
-    // 6. useEffect flyttad till roten av komponenten!
+    
     useEffect(() => {
         checkLogin();
     }, []);
 
-    //Change password. denna kan vi ta bort. 
+     
     function changePassword(newPassword: string) {
-        console.log("Byter lösenord till:", newPassword);
-        //TODO: implementera riktig API-logik
-        //exempelvis 
-        //await fetchJson("/api/cange-password", {
-        // method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({password: newPasswprd})});
     }
 
-
-    //Change password
+    
     async function changeUserName(value: string, role: string) {
         if (!user) return false;
-        console.log("Byter lösenord till:", value);
         let changeValue;
         if (role == "name") changeValue = JSON.stringify({ userName: value });
         else changeValue = JSON.stringify({ email: value });
@@ -191,7 +174,7 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         loading
     };
 
-    // 7. Return flyttad till roten av komponenten!
+    
     return (
         <AuthContext.Provider value={value}>
             {children}
@@ -199,7 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
     );
 }
 
-// Custom hook
+
 export function useAuth() {
     const context = useContext(AuthContext);
     if (context === undefined) {
