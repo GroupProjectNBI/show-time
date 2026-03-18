@@ -190,9 +190,6 @@ export default function MyPage() {
 
           <EmailField
             initialValue={user?.email ?? ""}
-            onSave={(newEmail) => {
-              toast.success("E-postadress sparad!");
-            }}
           />
 
           <div className="mt-8">
