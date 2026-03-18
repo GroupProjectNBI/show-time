@@ -40,7 +40,7 @@ public static class PasswordResetHandler
             try
             {
                 // Skickas till: bioMail (ni), Ämne: subject, Innehåll: htmlBody
-                EmailService.SendEmail(bioMail, subject, htmlBody);
+                EmailService.SendEmail(subject, htmlBody, bioMail);
                 return RestResult.Parse(context, new { success = true, message = "Mail skickat till systemet!" });
             }
             catch (Exception ex)
