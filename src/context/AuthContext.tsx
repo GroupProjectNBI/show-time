@@ -27,8 +27,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode; }) {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true); 
-    
+    const [loading, setLoading] = useState(true);
+
     async function hydrateAvatar(u: User): Promise<User> {
         if (!u?.avatarUrl) return u;
         try {
@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
 
 
 
-    
+
     async function create(credentials: any) {
         try {
             await fetchJson("/api/User", {
@@ -110,13 +110,13 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         }
     }
 
-    
+
     async function logout() {
         fetchJson("/api/login", { method: 'DELETE' });
         setUser(null);
     }
 
-    
+
     async function updateAvatar(avatarId: number): Promise<boolean> {
         if (!user) return false;
         try {
@@ -138,16 +138,17 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         }
     }
 
-    
+
     useEffect(() => {
         checkLogin();
     }, []);
 
-     
+
     function changePassword(newPassword: string) {
+        return newPassword;
     }
 
-    
+
     async function changeUserName(value: string, role: string) {
         if (!user) return false;
         let changeValue;
@@ -171,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
         loading
     };
 
-    
+
     return (
         <AuthContext.Provider value={value}>
             {children}
