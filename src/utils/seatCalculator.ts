@@ -1,4 +1,3 @@
-// Din fallback-konfiguration (Säkerhetsnätet)
 const FALLBACK_CONFIG: Record<string, { seatsPerRow: number[], baseOffset: number }> = {
     "Stora": {
         seatsPerRow: [8, 9, 10, 10, 10, 10, 11, 12],
@@ -10,15 +9,37 @@ const FALLBACK_CONFIG: Record<string, { seatsPerRow: number[], baseOffset: numbe
     }
 };
 
+/**
+ * calculateSeat kan nu anropas på två sätt:
+ * 1. (id, "Stora", [8,9...]) -> Använder namnet för offset, och arrayen för layout.
+ * 2. (id, [8,9...], 0)      -> Använder arrayen direkt med en manuell offset.
+ */
 export function calculateSeat(
     seatId: number,
-    theaterName: string,
-    dbSeatsPerRow?: number[] // Valfri: Om vi har data från databasen använder vi den
+    theaterNameOrLayout: string | number[],
+    layoutOrOffset?: number[] | number
 ) {
-    // 1. Välj layout: Använd db-data om den finns, annars fallback
-    const fallback = FALLBACK_CONFIG[theaterName] || FALLBACK_CONFIG["Stora"];
-    const seatsPerRow = dbSeatsPerRow || fallback.seatsPerRow;
-    const baseOffset = fallback.baseOffset;
+    let seatsPerRow: number[] = [];
+    let baseOffset = 0;
+
+    // SCENARIO A: Andra argumentet är ett namn ("Stora" / "Lilla")
+    if (typeof theaterNameOrLayout === "string") {
+        const config = FALLBACK_CONFIG[theaterNameOrLayout] || FALLBACK_CONFIG["Stora"];
+        baseOffset = config.baseOffset;
+
+        // Om tredje argumentet är en array, använd den. Annars använd fallback.
+        if (Array.isArray(layoutOrOffset)) {
+            seatsPerRow = layoutOrOffset;
+        } else {
+            seatsPerRow = config.seatsPerRow;
+        }
+    }
+    // SCENARIO B: Andra argumentet är en array direkt [8,9,10...]
+    else {
+        seatsPerRow = theaterNameOrLayout;
+        // Om tredje argumentet är ett nummer, använd det som offset.
+        baseOffset = typeof layoutOrOffset === "number" ? layoutOrOffset : 0;
+    }
 
     const localId = seatId - baseOffset;
     let currentCount = 0;
@@ -40,7 +61,6 @@ export function calculateSeat(
         currentCount = rowLimit;
     }
 
-    // Sista utvägen om stolen ligger utanför alla rader
     return { row: 0, seat: 0, label: `Stol ${seatId}` };
 }
 
@@ -66,6 +86,8 @@ export function formatSeatString(
     }
 
     return seatIds
+        .sort((a, b) => a - b)
+        // Nu matchar detta calculateSeat perfekt!
         .map(id => calculateSeat(id, theaterName, dbSeatsPerRow).label)
         .join("; ");
 }
