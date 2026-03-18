@@ -2,7 +2,6 @@
 
 interface EmailFieldProps {
   initialValue: string;
-  onSave: (newEmail: string) => void;
 }
 
 export default function EmailField({ initialValue }: EmailFieldProps) {
@@ -26,7 +25,7 @@ export default function EmailField({ initialValue }: EmailFieldProps) {
             opacity-100"
           opacity-60="cursor-not-allowed" />
 
-        
+
       </div>
     </div>
 

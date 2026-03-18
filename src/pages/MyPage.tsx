@@ -190,9 +190,6 @@ export default function MyPage() {
 
           <EmailField
             initialValue={user?.email ?? ""}
-            onSave={(newEmail) => {
-              toast.success("E-postadress sparad!");
-            }}
           />
 
           <div className="mt-8">
@@ -265,7 +262,7 @@ export default function MyPage() {
               }),
               theaterLabel: booking.theaterName + " salongen",
               ticketsLabel: `${booking.ticketCount || 0} biljetter`,
-              seatsLabel: booking.seats || "Information saknas",
+              seatsLabel: formatSeatString(booking.seats, booking.theaterName),
               seenLabel: `Sågs ${new Date(booking.startTime).toLocaleDateString("sv-SE", {
                 day: "numeric",
                 month: "long",
