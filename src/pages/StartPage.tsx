@@ -41,7 +41,7 @@ function StartPage() {
   const handleBooking = () => {
     if (selectedScreening) {
       // Navigera till bokningen med valt screeningId
-      navigate(`/booking/${selectedScreening.screeningId}`);
+      navigate(`/bokning/${selectedScreening.screeningId}`);
     }
   };
 
