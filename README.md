@@ -7,7 +7,17 @@
 * [Cecilia (@ceccav)](https://github.com/ceccav)
 * [Zhaneta (@Zhaneta-Lecini)](https://github.com/Zhaneta-Lecini)
 
-Ett komplett och modernt bokningssystem för en biograf. Projektet hanterar allt från dynamisk schemaläggning av filmer och sätesbokning, till AI-drivna filmtips och automatiska e-postbekräftelser.
+Ett komplett och modernt bokningssystem för en biograf som en del av grupparbetet i kursen Datadrivna Applikationer. Projektet hanterar allt från dynamisk schemaläggning av filmer och sätesbokning, till AI-drivna filmtips och automatiska e-postbekräftelser.
+
+## Dokumentation
+
+Utöver README filen innehåller projektet ytterligare dokumentation allt samlat i mappen "documents".
+
+* TECHDEBT - rapport för den tekniska skuld som gruppen upplever att vi haft under arbetets gång.
+
+* README-DYNDATA 
+
+
 
 ---
 
@@ -46,15 +56,33 @@ För att köra detta projekt lokalt behöver du ha följande installerat:
 
 Om du vill köra alla delar separat på din maskin:
 
-### 1. Databasen 
+### 1. Databasen
 1. Skapa en lokal MySQL-databas.
-2. Importera dump-filen: `mysql -u root -p din_databas < setup.sql`
-3. **Viktigt:** Se till att event scheduler är igång i din databas för att auto-schemaläggningen ska fungera:
-   ```sql
-   SET GLOBAL event_scheduler = ON;
-
-   2. Mailpit (E-post)
-Ladda ner och starta Mailpit. Den kommer att lyssna på port 1025 för inkommande mail och visa en webbinkorg på http://localhost:8025.
+2. Sätt upp projektet: Beroende på om du kör docker eller lokalt så sätter du upp det olika.
+ 
+Lokalt:
+Skapa/kopiera filen db-config.json och fyll i dina uppgifter till databsen , email och AI-tjänst.
+ 
+{
+    "host": "xxxxxxx",
+    "port": ,
+    "username": "xxx",
+    "password": "xxxxx",
+    "database": "xxxx",
+    "createTablesIfNotExist": true,
+    "seedDataIfEmpty": true,
+    "aiAccessToken": "xxxxx",  
+    "smtpServer": "",
+    "smtpPort": ,
+    "emailUsername": "",
+    "emailPassword": ""
+}
+ 
+Vid användande av MailPit istället för gmail så behöver du en extra nyckel:
+ 
+useMailPit: true
+ 
+Vid start av projektet sker uppkopplingen och hämtningen av data per automatik. Förutsatt att projektet satts upp korrekt.
 
 ###  3. Backend (C#)
 Gå till backend-mappen: cd backend
@@ -240,3 +268,12 @@ Vår pipeline är designad för säker och smidig continuous delivery till vår 
 Varför krockar aldrig våra filmer?
 Systemet använder ett noga uträknat SQL-event. Istället för att manuellt lägga in filmer, har vi en "Golden Week" inskriven i databasen. Eventet använder en WHERE NOT EXISTS-koll samt kontrollerar tiden med logiken (startTime + duration + 30 minuter buffer) för att säkerställa att personalen hinner städa salongen innan nästa film börjar!
 
+## Planerat men ej genomfört arbete
+
+Refaktorera systemet ur ett säkerhetsperspektiv, för att kunna uppfylla de krav som kommer med lagar och förordningar som exempelvis GDPR, NIST2 med flera. Men också för att stärka upp våra sårbarheter mot eventuella cyber attacker.
+
+Gruppen har planerat och påbörjat en fullt utvecklad admin sida för att kunna hantera admin-funtkioner så som: Att lägga till och justera visningstider för en film, justera priser för snacks, hantera bokningar, ta bort användarkonton på begäran, skapa och hantera åtkomster för admin-konton.
+
+Vidareutvecklingen därifrån är implementationen av en funktion som gör det möjligt att skapa/hantera olika typer av event genom admin sidan, ett exempel på ett event skulle kunna vara: ''Scary Tuesdays'' där värden lägger ihop film, salong, snacks och tider i ett event som kan ske en eller upprepade gånger. 
+
+Det finns även en idé om att utefter säsong/ högtid kunna ändra utseendet på hela applikationen. Snöflingor och julfilmer i december, sommarklassiker för regniga dagar med flera. 
