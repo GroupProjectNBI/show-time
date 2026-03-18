@@ -1,4 +1,5 @@
 namespace WebApp;
+
 public static class LoginRoutes
 {
     private static Obj GetUser(HttpContext context)
@@ -22,14 +23,14 @@ public static class LoginRoutes
 
             // Find the user in the DB
             var dbUser = SQLQueryOne(
-                "SELECT * FROM users WHERE email = @email",
+                "SELECT * FROM User  WHERE email = @email",
                 new { body.email }
             );
             if (dbUser == null)
             {
                 return RestResult.Parse(context, new { error = "No such user." });
             }
-
+            // nyaste i desktop , äldre i mobil. 
             // If the password doesn't match
             if (!Password.Verify(
                 (string)body.password,
@@ -51,8 +52,12 @@ public static class LoginRoutes
         App.MapGet("/api/login", (HttpContext context) =>
         {
             var user = GetUser(context);
-            return RestResult.Parse(context, user != null ?
-                user : new { error = "No user is logged in." });
+            if (user == null)
+            {
+                // Returnera en tom lista eller ett "anonymt" objekt med status 200
+                return Results.Json(new { loggedIn = false });
+            }
+            return RestResult.Parse(context, user);
         });
 
         App.MapDelete("/api/login", (HttpContext context) =>

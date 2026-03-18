@@ -1,4 +1,5 @@
 namespace WebApp;
+
 public static class RequestBodyParser
 {
     public static dynamic ReqBodyParse(string table, Obj body)
@@ -9,6 +10,30 @@ public static class RequestBodyParser
         var cleaned = Obj();
         body.GetKeys().ForEach(key
             => cleaned[key] = ((object)(body[key])).TryToNumber());
+
+        //Email validation for booking
+        if (table == "Booking")
+        {
+            //Email has to exist and be of type string
+            if (!cleaned.HasKey("email") || cleaned.email is not string)
+            {
+                return Obj(new { error = "Invalid email" });
+            }
+
+            var email = ((string)cleaned.email).Trim().ToLowerInvariant();
+
+            if (!email.IsValidEmail())
+            {
+                return Obj(new
+                {
+                    error = "Invalid email"
+                });
+            }
+
+            //save normalized email
+            cleaned.email = email;
+        }
+
         // Always encrypt fields named "password"
         if (cleaned.HasKey("password"))
         {

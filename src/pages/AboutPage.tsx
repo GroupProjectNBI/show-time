@@ -1,33 +1,147 @@
-import { Row, Col } from 'react-bootstrap';
-import Image from '../parts/Image';
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
+function AboutPage() {
+  const { hash } = useLocation();
+  const navigate = useNavigate();
+
+  // Scrolla till hash när sidan laddas
+  useEffect(() => {
+    if (hash) {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  }, [hash]);
+
+  return (
+    <div className="about-page">
+
+      {/* HERO SECTION */}
+      <section className="relative h-[45vh] md:h-[80vh] w-full overflow-hidden rounded-2xl -mb-10">
+        <img
+          src="/images/Commercials/biografhus.png"
+          alt="Biograf"
+          className="absolute inset-0 w-full h-full object-cover scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/20" />
+
+        <div className="relative z-10 flex flex-col justify-end h-full px-6 max-w-6xl mx-auto pb-12">
+          <h1 className="text-4xl md:text-5xl font-bold text-white/75 drop-shadow-lg animate-fadeIn">
+            Om oss
+          </h1>
+          <p className="text-lg md:text-xl text-white/75 mt-2 animate-fadeIn delay-150">
+            En premium bioupplevelse i hjärtat av Malmö
+          </p>
+        </div>
+      </section>
+
+      {/* ABOUT SECTION */}
+      <section className="w-full max-w-6xl mx-auto px-6 py-20">
+        <div className="max-w-3xl space-y-8 leading-relaxed text-accent text-lg animate-fadeIn">
+          <p className="text-xl md:text-2xl font-semibold text-accent">
+            Välkommen till vår biograf - en lokal mötesplats för filmälskare.
+          </p>
+
+          <p>
+            Vi är en småskalig biograf med två salonger, där fokus ligger på filmupplevelsen,
+            gemenskapen och närheten till vår publik.
+          </p>
+
+          <p>
+            Hos oss kan du se allt från aktuella storfilmer till utvalda visningar i en lugn och
+            personlig miljö. Tack vare våra två salonger kan vi erbjuda variation i programmet och
+            skapa en bioupplevelse som passar både familjer, vänner och ensamma biobesökare.
+          </p>
+
+          <p>
+            Som lokal biograf vill vi vara en del av området och bidra till kulturlivet. För oss
+            handlar bio inte bara om film - det handlar om upplevelser som delas tillsammans.
+          </p>
+        </div>
+      </section>
+
+      {/* CINEMATIC IMAGE */}
+      <section className="px-6 md:px-10 pb-20">
+        <div className="max-w-6xl mx-auto overflow-hidden rounded-2xl shadow-2xl animate-fadeIn">
+          <img
+            src="/images/Commercials/salong1.png"
+            alt="Biograf"
+            className="w-full h-[350px] md:h-[550px] object-cover hover:scale-[1.05] transition-transform duration-700"
+          />
+        </div>
+      </section>
+
+      {/* INFÖR BESÖKET */}
+      <section
+        id="infor-besoket"
+        className="scroll-mt-[100px] bg-surface-light py-15 px-6"
+      >
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-semibold text-accent mb-12 animate-fadeIn">
+            Inför ditt biografbesök
+          </h2>
+
+          {/* CARD LAYOUT */}
+          <div className="grid md:grid-cols-3 gap-8">
+
+            {/* Card 1 */}
+            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl transition animate-fadeIn">
+              <h3 className="text-xl font-semibold mb-4 text-accent">Innan filmen</h3>
+              <p className="text-accent leading-relaxed">
+                Välkommen till vår biograf! Vi rekommenderar att du är på plats minst 1 timme
+                före filmens start för att hämta ut dina biljetter. Har du redan hämtat dina biljetter? Då räcker det med 15 minuter innan för att i lugn och ro ta plats och köpa popcorn
+                vår kiosk.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl transition animate-fadeIn delay-100">
+              <h3 className="text-xl font-semibold mb-4 text-accent">Biljetter & betalning</h3>
+              <p className="text-accent leading-relaxed">
+                Biljetter reserveras smidigast här på vår hemsida men finns det biljetter kvar kan biljetter även köpas i kassan på plats. All betalning sker på plats, för att behålla era reserverade biljetter behöver ni hämta ut dom innan dess att det är 1 timme kvar innan filmstart.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl transition animate-fadeIn delay-200">
+              <h3 className="text-xl font-semibold mb-4 text-accent">Regler & trivsel</h3>
+              <p className="text-accent leading-relaxed">
+                Vår biograf följer Statens medieråds åldersgränser och att barn endast får se filmer som är godkända för deras ålder.
+                Vi ber er stänga av mobilen under filmen. Fotografering och filmning är inte tillåtet.
+                Biografen är tillgänglighetsanpassad — kontakta oss gärna i förväg vid särskilda
+                behov. Slå dig ner och njut av filmen!
+              </p>
+            </div>
+{/* Card 4: KLICKBART FAQ  */}
+            <div 
+              onClick={() => navigate("/faq")}
+              className="bg-white/5 backdrop-blur-sm p-6 rounded-xl shadow-md hover:shadow-xl hover:bg-white/10 hover:border-accent/30 border border-transparent transition-all duration-300 animate-fadeIn delay-200 cursor-pointer group"
+            >
+              <h3 className="text-xl font-semibold mb-4 text-accent group-hover:text-white transition-colors">FAQ</h3>
+              <p className="text-accent leading-relaxed">
+                Välkommen till vår kundservice och FAQ! Här har vi samlat svar på de vanligaste frågorna som dyker upp inför, under och efter ditt biobesök. Vi vet att det kan finnas funderingar kring allt från biljetter till regler i salongen.
+              </p>
+              <div className="mt-4 text-[10px] uppercase tracking-widest text-accent/40 font-bold group-hover:text-accent transition-colors">
+                Klicka för att läsa mer →
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+      </section>
+
+    </div>
+  );
+}
+
+/* ROUTE-DEFINITIONEN */
 AboutPage.route = {
-  path: '/about-us',
-  menuLabel: 'About us',
-  index: 2
+  path: "/om-oss",
+  //menuLabel: "Om oss",
+  index: 3
 };
 
-export default function AboutPage() {
-  return <>
-    <Row>
-      <Col>
-        <h2 className="text-primary">About us</h2>
-        <Image
-          src="/images/us.jpg"
-          alt="A group photo of our employees."
-        />
-      </Col>
-    </Row>
-    <Row>
-      <Col md={6}>
-        <p>Founded in 2018 in the heart of Oslo, The Good Grocery began as a simple dream: bringing the finest quality ingredients to our community. What started as a small family business has grown into a trusted source for fresh, organic, and carefully curated products.</p>
-        <p>Our commitment goes beyond just selling groceries. We believe in supporting local farmers, choosing sustainable practices, and creating connections between our customers and the stories behind their food. Every product on our shelves is selected with care, ensuring both exceptional quality and responsible sourcing.</p>
-      </Col>
-      <Col md={6}>
-        <p>Today, we serve hundreds of families who share our passion for good food and conscious living. Our team works tirelessly to maintain the personal touch that makes grocery shopping a pleasure, not a chore.</p>
-        <p>We source directly from organic farms across Norway and Europe, building relationships that ensure freshness and fair practices. From our hand-picked produce to our artisanal bread selection, every item reflects our dedication to excellence.</p>
-        <p>Whether you're planning a simple weeknight dinner or hosting a special celebration, we're here to provide ingredients that make every meal memorable and meaningful.</p>
-      </Col>
-    </Row>
-  </>;
-}
+export default AboutPage;

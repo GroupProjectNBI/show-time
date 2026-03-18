@@ -4,18 +4,44 @@ import { createElement } from 'react';
 // page components
 import AboutPage from './pages/AboutPage.tsx';
 import NotFoundPage from './pages/NotFoundPage.tsx';
-import OurVisionPage from './pages/OurVisionPage.tsx';
-import ProductDetailsPage from './pages/ProductDetailsPage.tsx';
-import ProductsPage from './pages/ProductsPage.tsx';
+import ScreeningsPage from './pages/ScreeningsPage.tsx';
+import BookingPage from './pages/BookingPage.tsx';
+import ConfirmationPage from './pages/ConfirmationPage.tsx';
+import WorkWithUs from "./pages/WorkWithUs.tsx";
+import Faq from "./pages/FaqPage.tsx";
+import StartPage from './pages/StartPage.tsx';
+import MovieInfo from './pages/MovieInfo.tsx';
+import VisitInfoLink from './pages/VisitInfo.tsx';
+import MyPage from './pages/MyPage.tsx';
+import CancelBookingPage from './pages/CancelBookingPage.tsx';
+import AdminPage from './pages/AdminPage.tsx';
+import JobsPage from './pages/JobsPage.tsx';
+import JobDetailsPage from './pages/JobDetailsPage.tsx';
+
+
 
 export default [
+
   AboutPage,
-  NotFoundPage,
-  OurVisionPage,
-  ProductDetailsPage,
-  ProductsPage
+  VisitInfoLink,
+  ScreeningsPage,
+  BookingPage,
+  ConfirmationPage,
+  CancelBookingPage,
+  WorkWithUs,
+  JobsPage,
+  JobDetailsPage,
+  StartPage,
+  MovieInfo,
+  Faq,
+  MyPage,
+  AdminPage,
+  NotFoundPage
 ]
   // map the route property of each page component to a Route
-  .map(x => (({ element: createElement(x), ...x.route }) as Route))
-  // sort by index (and if an item has no index, sort as index 0)
-  .sort((a, b) => (a.index || 0) - (b.index || 0));
+  .map(x => {
+    const route = (x as any).route || {};
+    return { element: createElement(x), ...route } as Route;
+  });
+
+
