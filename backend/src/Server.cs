@@ -55,7 +55,6 @@ public static class Server
 
 
         // // Start the server on port 3001
-        // var runUrl = "http://localhost:" + Globals.port;
         Log("Server running on:", runUrl);
         Log("With these settings:", Globals);
         App.Run(runUrl);

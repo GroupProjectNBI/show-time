@@ -71,7 +71,6 @@ export default function BookingPage() {
         newConn.on("SeatUnlocked", (sid: number) => setRealtimeLockedSeats(p => p.filter(s => s !== sid)));
         newConn.on("InitialLocks", (ids: number[]) => {
             if (isMounted) {
-                console.log("[SignalR] Synkar befintliga lås:", ids);
                 setRealtimeLockedSeats(ids);
             }
         });
@@ -84,7 +83,6 @@ export default function BookingPage() {
             try {
                 await newConn.start();
                 if (isMounted) {
-                    console.log("[SignalR] Nu pratar vi via WebSockets!");
                     await newConn.invoke("JoinScreening", numericId);
                     setConnection(newConn);
                 }
