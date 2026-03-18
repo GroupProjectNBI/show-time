@@ -94,8 +94,7 @@ public static class PasswordResetHandler
                 <h1 style='color: #ffcc00; letter-spacing: 5px;'>{code}</h1>
                 <p>Koden är giltig i 15 minuter.</p>
             </div>";
-
-               EmailService.SendEmail(email, subject, htmlBody);
+               EmailService.SendEmail(subject, htmlBody, email);
 
                return RestResult.Parse(context, new { success = true, message = "En återställningskod har skickats!" });
            });
