@@ -33,7 +33,6 @@ export default function JobsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-        {/* Visa laddning om Jobs är null */}
         {!Jobs ? (
           <div className="text-white p-10">Laddar...</div>
         ) : (

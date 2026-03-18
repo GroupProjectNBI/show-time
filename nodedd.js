@@ -23,10 +23,6 @@ async function processPosters() {
         // Vi läser in filen i minnet först (.toBuffer) för att släppa låset på originalet direkt
         const imageBuffer = await fs.promises.readFile(inputPath);
 
-        // await sharp(imageBuffer)
-        //   .resize(800, 1200, { fit: 'cover' })
-        //   .webp({ quality: 80, effort: 6 })
-        //   .toFile(tempPath);
         await sharp(imageBuffer)
           .resize(1000, 1500, {
             fit: 'cover', // Ändra från 'cover' till 'contain' för att slippa klippning!
