@@ -1,5 +1,8 @@
 namespace WebApp;
 
+using System.Text.Json;
+using System.Globalization;
+
 public static class AiChatRoutes
 {
     private static string aiAccessToken = "";
@@ -62,11 +65,6 @@ public static class AiChatRoutes
                 var response = await httpClient.SendAsync(request);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    return RestResult.Parse(context, JSON.Parse(responseContent));
-                }
-
                 return RestResult.Parse(context, JSON.Parse(responseContent));
             }
             catch (Exception ex)
@@ -78,7 +76,8 @@ public static class AiChatRoutes
 
     private static string GetDynamicMovieContext(string filterDate = null)
     {
-        string sql = "SELECT movieTitle, theaterName, startTime, availableSeats, ageLimit FROM v_screenings WHERE startTime >= NOW()";
+        // FIX: Lade till 'id' i SELECT-satsen!
+        string sql = "SELECT id, movieTitle, theaterName, startTime, availableSeats, ageLimit FROM v_screenings WHERE startTime >= NOW()";
 
         if (!string.IsNullOrEmpty(filterDate))
         {
@@ -95,14 +94,21 @@ public static class AiChatRoutes
         foreach (var s in screenings)
         {
             DateTime st = DateTime.Parse(s.startTime.ToString());
-            string relativeUrl = $"/bokning/{s.id}";
-            context += $"- Tid: {st:MM-dd HH:mm} | Film: {s.movieTitle} | Salong: {s.theaterName} | Lediga platser: {s.availableSeats} | Länk: {relativeUrl}\n";
+            // Nu kommer s.id fungera eftersom vi hämtar det från DB
+            string bookingUrl = $"/bokning/{s.id}";
+            context += $"- Tid: {st:MM-dd HH:mm} | Film: {s.movieTitle} | Salong: {s.theaterName} | Lediga platser: {s.availableSeats} | LÄNK_ID: {bookingUrl}\n";
         }
 
         var culture = new CultureInfo("sv-SE");
         string todaysDate = DateTime.Now.ToString("dddd den d MMMM yyyy 'kl' HH:mm", culture);
 
-        context += $"\nSysteminfo: Idag är det {todaysDate}. VIKTIGT: När du rekommenderar en film måste du ALLTID skapa en klickbar länk till den. Använd formatet [Boka biljetter här](/bokning/ID) baserat på Länk-datan i listan. Inkludera aldrig domännamn eller https://, använd bara den relativa länken.";
+        // FIX: Tydligare instruktioner för att AI:n ska kopiera ID:t
+        context += $"\nSysteminfo: Idag är det {todaysDate}.\n";
+        context += "VIKTIGT: När du rekommenderar en film måste du ALLTID skapa en klickbar Markdown-länk.\n";
+        context += "Följ dessa exempel exakt:\n";
+        context += "- Om det finns 'LÄNK_ID: /bokning/55', svara med [Boka biljetter här](/bokning/55)\n";
+        context += "- Om det finns 'LÄNK_ID: /bokning/102', svara med [Boka biljetter här](/bokning/102)\n";
+        context += "Kopiera värdet från LÄNK_ID i listan ovan. Skriv aldrig bara '/bokning/'.";
 
         return context;
     }
@@ -111,21 +117,17 @@ public static class AiChatRoutes
     {
         try
         {
-            // Försök hämta från miljövariabler först
             string token = Environment.GetEnvironmentVariable("aiAccessToken");
-
             if (!string.IsNullOrEmpty(token))
             {
                 aiAccessToken = token;
             }
             else
             {
-                // Fallback till json
                 var configPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "db-config.json");
                 if (!File.Exists(configPath)) configPath = "db-config.json";
                 var configJson = File.ReadAllText(configPath);
                 var config = JSON.Parse(configJson);
-
                 if (config.aiAccessToken != null)
                 {
                     aiAccessToken = (string)config.aiAccessToken;
@@ -139,24 +141,20 @@ public static class AiChatRoutes
     {
         try
         {
-            // 1. Leta i samma mapp som den kompilerade koden (Docker / Produktion)
             var promptPath = Path.Combine(AppContext.BaseDirectory, "system-prompt.md");
-
-            // 2. Om den inte finns där, hoppa upp tre mappar (Lokal utveckling i VS/VS Code)
             if (!File.Exists(promptPath))
             {
                 promptPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "system-prompt.md");
             }
 
-            // Läs in filen om vi hittade den
             if (File.Exists(promptPath))
             {
                 systemPrompt = File.ReadAllText(promptPath);
-                Console.WriteLine("[AiChatRoutes] System prompt laddad framgångsrikt!");
+                Console.WriteLine("[AiChatRoutes] System prompt laddad!");
             }
             else
             {
-                Console.WriteLine("[AiChatRoutes] VARNING: Hittade inte system-prompt.md! AI:n kommer tappa sin personlighet.");
+                Console.WriteLine("[AiChatRoutes] VARNING: system-prompt.md saknas!");
             }
         }
         catch (Exception ex) { Console.WriteLine("Error loading system prompt: " + ex.Message); }
