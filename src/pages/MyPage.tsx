@@ -46,38 +46,55 @@ export default function MyPage() {
     loadAvatars();
   }, []);
 
-  // Hämta användarens bokningar
+  // Hämta användarens bokningar OCH recensioner
   useEffect(() => {
     if (!user?.email) return;
 
-    const loadBookings = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
-        const result = await fetchJson(`/api/v_user_bookings?where=email=${user.email.toLowerCase()}`);
 
-        if (result && !result.error) {
+        // 1. Hämta bokningar och recensioner parallellt
+        const [bookingsResult, reviewsResult] = await Promise.all([
+          fetchJson(`/api/v_user_bookings?where=email=${user.email.toLowerCase()}`),
+          fetchJson(`/api/Review?where=author=${user.userName || user.email}`)
+        ]);
+
+        if (bookingsResult && !bookingsResult.error) {
           const now = new Date();
+          const reviews = Array.isArray(reviewsResult) ? reviewsResult : [];
 
-          const myUpcoming = result
+          // Hjälpfunktion för att hitta betyg för en specifik film
+          const getRatingForMovie = (movieId: number) => {
+            const review = reviews.find((r: any) => r.movieId === movieId);
+            return review ? review.gradingOfStars : undefined;
+          };
+
+          const myUpcoming = bookingsResult
             .filter((b: any) => new Date(b.startTime) >= now)
             .sort((a: any, b: any) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 
-          const myPast = result
+          // 2. Här mappar vi in userRating från Review-tabellen till pastBookings
+          const myPast = bookingsResult
             .filter((b: any) => new Date(b.startTime) < now)
+            .map((b: any) => ({
+              ...b,
+              userRating: getRatingForMovie(b.movieId) // Lägg till betyget om det finns!
+            }))
             .sort((a: any, b: any) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime());
 
           setBookings(myUpcoming);
           setPastBookings(myPast);
         }
       } catch (error) {
-        toast.error("Kunde inte hämta dina bokningar.");
+        toast.error("Kunde inte hämta din data.");
       } finally {
         setLoading(false);
       }
     };
 
-    loadBookings();
-  }, [user?.email]);
+    loadData();
+  }, [user?.email, user?.userName]);
 
   // Avboka film
   const handleCancelBooking = async (id: number) => {
