@@ -27,6 +27,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0
 WORKDIR /app
 COPY --from=backend-builder /out .
 
+# Denna rad ser till att backenden hittar filen på VPS:en
+COPY backend/setup.sql .
+
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 EXPOSE 3001
 
