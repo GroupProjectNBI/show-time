@@ -84,6 +84,13 @@ useMailPit: true
  
 Vid start av projektet sker uppkopplingen och hämtningen av data per automatik. Förutsatt att projektet satts upp korrekt.
 
+#### Seeding databasen 
+
+För att seeda databasen behöver man sätta seedDataIfEmpty: true. 
+
+Då kollar systemet om där inte tabller då skapar ett script tabeller och seedar data till dem. 
+Där behövs ingen extra körning utan detta startar när programmet startar. 
+
 ###  3. Backend (C#)
 Gå till backend-mappen: cd backend
 
