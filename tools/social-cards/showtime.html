@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Show Time card</title>
+  <link rel="stylesheet" href="card.css" />
+</head>
+
+<body>
+  <div class="card">
+    <!-- The seat map: the screen at the top, booked seats (red), two seats being picked (gold) -->
+    <div class="picture">
+      <svg viewBox="0 0 410 340" aria-hidden="true">
+        <defs>
+          <linearGradient id="screen" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#f0a92e" stop-opacity="0.2" />
+            <stop offset="0.5" stop-color="#ffe9a3" />
+            <stop offset="1" stop-color="#f0a92e" stop-opacity="0.2" />
+          </linearGradient>
+        </defs>
+        <path d="M30 46 Q205 6 380 46" fill="none" stroke="url(#screen)" stroke-width="7" stroke-linecap="round" />
+        <g>
+          <rect x="18" y="92" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="55" y="92" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="92" y="92" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="129" y="92" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="166" y="92" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="211" y="92" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="248" y="92" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="285" y="92" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="322" y="92" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="359" y="92" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="18" y="127" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="55" y="127" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="92" y="127" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="129" y="127" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="166" y="127" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="211" y="127" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="248" y="127" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="285" y="127" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="322" y="127" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="359" y="127" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="18" y="162" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="55" y="162" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="92" y="162" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="129" y="162" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="166" y="162" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="211" y="162" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="248" y="162" width="29" height="25" rx="6" fill="#fbbf24" />
+          <rect x="285" y="162" width="29" height="25" rx="6" fill="#fbbf24" />
+          <rect x="322" y="162" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="359" y="162" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="18" y="197" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="55" y="197" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="92" y="197" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="129" y="197" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="166" y="197" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="211" y="197" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="248" y="197" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="285" y="197" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="322" y="197" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="359" y="197" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="18" y="232" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="55" y="232" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="92" y="232" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="129" y="232" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="166" y="232" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="211" y="232" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="248" y="232" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="285" y="232" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="322" y="232" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="359" y="232" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="18" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="55" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="92" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="129" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="166" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="211" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="248" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="285" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="322" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="359" y="267" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="18" y="302" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="55" y="302" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="92" y="302" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="129" y="302" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="166" y="302" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="211" y="302" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="248" y="302" width="29" height="25" rx="6" fill="#475569" />
+          <rect x="285" y="302" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="322" y="302" width="29" height="25" rx="6" fill="#7a0d0d" />
+          <rect x="359" y="302" width="29" height="25" rx="6" fill="#7a0d0d" />
+        </g>
+      </svg>
+    </div>
+    <div class="words">
+      <h1>SHOW TIME</h1>
+      <h2>Book a seat at the cinema</h2>
+      <p>A full-stack booking system: React and .NET, with MySQL behind it.</p>
+      <div class="chips">
+        <span>Seat maps</span>
+        <span>Ticket types</span>
+        <span>Booking numbers</span>
+        <span>AI chat</span>
+      </div>
+      <div class="site">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <defs>
+            <radialGradient id="bg" cx="50%" cy="40%" r="60%">
+              <stop offset="0" stop-color="#d4231f"/>
+              <stop offset="1" stop-color="#7a0d0d"/>
+            </radialGradient>
+            <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#ffe9a3"/>
+              <stop offset="1" stop-color="#f0a92e"/>
+            </linearGradient>
+          </defs>
+          <circle cx="32" cy="32" r="30" fill="url(#bg)" stroke="url(#gold)" stroke-width="4"/>
+          <path d="M32 11.5l5.9 12.6 13.8 1.6-10.2 9.4 2.7 13.6L32 41.9l-12.2 6.8 2.7-13.6-10.2-9.4 13.8-1.6z"
+                fill="url(#gold)" stroke="#8a4b07" stroke-width="1.2" stroke-linejoin="round"/>
+        </svg>
+        showtime.jarllindquist.com
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
